@@ -1,0 +1,951 @@
+IL NOSTROMO
+emmeciquadro
+123
+dicembre 2001
+123
+IL COMPUTER USATO BENE
+INTERVISTA A ROBERTO BUSA S.J.*
+a cura di Maria Cristina Speciani e Vittorio Sacchi
+Una vita lunga e feconda quella di padre Busa, il gesuita
+ottantottenne che è riconosciuto come il pioniere della
+linguistica computazionale. Usando il computer come
+nessuno aveva mai fatto prima, con pazienza, coraggio e
+ostinazione, ha approfondito il suo rapporto con l’infini-
+to riscoprendo sul fondo «la luce di Dio che illumina
+ogni uomo e lo chiama». Oggi la sua avventura continua
+prospettando nuove analisi dei fatti e nuove metodologie
+di ricerca per ottenere dalla tecnologia del computer
+tutte le sue potenzialità e metterle al servizio dell’uomo.
+Sono passati più di cin-
+quant’anni da quando incontrò
+Thomas Watson, il fondatore
+dell’IBM, convincendolo a rac-
+cogliere la sfida dell’analisi
+computerizzata del linguaggio
+di san Tommaso. Nello svilup-
+po del suo lavoro ha attraver-
+sato i principali nodi della rivo-
+luzione informatica. In partico-
+lare, come ha vissuto, a partire
+dal desiderio iniziale, il rappor-
+to tra ricerca e tecnologia? 
+È meglio che racconti un po’ di
+storia. Il mio sogno, quando sono
+diventato gesuita era di andare in
+missione, invece i superiori mi
+hanno chiesto di fare il professo-
+re di filosofia scolastica con spe-
+cializzazione in san Tommaso.
+Durante la guerra, dopo aver
+fatto il cappellano per un anno,
+mi hanno mandato a fare la libe-
+ra docenza alla Gregoriana e poi
+il Ph.D. Vi racconto la storiella
+della recluta che, ricevuto l’ordine
+«avanti marsc», non si ferma in
+attesa del contrordine; il sergente
+si dimentica di lui e due giorni
+dopo quello da Padova ha rag-
+giunto Chioggia e «segna il
+passo» davanti al mare in attesa
+di nuovi ordini. Io son quello: mi è
+stato dato l’ordine di studiare san
+Tommaso, son partito, mi sono
+rimboccato le maniche e non ho
+più abbandonato la filosofia.
+Anche se oggi troppa filosofia è
+una passerella di estetismi verba-
+li e non la ricerca della Verità.
+Mi venne l’idea di cercare nei
+testi di san Tommaso la docu-
+mentazione originaria e probato-
+ria delle affermazioni che chia-
+miamo filosofiche; così è nato il
+progetto dell’Index Thomisticus. 
+Il linguaggio mi ha messo a con-
+tar parole e mi sono reso conto
+che il nostro parlare, alle sue
+radici, non lo conosciamo anco-
+ra. Ho usato il computer come
+*Nato a Vicenza nel 1913,
+è tuttora in piena attività. Ha
+insegnato alla Pontificia
+Università Gregoriana, al-
+l’Aloisianum di Gallarate e
+all’Università Cattolica di
+Milano. Dal 1995 al 2000
+ha insegnato al Politecnico
+di Milano nell’ambito dei
+corsi di Intelligenza Arti-
+ficiale e robotica tenuti da
+Marco Somalvico. «1261
+momenti di pensiero distilla-
+ti» da questo corso sono
+stati pubblicati nel 2000 da
+ITACAlibri in Dal computer
+agli angeli.
+Autore di numerosissimi
+saggi. La sua opera fonda-
+mentale, l’Index Thomisti-
+cus, pubblicato tra il 1974 e
+il 1980 in 56 volumi e oggi
+disponibile anche su cd-
+rom, è il risultato della ela-
+borazione computazionale
+dei testi di san Tommaso e
+ha costituito la base di qual-
+siasi ulteriore ricerca di
+informatica linguistica.
+ IL NOSTROMO
+dicembre 2001 124
+emmeciquadro
+strumento che permette di
+andare più in profondità median-
+te l’osservazione statistica e pro-
+babilistica. E mi sono accorto
+che le parole non hanno confini
+precisi: sul fondo c’era la luce di
+Dio che illumina ogni uomo e lo
+chiama.
+Oggi molti pensano che con il
+computer si possano risolvere
+tutti i problemi. A suo parere,
+quali sono le potenzialità del-
+l’informatica dal punto di vista
+didattico ed educativo?
+Gli aspetti educativi dell’informa-
+tica linguistica sono legati alla
+possibilità di rendersi conto che
+c’è un «pensiero», una «espres-
+sione esteriore» e una «espres-
+sione interiore». 
+La mia impressione è che oggi
+troppa didattica è basata sulla
+memorizzazione: si concepisce il
+nucleo del pensiero umano
+come una banca di dati e allora
+l’obiettivo dell’apprendimento
+diventa sapere tutto. 
+Invece, i principi sono questi: le
+strutture dell’espressione scritta
+riflettono il fatto che c’è un pen-
+siero originario il quale può
+dominare la moltitudine delle
+cose perché le classifica, le riuni-
+sce e le esprime con le parole.
+C’è un pensiero la cui caratteri-
+stica è di non reagire soltanto
+allo stimolo che c’è, ma anche e
+soprattutto agli stimoli che non ci
+sono ancora o non ci sono più.
+Per esempio: se si iscrive un
+bambino a scuola è perché si
+pensa che tra dieci anni, che
+non ci sono oggi, questo bambi-
+no avrà bisogno di avere un
+lavoro. E i nostri desideri punta-
+no sempre su quello che non
+c’è, su quello che non si ha (l’uo-
+mo è l’unico animale che ha
+inventato le distillerie!). In questo
+senso, il linguaggio, soprattutto il
+linguaggio scritto, non è una
+ripetizione continua, ma la crea-
+zione di architetture sempre
+nuove. 
+L’espressione esteriore è quella
+che noi chiamiamo realtà virtua-
+le: un’immagine non nel senso
+stretto della parola, iconico, ma
+immagine come segno e simbo-
+lo i quali vengono fatti sussistere
+in un altro soggetto che non è
+l’uomo che le pronuncia. Per
+esempio, la musica della marcia
+trionfale dell’Aida, creata dalla
+mente di Verdi, esiste per conto
+suo, ma sussiste oggi in un’or-
+chestra, domani in un’altra. 
+C’è anche una espressione inte-
+riore: vuol dire che le frasi che si
+pronunciano sono costruite
+prima dentro di noi e poi «buttate
+fuori» mediante la voce. Ma
+come si costruisce l’espressione
+dentro di noi è ancora terra sco-
+nosciuta. 
+Può fare un esempio?
+Lo spiego con questa storia.
+All’inizio degli anni Cinquanta,
+alcuni anni dopo che avevo
+cominciato, è nata la traduzione
+automatica (al MIT si pubblicava
+allora lo MT
+Mechanical
+Translation). Il Penta-gono
+aveva finanziato tutti i centri che
+si offrivano di lavorare sulla tra-
+duzione dal russo all’inglese e io
+avevo collegato il gruppo di
+Leon Dostert e Peter Toma di
+«Agli inizi l’obiettivo primo
+erano 12 milioni di schede
+perforate con stampato sul
+dorso un contesto di 11
+righe. Ne sarebbe risultato
+uno schedario unico di 90
+metri di fronte, 1,20 di altez-
+za e 1 di profondità: peso
+complessivo 500 tonnellate.
+Dopo che ne ebbi perforato
+sei milioni, la misericordia
+del Signore ha fatto inven-
+tare agli uomini i nastri
+magnetici. [...] Ebbi da allo-
+ra in lavorazione un parco
+di 1800 nastri magnetici, di
+2400 piedi cioè 800 metri
+ciascuno: erano circa 1500
+kilometri di nastro, presso a
+poco la distanza tra Milano
+e Palermo o tra Parigi e
+Lisbona. [...] Per cui la
+prima epoca fu quella delle
+500 tonnellate di schede, la
+seconda fu quella dei 1800
+nastri magnetici. Terza
+epoca è ora quella di 1 solo
+cd-rom.»
+(Dal computer agli angeli,
+pp. 25-26)
+ IL NOSTROMO
+emmeciquadro
+125
+dicembre 2001
+Georgetown, università dei miei
+confratelli di Washington DC con
+l’Euratom di Ispra per tradurre
+abstract di biochimica e biofisica
+russi: per questo abbiamo perfo-
+rato un milione di parole in cirilli-
+co. Anche il progetto su san
+Tommaso, a cui lavoravo sui
+computer dell’Euratom, era lega-
+to a questa iniziativa. Alla metà
+degli anni Sessanta, a seguito
+del famoso rapporto ALPAC, il
+Pentagono improvvisamente
+sospese i finanziamenti procla-
+mando l’insuccesso della tradu-
+zione automatica; tale insucces-
+so era dovuto non a mancanza
+di velocità o di memoria dei com-
+puter, ma alla mancanza di infor-
+mazioni filologiche sul nostro par-
+lare, delle quali il computer ha
+bisogno.
+La «vecchia» filologia è basata
+solo sulla campionatura, sulla
+massa dei grandi numeri e delle
+parole che noi cerchiamo; questo
+non è sufficiente per il computer
+che ha bisogno di avere dati in
+percentuale molto approssimati e
+formalizzati, cioè traducibili in
+byte. Per far questo è necessario
+che sia chiaro in base a quali
+logiche si parla, logiche che si
+manifestano con la morfologia,
+con la sintassi e con il lessico.
+Dal computer, dal mostro d’ac-
+caio, dalla tecnologia usata per
+l’industria dell’informazione viene
+la richiesta che si conosca
+meglio in base a quali elementi e
+a quali logiche si parla. Se l’uma-
+nesimo è la scienza dell’espres-
+sione umana in tutte le sue mani-
+festazioni, allora il computer
+esige che noi uomini abbiamo un
+umanesimo più spinto. 
+Dunque il computer chiede
+all’uomo di conoscere meglio
+se stesso. Allora quali posso-
+no essere i vantaggi nell’impa-
+rare attraverso lo strumento
+informatico piuttosto che con
+un altro supporto? 
+Studiare con il computer, in
+realtà è comunicare: dal mio
+osservatorio comunico dei bit di
+informazione agli altri. Quando si
+tratta di studiare occorre introdur-
+re due elementi: raccogliere dati
+di fatto, il maggior numero possi-
+bile, dalla realtà, mediante l’os-
+servazione; poi questi dati vanno
+sintetizzati. Questa elaborazione
+è il lavoro specifico del pensiero,
+ma per sintetizzare bisogna
+prima di tutto classificare. 
+In questo senso io ho fatto due
+ricerche originali, che non ho tro-
+vato in nessuna parte: la prima è
+sulla eterogeneità delle parole e
+la seconda sui segni grafici delle
+parole. 
+La ricerca sull’eterogeneità
+delle parole in sanTommaso
+durò ben otto anni, dal 1983 al
+1991. Quali furono i criteri del
+lavoro? E quali i risultati?
+Si trattava di classificare le parole
+secondo «tipi di semanticità»,
+ossia secondo le diversità dei
+rapporti tra segno e significato. E
+richiese alcune migliaia di ore-
+uomo e molta pazienza anche
+solo per far emergere il criterio
+per distinguere le categorie delle
+parole. Perché i rapporti tra signi-
+ficante e significato sono diver-
+sissimi in relazione alla semanti-
+cità delle parole. 
+ IL NOSTROMO
+dicembre 2001 126
+emmeciquadro 126
+Porto qualche esempio.
+Ci sono i nomi deittici, come per
+esempio i due pronomi personali
+«io» e «tu». Essi hanno come
+significante due lettere, rispetti-
+vamente i-o e t-u, ma il significa-
+to di queste parole è che sono
+segni della conoscenza di una
+presenza; non sono concetti,
+perché un concetto prevede una
+formula. Ma quando io dico «io»
+la presenza è diversa da quando
+un altro dice «io». Pensate,
+anche il Signore, che pure ha
+inventato padre Busa, non può
+dire di essere padre Busa.
+Un'altra categoria sono i nomi
+propri; essi sono nomi etichetta e
+indicano un oggetto preciso; non
+esprimono che cosa sia, ma
+anch’essi sono la conoscenza di
+una singolarità. Per esempio,
+sentendo qualcuno che chiama
+Cicci si sa che c’è un Cicci ma
+non si sa se sia un gatto, una
+bambina o un ragazzo. Poi ven-
+gono i nomi di oggetti (un tavolo,
+un cavallo) che gli antichi chia-
+mavano sostanza; sono il sog-
+getto e il complemento oggetto di
+quei verbi che significano attività
+e produzione. Anche questi sono
+nomi etichetta. Quando dico
+tamarindo so che voglio dire una
+certa pianta o una certa bibita,
+anche se non dico niente delle
+sue proprietà. Poi vengono final-
+mente gli aspetti delle cose:
+dimensioni, forme, temperatura,
+peso, movimento eccetera, che
+solitamente chiamiamo aggettivi.
+Son quelli in cui sta tutta la cultu-
+ra perché sono vere e proprie
+immagini mentali, veri e propri
+concetti. Poi vengono le parole
+che esprimono relazioni e corre-
+lazioni cominciando con le pre-
+posizioni; infine ci sono parole
+vicarie come i pronomi relativi e
+simili.
+Ho fatto il censimento di tutte
+queste parole. Negli 11 milioni di
+parole dell’Index Thomisticus
+(siccome Dio l’ho messo tra i
+nomi propri), con tutti gli altri
+nomi propri arriviamo al 3%; gli
+oggetti e le cose arrivano al 6-
+8%; la maggior parte dei restanti
+sono le parole di correlazione. 
+A questo proposito, mi ricordo
+che in un congresso un gruppo
+di scienziati sosteneva che metà
+delle parole di san Tommaso
+esprimessero le realtà religiose
+invisibili. Invece il nome Cristo
+non è un nome invisibile; è invisi-
+bile come è invisibile Socrate. Le
+realtà invisibili sono poche e
+sono alla radice del cosmo: Dio,
+gli angeli, i demoni e i nostri
+morti. Ma invisibili sono anche le
+forze di base della natura, dalle
+forze cosmiche di base (l’elettri-
+cità, la gravità, le onde hertziane)
+ai loro programmatori che sono
+gli angeli, i software del Signore
+Dio loro creatore. Questo c’è in
+san Tommaso, con altre parole
+naturalmente.
+Invece, come ha strutturato la
+ricerca sui segni grafici?
+Avevo 11 milioni di parole latine;
+riepilogate secondo «forme» di
+parola graficamente diverse
+erano circa 150 000; poi avevo
+«lemmatizzato» ciascuna di esse
+trovando 20 000 lemmi. Il lemma
+è quella parola che nei vocabola-
+ri rappresenta tutte le proprie
+flessioni secondo una certa unità
+ IL NOSTROMO
+emmeciquadro
+127
+dicembre 2001
+127
+che io chiamo unità lessicale
+che con le flessioni viene arric-
+chita, ma non contraddetta (il
+lemma è come il corpicino della
+bambola Barbie e le flessioni
+sono come gli abitini che le si
+mettono intorno). 
+Ho preso tutti i lemmi, li ho divisi
+in un massimo di tre segmenti
+(iniziale, centrale e finale), in
+qualche senso a caso, senza
+badare al significato e meno
+ancora alla glottologia, alle deri-
+vazione o alle trasformazioni, ma
+proprio graficamente. Una stessa
+stringa di quattro caratteri si trova
+ripetuta in tante parole all’inizio,
+come iniziale assieme ad altre
+stringhe diverse, ma anche in
+posizione centrale o finale. Ho
+fatto una classificazione e la mia
+sorpresa è stata che 11 milioni di
+parole sono la combinazione di
+un massimo di 1 500 stringhe
+diverse di caratteri. Solo 1 500. 
+Naturalmente ci sono le stesse
+stringhe con significati diversi. 
+Nel suo libro Dal computer agli
+angeli auspica che la statistica
+linguistica tenga conto della
+eterogeneità delle parole di un
+testo e di quella che lei defini-
+sce «doppia struttura del lessi-
+co». Può spiegare il significato
+di questa espressione?
+Da sempre è risaputo che quan-
+do si parla o si scrive ci sono
+poche parole diverse, di solito
+corte, moltissimo ripetute. Poi ci
+sono tante parole, relativamente
+poco ripetute, tra le quali tutte le
+parole lunghe. Questo l’ho sem-
+pre riscontrato e oggi li chiamo i
+due emisferi del lessico.
+Il primo lessico, quello delle paro-
+le frequenti e brevi, le particelle
+che a scuola venivano chiamate
+grammaticali, oggi sono definite
+dagli inglesi function words e
+anche close class words perché
+non aumentano. Esse sono con-
+trapposte a quelle di contenuto,
+chiamate content words e anche
+open class words perché cam-
+biano e crescono. Le prime sono
+quelle che esprimono la logica
+con cui ciascuno cerca di parla-
+re. Le seconde sono quelle che
+specificano la cultura, cioè i con-
+tenuti che specificano il messag-
+gio. I due emisferi sono questi:
+la logica e la cultura. E tra le per-
+sone non c’è differenza nella
+logica di base, ma nella cultura.
+Io non ho lavorato solo le parole
+di san Tommaso, ma altrettanti
+milioni di parole in altre 22 lingue
+e alfabeti diversi: i rotoli di
+Qumrân, che sono in alfabeto
+ebraico ma in tre lingue (ebraico,
+aramaico e nabateo), tutto il
+Corano in arabo, il finnico, il cirilli-
+co, il boemo e ovviamente tutte
+le lingue europee e il greco; le
+ultime sono state l’albanese e il
+giorgiano e poi l’alfabeto foneti-
+co. In tutte queste cose ci sono i
+due emisferi del lessico. 
+Nell’oralità non ho fatto calcoli,
+perché i media espressivi sono
+tanti e perché nell’oralità il lin-
+guaggio è ridotto al minimo. Per
+esempio, se ordino una birra e
+dico «cameriere me ne porti
+un’altra», in questo caso «altra»
+è la birra; invece, se avessi ordi-
+nato una zuppa, «altra» avrebbe
+un altro significato. 
+Invece il linguaggio educato è
+quello scritto.
+Pagine dei Rotoli di Qumrân
+ IL NOSTROMO
+dicembre 2001 128
+emmeciquadro
+In questa direzione, la critica
+di un libro si fa al suo interno.
+Di fronte a un libro non biso-
+gna mettersi con l’idea di con-
+futarlo, ma vedere se quello
+che dice è coerente con la
+logica con cui lo dice.
+Recentemente mi hanno chie-
+sto perché lavorare su san
+Tommaso e non su un testo
+moderno. Trent’anni fa mi
+hanno invitato a Mosca per
+lavorare sui testi di Lenin con
+lo stesso metodo. E ho prova-
+to a farlo, nei ritagli di tempo,
+anche sul libro di Jacques
+Monod (Il caso e la necessità)
+e poi su quello di Stephen
+Hawking (Dal big bang ai
+buchi neri) e in passato l’ave-
+vo fatto con il behaveourista
+Skinner. Si riesce a vedere il
+momento in cui i testi di un
+autore sono illogici: non per-
+ché 
+contraddicono 
+san
+Tommaso o san Bonaventura,
+ma perché sono illogici in se
+stessi. 
+Recentemente i giornali
+hanno parlato di lei definen-
+dola «informatico di scienze
+umane», invece ci sta
+facendo una riflessione sul-
+l’uomo. Queste categorie
+valgono in tutti gli ambiti?
+Anche nel fare scienza?
+Facciamo riferimento ai due
+emisferi. Nel primo emisfero,
+quello della logica, si vede la
+luce di Dio che illumina ogni
+uomo. In tutti i congressi
+sostengo che tutte le anime e
+le intelligenze non vengono
+per evoluzione: le anime sono
+fatte tutte dal Signore Dio, una
+per una. È un paradosso, ma
+utile per chiarire: non ci vuole
+meno di Dio tutto intero per
+fare un’intelligenza d’uomo,
+per fare uno spirito. La luce di
+Dio è la logica e la logica sono
+le leggi dell’essere. 
+Io vedo tre livelli di logica.
+Quella che si insegna all’uni-
+versità, la logica formale, è il
+rapporto tra contenente e
+contenuto, fra tutto e parte. 
+Un’altra logica, che non viene
+così studiata, è quella del rap-
+porto tra autore e opera, tra
+attivo e passivo che è un rap-
+porto strano, perché è a
+senso unico: nessun figlio è
+padre del proprio padre, nes-
+suna statua è l’autrice del
+proprio scultore. Tutti lo
+sanno: chi ha scritto un’opera
+va dalla SIAE a farsi dare la
+percentuale e non dice mai
+che la sua opera è fatta per
+caso. 
+Il terzo livello è quel rapporto
+tra pensiero ed espressione
+che è il principio di non con-
+traddizione. Come dice il
+nome, la contraddizione ha a
+che fare con il dire, cioè con
+l’espressione. Si riesce sem-
+pre a pronunciare frasi con-
+traddittorie: per esempio «qui
+ora piove» e «qui ora non
+piove», ma nessuno riesce a
+pensare che ambedue siano
+contemporaneamente vere,
+né che ambedue siano con-
+temporaneamente 
+false.
+L’espressione non deve con-
+traddire il proprio pensiero: il
+che conchiude alla immoralità
+intrinseca della menzogna.
+ IL NOSTROMO
+emmeciquadro
+129
+dicembre 2001
+Perché oggi nel mondo
+della cultura questi livelli di
+logica sono più spesso
+negati che affermati? Per-
+ché nella comunicazione,
+nel lavoro, nella scuola,
+nella scienza, ci si basa di
+più sul suscitare sensazioni
+che non sulla logica? 
+Direi ignorati, moltissimo igno-
+rati e poche volte negati. Nei
+libri di logica non ho mai tro-
+vato il rapporto attivo/passivo,
+ma sempre il rapporto ve-
+ro/falso e poi contenente/con-
+tenuto. Ai miei studenti di filo-
+sofia, preoccupati di aver letto
+una gran quantità di autori,
+dicevo: basterebbe sapere la
+metà di quel che sappiamo
+ma saperlo dire meglio il dop-
+pio se no è esibizione di quel-
+lo che abbiamo in magazzino
+nella memoria. 
+La storia del linguaggio e della
+cultura è in fondo storia di
+anime, storia del colloquio
+segreto che abbiamo con Dio.
+Ed è una storia che ha più
+avventure di quelle di San-
+dokan e delle Twin Towers. 
+Perché segreto?
+Perché sta nel profondo della
+logica, perché la logica è data
+per arrivare a capire il perché
+di tutto e perché nel vocabola-
+rio di tutte le persone c’è la
+parola «prima» e anche la
+parola «sempre». Sotto que-
+sto luccichio e questo mare di
+parole c’è la storia delle anime
+nel tempo: dall’eternità verso
+l’eternità. Si arriva dunque alla
+logica come prima luce dell’a-
+nima, quella che porta il
+tempo all’eternità, dall’eternità
+all’eternità. Un mio amico arti-
+giano mi ha detto che la mag-
+gior parte delle persone non
+sa dove va, ma ci sta andando
+di corsa. E oggi è così anche
+per molta filosofia professio-
+nale: dalla ragion pratica fino
+alla new age, certa filosofia è
+la maschera della logica.
+Nel mese di ottobre, al
+Circolo della Stampa di
+Milano, ha presentato il pro-
+getto a cui sta lavorando.
+Ce ne illustra i punti chiave? 
+Il progetto si chiama Lessico
+Tomistico Biculturale (LTB). 
+Lo spunto è venuto dall’analisi
+dell’espressione 
+di 
+san
+Tommaso ratio seminalis, che
+era l’antico stoico λογοσ
+σπερµατικοσ, l’anima mundi
+che Virgilio ha messo in versi
+latini molto belli. Sant’Agosti-
+no l’ha introdotto nel pensiero
+cristiano spiegando il Genesi
+e a conseguenza di questo il
+pensiero cristiano è stato evo-
+luzionista, non nel senso
+magico di oggi, fino al Rina-
+scimento avanzato. Ho e-
+saminato questa frase, che
+san Tommaso ha usato dieci o
+quindici volte più di sant’A-
+gostino.con il metodo cui ac-
+cennerò dopo e mi è risultato
+chiaro che san Tommaso,
+quando scriveva ratio semina-
+lis (che ho trovato sempre tra-
+dotto come ragione seminale)
+aveva in mente quello che
+abbiamo in mente noi quando
+ IL NOSTROMO
+dicembre 2001 130
+emmeciquadro
+parliamo di «programma geneti-
+co». Se sostituite nelle frasi di
+san Tommaso questa espres-
+sione, il contesto si accende
+come una lampadina. Non che
+lui conoscesse il DNA, perché
+ovviamente non c’erano gli stru-
+menti di indagine, ma lui sapeva
+che doveva esserci un program-
+ma genetico che partiva da Dio
+creatore e si esprimeva in ogni
+individuo. Poi c’erano le forze di
+base della natura; non dice quali
+sono, ma dice che ci sono. Per
+me sono luce, onde hertziane
+gravità eccetera, queste forze
+che sono a monte dell’evoluzio-
+ne, che la generano. 
+Quando parte il progetto?
+Il lessico di san Tommaso è
+enciclopedico ed è una sintesi di
+quaranta secoli di civiltà medi-
+terranea: comincia con Abramo,
+frutto della civiltà e della cultura
+mesopotamica, circa 3000-3500
+anni prima di Cristo, poi c’è il
+pensiero greco, il pensiero
+romano, il pensiero arabo e tutto
+il pensiero cristiano; di questi
+quaranta secoli, dodici sono di
+civiltà cristiana. Adesso che ho
+tutto il suo lessico, prendo in
+esame san Tommaso non per
+quello che lo distingue dagli altri
+autori analoghi, ma per quello
+che ha in comune con tutti.
+Allora, si tratta di prendere le
+sue parole una per una, aven-
+dole già divise per categorie
+semantiche, risalire da queste
+parole ai concetti che esprime-
+vano allora (nella cultura del
+1200), venire oggi (nel 2000)
+agli stessi concetti e da questi
+discendere alle parole che li
+esprimono e darne così la tradu-
+zione in diverse lingue. Per que-
+sto il progetto si chiama bicultu-
+rale.
+Sono già trent’anni che lavoro in
+questo senso con il metodo che
+spiegherò e ho analizzato deci-
+ne di migliaia di contesti. 
+Ci sono parole come «esperien-
+za» e «espressione» che hanno
+circa lo stesso valore che i nostri
+espressione ed esperienza. 
+Ci sono altre parole invece che
+hanno significati molto maggiori.
+Per esempio, virtus-virtutis non
+si può tradurre sempre con
+«virtù» perché virtus ha tutto il
+vocabolario dell’energia, forza,
+professionalità, potenza. E
+anche la parola ordo-ordinis,
+che ho analizzato in 10 000 con-
+testi, non può essere tradotta
+sempre con «ordine»: nel latino
+di san Tommaso non voleva
+ancora dire precetto, comando
+e neppure in Dante Alighieri.
+Ordo-ordinis esprime tutto il
+vocabolario della organizzazio-
+ne, pianificazione, progettazio-
+ne, programmazione, tutti i con-
+cetti di struttura e sistema, quelli
+di tassonomia e classificazione
+oltre a indicare categorie profes-
+sionali. Poi spiritus: tante volte è
+spirito, altre volte è spinta,
+impulso, pulsione oltre che spiri-
+to nel senso di spirituale o
+anche fantasma. 
+Allora ci spiega il metodo che
+propone?
+Il metodo. Prendo, di una paro-
+la, tutti i contesti, tutte le frasi
+che la contengono; su queste
+ IL NOSTROMO
+emmeciquadro
+131
+dicembre 2001
+frasi inserisco i codici delle cor-
+relazioni sintattiche, elementari
+e dirette; in parole correnti i
+codici che specificano l'analisi
+grammaticale e logica di questa
+parola, frase per frase. 
+Questo è un lavoro da «sgobbo-
+ni» però è la forma profonda e
+solida di pensare. Mi aspetto che
+qualcuno mi dica che è puerile
+ma ho già la risposta pronta:
+provi a farla, anche solo su 100
+frasi, non su 10 000 come le ho
+fatte per ordo o su 20 000 per
+spiritus e si accorgerà della diffi-
+coltà. Perché il pensiero e l’e-
+spressione sono disparati e il
+pensiero è multidimensionale,
+eccentrico e a-centrato: non si
+riesce mai a trovare i confini di
+un concetto, se ne trova subito
+un altro; per questo parlo di unità
+lessicali più che di unità concet-
+tuali. Invece l'espressione è
+sequenziale, tabulata come le
+battute di una musica, però «liofi-
+lizza» un concetto.
+In periferia, in tutto il mondo
+dovremo trovare persone che
+sappiano il latino, che siano
+sgobboni, che non disdegnino
+gli antichi. Se hanno queste
+qualità possono partecipare al
+progetto. A ognuno viene data
+una parola su cui devono esse-
+re eseguite tutte le sintesi di cor-
+relazioni con una cascata di pro-
+grammi monofunzione: non un
+programma come quello per gli
+stipendi che fa tutto insieme in
+un colpo solo, perché questa è
+ricerca. Dai collegamenti sintatti-
+ci di ogni parola con i verbi di cui
+è soggetto o complemento, ver-
+ranno fuori i suoi significati.
+Finora a me sono venuti fuori.
+Poi ognuno deve fare un elenco
+di questi significati nella propria
+lingua: inglese, spagnolo, tede-
+sco eccetera..
+Poi i risultati vengono inviati a
+Roma dove, per prima cosa, un
+comitato certifica la qualità del
+lavoro. Questo è indispensabile.
+Poi, all’interno di seminari tra
+esperti di vari paesi e lingue,
+bisogna esaminare i significati di
+questi concetti per tradurli nelle
+diverse lingue e nelle diverse
+culture contemporanee. Tra l’al-
+tro, chi fa l’esame sintattico di
+una voce deve analizzare le
+desinenze: per esempio deve
+dire quando veni è imperativo,
+quando è passato remoto ecce-
+tera, quando rosae è genitivo,
+ottativo, eccetera; io segnalo
+solo, in una nota, se la parola è
+omografa. Questo progetto è la
+continuazione di tutto quello che
+ho fatto finora. Ci lavoro da
+quindici anni e ora è nato a
+Roma un consorzio tra sei uni-
+versità: Gregoriana, Salesiani,
+Pontificia Università
+Gregoriana, Roma 
+ IL NOSTROMO
+dicembre 2001 132
+emmeciquadro
+Domenicani, Opus Dei, Servi
+di Maria, Laterano, più la
+Sapienza statale di Roma
+con l’istituto di Tullio Gregory.
+L’iniziativa si è sviluppata
+piano piano e adesso è
+patrocinata da due gruppi. Il
+primo con Antonio Fazio,
+Hans Tietmayer e Michel
+Camdessous e anche i due
+cardinali Re e Tettamanzi. Il
+secondo è la CAEL (Compu-
+terizzazione delle Analisi
+Ermeneutiche e Lessicolo-
+giche), continuazione del
+CAAL (Centro Automazione
+Analisi Linguistica) che per
+trent’anni con la IBM ha
+finanziato l’Index Thomisti-
+cus.
+Nel mese di dicembre i due
+gruppi si incontreranno per
+definire la forma di collabora-
+zione allo stesso scopo. Si cer-
+cheranno i finanziamenti con
+l’intenzione di spendere il
+meno possibile. Perché, diver-
+samente da quanto avviene di
+solito (prima i soldi, poi una
+sede pomposa, poi il lavoro),
+noi abbiamo cercato prima l’i-
+dea, poi il lavoro e i soldi sono
+sempre venuti. I progetti son
+come semi che bisogna gettare
+e piano piano cresceranno.
+Un’altra importante novità nel
+metodo di lavoro è la speri-
+mentazione di una collabora-
+zione internazionale tra diverse
+università attraverso un lavoro
+in equipe in rete (e-mail, tele-
+conferenza) e i loro sviluppi. A
+Roma c’è già un piccolo nucleo
+di persone che sarà il centro di
+questo lavoro in rete. 
+Per concludere, vorrei ripetere
+che l’informatica e i computer
+sono un dono di Dio che Lui ha
+preparato dagli inizi del mondo.
+Oggi purtroppo in questo
+campo c’è una grande confu-
+sione: primo ne parlano troppo
+quelli che non ne sanno,
+secondo ne parlano i sognatori
+facili, che desiderano far dena-
+ro velocemente.
+Invece dobbiamo dire che le
+potenzialità dell’informatica
+non sono esaurite, stanno
+ancora «cabrando». Gli aero-
+plani ci hanno messo 100 anni
+a perfezionarsi, queste cose
+ce ne metteranno altrettanti,
+piano piano. 
+Per contribuire solidamente a
+questo sviluppo basta che
+ognuno cominci a fare il poco
+che è utile a lui: questo fa cre-
+scere vitalmente le strutture
+nuove. Però bisogna mettersi
+a lavorare su una linea preci-
+sa e definita. 
+Volete un ultimo aforisma? 
+Il computer può essere usato
+bene per il bene, può essere
+usato male per il bene e può
+essere usato bene anche per il
+male.
+v
+«Siccome il computer è
+figlio dell’uomo e l’uomo è
+figlio di Dio, allora il Signore
+Dio guarda il computer
+come un nonno guarda i
+suoi nipotini. Guai a parlar-
+ne male e a usarlo male.»

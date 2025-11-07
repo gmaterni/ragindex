@@ -1,0 +1,8 @@
+Il compito che ti chiedo è piuttosto difficile e di alto livello di astrazione.
+In docs hai le specifiche e l'architettura per implementare un'applicazione Javascript con una particolare architettura RAG.
+In static/* hai tutti gli script per un'applicazione Javascript funzionante ma che utilizza un'architettura RAG completamente diversa.
+In py/* hai tutti gli script Python che implementano la nuova architettura e sono quelli a cui si fa riferimento nel documento delle specifiche.
+In tools trovi delle librerie per sostituire spaCy ed implementare BM25, hai tutto il progetto di GitHub, sei tu a dover individuare quello che eventualmente ti serve.
+Mi rendo conto che il compito è gravoso, siccome prevedo una conversazione lunga, quando vedi che stai per esaurire le risorse genera un breakpoint per poter iniziare da quel punto una nuova sessione insieme.
+Quando hai dei dubbi chiedi chiarimenti.
+Rispetta i comportamenti che ti sono stati indicati nei documenti che hai letto.
