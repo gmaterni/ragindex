@@ -297,8 +297,8 @@ export const TextInput = {
         allChunks.push(...docChunks);
       }
       
-      UaDb.saveJson(DATA_KEYS.PHASE0_CHUNKS, allChunks);
-      UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in localStorage.`);
+      await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, allChunks);
+      UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in IndexedDB.`);
       
       console.debug("--- FASE 0: CHUNKS CREATI ---");
       console.debug(allChunks);
@@ -315,9 +315,9 @@ export const TextInput = {
 
   async runPhase1() {
     UaLog.log("Inizio Fase 1: Indicizzazione...");
-    const chunks = UaDb.readJson(DATA_KEYS.PHASE0_CHUNKS);
+    const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
     if (!chunks || chunks.length === 0) {
-      alert("Nessun chunk trovato. Esegui prima la Fase 0.");
+      alert("Nessun chunk trovato in IndexedDB. Esegui prima la Fase 0.");
       return;
     }
     
@@ -325,9 +325,9 @@ export const TextInput = {
     try {
       const index = ragEngine.ne1_buildIndex(chunks);
       const serializedIndex = JSON.stringify(index);
-      UaDb.save(DATA_KEYS.PHASE1_INDEX, serializedIndex);
+      await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
       
-      UaLog.log(`Fase 1 completata: Indice creato e salvato in localStorage.`);
+      UaLog.log(`Fase 1 completata: Indice creato e salvato in IndexedDB.`);
       console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
       console.debug(serializedIndex);
       setResponseHtml(`<h4>Fase 1 Completata</h4><p>Indice creato e salvato. Controlla la console (F12) per i dettagli.</p>`);
@@ -342,16 +342,16 @@ export const TextInput = {
   },
 
   async runPhase2() {
-    UaLog.log("Inizio Fase 2: Ricerca...");
+    UaLog.log("Inizio Fase 2: Ricerca Contesto...");
     const query = this.inp.value.trim();
     if (!query) {
       alert("Inserisci una query nell'area di testo.");
       return;
     }
     
-    const serializedIndex = UaDb.read(DATA_KEYS.PHASE1_INDEX);
+    const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
     if (!serializedIndex) {
-      alert("Nessun indice trovato. Esegui prima la Fase 1.");
+      alert("Nessun indice trovato in IndexedDB. Esegui prima la Fase 1.");
       return;
     }
 
@@ -360,15 +360,15 @@ export const TextInput = {
       const index = lunr.Index.load(JSON.parse(serializedIndex));
       const searchResults = ragEngine.ne2_search(index, query);
       
-      UaDb.saveJson(DATA_KEYS.PHASE2_SEARCH_RESULTS, searchResults);
-      UaDb.save(DATA_KEYS.PHASE2_QUERY, query);
+      await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, searchResults);
+      UaDb.save(DATA_KEYS.PHASE2_QUERY, query); // Query is small, localStorage is fine
 
-      UaLog.log(`Fase 2 completata: ${searchResults.length} risultati trovati per la query.`);
+      UaLog.log(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati per la query.`);
       
-      console.debug("--- FASE 2: RISULTATI RICERCA ---");
+      console.debug("--- FASE 2: RISULTATI CONTESTO ---");
       console.debug(searchResults);
-      setResponseHtml(`<h4>Fase 2 Completata</h4><p>${searchResults.length} risultati trovati. Controlla la console (F12) per i dettagli.</p>`);
-      alert(`Fase 2 completata: ${searchResults.length} risultati trovati.`);
+      setResponseHtml(`<h4>Fase 2 Completata</h4><p>${searchResults.length} risultati di contesto trovati. Controlla la console (F12) per i dettagli.</p>`);
+      alert(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati.`);
 
     } catch (error) {
       console.error("Errore in Fase 2", error);
@@ -380,19 +380,19 @@ export const TextInput = {
 
   async runPhase3() {
     UaLog.log("Inizio Fase 3: Generazione Risposta...");
-    const chunks = UaDb.readJson(DATA_KEYS.PHASE0_CHUNKS);
-    const searchResults = UaDb.readJson(DATA_KEYS.PHASE2_SEARCH_RESULTS);
+    const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+    const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
     const query = UaDb.read(DATA_KEYS.PHASE2_QUERY);
 
-    if (!chunks || !searchResults || !query) {
-        alert("Dati mancanti dalle fasi precedenti. Assicurati di aver completato le Fasi 0, 1 e 2.");
+    if (!chunks || !context || !query) {
+        alert("Dati mancanti dalle fasi precedenti (in IndexedDB o localStorage). Assicurati di aver completato le Fasi 0, 1 e 2.");
         return;
     }
 
     Spinner.show();
     try {
       AppMgr.initConfig(); // Ensure LLM client is ready
-      const answer = await ragEngine.ne3_generateResponse(query, searchResults, chunks);
+      const answer = await ragEngine.ne3_generateResponse(query, context, chunks);
       
       setResponseHtml(`<div class="final-answer">${answer}</div>`);
       UaLog.log("Fase 3 completata: Risposta generata.");
@@ -447,7 +447,7 @@ export const TextOutput = {
   async clearHistoryContext() {
     const ok = await confirm("Confermi nuovo Contesto & Conversazione ?  ");
     if (!ok) return;
-    await idbMgr.delete(DATA_KEYS.KEY_CONTEXT);
+    await idbMgr.delete(DATA_KEYS.PHASE2_CONTEXT);
     await idbMgr.delete(DATA_KEYS.KEY_THREAD);
     setResponseHtml("");
   },
@@ -484,7 +484,7 @@ const showQuickstart = () => {
 };
 
 const showQuery = () => {
-  const s = UaDb.read(DATA_KEYS.KEY_QUERY);
+  const s = UaDb.read(DATA_KEYS.PHASE2_QUERY);
   if (s)
     wnds.winfo.show(s);
 };
@@ -499,7 +499,6 @@ const showThread = async () => {
   const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
   if (!lst) return;
   const s = messages2text(lst);
-  // const s = lst.join("\n");
   wnds.wpre.show(s);
 };
 
@@ -510,45 +509,96 @@ export const showHtmlThread = async () => {
   setResponseHtml(html);
 };
 
-const showKnBase = async () => {
-  const s = await idbMgr.read(DATA_KEYS.KEY_KNBASE)
-  if (!s) return;
-  wnds.wpre.show(s);
-};
+// ==================================================
+// Generic Menu Handlers for IndexedDB artifacts
+// ==================================================
 
-const saveKnBase = async () => {
-  const knbase = await idbMgr.read(DATA_KEYS.KEY_KNBASE);
-  if (!knbase) {
-    alert("Knowledge Base Vuota");
+const showData = async (dataKey, title) => {
+  const data = await idbMgr.read(dataKey);
+  if (!data) {
+    alert(`${title} non presenti in IndexedDB.`);
     return;
   }
-  let name = await prompt("Nome Knowledge Base");
-  if (name) {
-    name = name.replace(" ", "_");
-    const key = `${DATA_KEYS.KEY_KNBASE_PRE}${name}`;
-    await idbMgr.create(key, knbase)
-  }
+  const dataFormat = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  wnds.wpre.show(dataFormat);
 };
 
-const showContesto = async () => {
-  const s = await idbMgr.read(DATA_KEYS.KEY_CONTEXT)
-  if (!s) return;
-  wnds.wpre.show(s);
-};
-
-const saveContesto = async () => {
-  const contesto = await idbMgr.read(DATA_KEYS.KEY_CONTEXT);
-  if (!contesto) {
-    alert("Contesto Vuoto");
+const saveData = async (dataKey, prefix, promptTitle) => {
+  const data = await idbMgr.read(dataKey);
+  if (!data) {
+    alert(`Nessun dato da salvare per: ${promptTitle}`);
     return;
   }
-  let name = await prompt("Nome Contesto");
+  let name = await prompt(`Nome per ${promptTitle}:`);
   if (name) {
-    name = name.replace(" ", "_");
-    const key = `${DATA_KEYS.KEY_CONTEXT_PRE}${name}`;
-    await idbMgr.create(key, contesto)
+    name = name.replace(/\s+/g, '_');
+    const key = `${prefix}${name}`;
+    await idbMgr.create(key, data);
+    alert(`${promptTitle} salvati come: ${name}`);
   }
 };
+
+const elencoData = async (prefix, title, currentDataKey) => {
+  const keys = await idbMgr.selectKeys(prefix);
+  const jfh = UaJtfh();
+  jfh.append(`<div class="data-dialog"><h4>Gestione ${title}</h4>`);
+  if (keys.length > 0) {
+    jfh.append('<table class="table-data"><thead><tr><th>Nome</th><th>Azioni</th></tr></thead><tbody>');
+    for (const key of keys) {
+      const displayName = key.slice(prefix.length);
+      jfh.append(`
+        <tr>
+          <td>${displayName}</td>
+          <td><button class="btn-load-item btn-success" data-item-key="${key}">Carica</button></td>
+          <td><button class="btn-delete-item btn-danger" data-item-key="${key}">Elimina</button></td>
+        </tr>
+      `);
+    }
+    jfh.append("</tbody></table>");
+  } else {
+    jfh.append(`<p>Nessun dato di tipo '${title}' trovato.</p>`);
+  }
+  jfh.append("</div>");
+  wnds.winfo.show(jfh.html());
+
+  const element = wnds.winfo.w.getElement();
+
+  element.querySelectorAll(".btn-load-item").forEach(btn => btn.addEventListener("click", async (event) => {
+    const key = event.currentTarget.dataset.itemKey;
+    const data = await idbMgr.read(key);
+    await idbMgr.create(currentDataKey, data);
+    const name = key.slice(prefix.length);
+    alert(`${title} '${name}' caricati come correnti.`);
+    wnds.winfo.close();
+  }));
+
+  element.querySelectorAll(".btn-delete-item").forEach(btn => btn.addEventListener("click", async (event) => {
+    const key = event.currentTarget.dataset.itemKey;
+    if (key) {
+      const ok = await confirm(`Confermi l'eliminazione di: ${key}?`);
+      if (ok) {
+        await idbMgr.delete(key);
+        wnds.winfo.close();
+        elencoData(prefix, title, currentDataKey); // Refresh list
+      }
+    }
+  }));
+};
+
+
+// --- Specific Implementations ---
+const showChunks = () => showData(DATA_KEYS.PHASE0_CHUNKS, "Chunks Correnti");
+const saveChunks = () => saveData(DATA_KEYS.PHASE0_CHUNKS, DATA_KEYS.KEY_CHUNKS_PRE, "Chunks");
+const elencoChunks = () => elencoData(DATA_KEYS.KEY_CHUNKS_PRE, "Chunks", DATA_KEYS.PHASE0_CHUNKS);
+
+const showIndex = () => showData(DATA_KEYS.PHASE1_INDEX, "Indice Corrente");
+const saveIndex = () => saveData(DATA_KEYS.PHASE1_INDEX, DATA_KEYS.KEY_INDEX_PRE, "Indice");
+const elencoIndex = () => elencoData(DATA_KEYS.KEY_INDEX_PRE, "Indici", DATA_KEYS.PHASE1_INDEX);
+
+const showContext = () => showData(DATA_KEYS.PHASE2_CONTEXT, "Contesto Corrente");
+const saveContext = () => saveData(DATA_KEYS.PHASE2_CONTEXT, DATA_KEYS.KEY_CONTEXT_PRE, "Contesto");
+const elencoContext = () => elencoData(DATA_KEYS.KEY_CONTEXT_PRE, "Contesti", DATA_KEYS.PHASE2_CONTEXT);
+
 
 const saveThread = async () => {
   const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
@@ -566,14 +616,15 @@ const saveThread = async () => {
 };
 
 const KEY_DESCRIPTIONS = {
-  [DATA_KEYS.KEY_KNBASE]: "Knowledge Base Corrente",
-  [DATA_KEYS.KEY_CONTEXT]: "Contesto Corrente",
+  [DATA_KEYS.PHASE0_CHUNKS]: "Chunks Correnti (Fase 0)",
+  [DATA_KEYS.PHASE1_INDEX]: "Indice Corrente (Fase 1)",
+  [DATA_KEYS.PHASE2_CONTEXT]: "Contesto Corrente (Fase 2)",
   [DATA_KEYS.KEY_THREAD]: "Conversazione Corrente",
-  [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider",
-  [DATA_KEYS.KEY_DOC_TYPE]: "Tipo Documento",
+  
+  [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
+  [DATA_KEYS.KEY_DOC_TYPE]: "Configurazione Tipo Documento",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
-  [DATA_KEYS.KEY_RESPONSE]: "Risposta Contestuale",
-  [DATA_KEYS.KEY_QUERY]: "Query per Creazione Contesto",
+  [DATA_KEYS.PHASE2_QUERY]: "Query Corrente (Fase 2)",
   [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati"
 };
 
@@ -581,57 +632,57 @@ const getDescriptionForKey = (key) => {
   if (KEY_DESCRIPTIONS[key]) {
     return KEY_DESCRIPTIONS[key];
   }
-  if (key.startsWith(DATA_KEYS.KEY_KNBASE_PRE)) {
-    return "Knowledge Base";
+  if (key.startsWith(DATA_KEYS.KEY_CHUNKS_PRE)) {
+    return "Archivio Chunks";
+  }
+  if (key.startsWith(DATA_KEYS.KEY_INDEX_PRE)) {
+    return "Archivio Indice";
   }
   if (key.startsWith(DATA_KEYS.KEY_CONTEXT_PRE)) {
-    return "Contesto";
+    return "Archivio Contesto";
   }
   if (key.startsWith(DATA_KEYS.KEY_THREAD_PRE)) {
-    return "Conversazione";
+    return "Archivio Conversazione";
   }
   return "Dato non classificato";
 };
 
 const elencoDati = async () => {
   const jfh = UaJtfh();
-  const idbKeysToShow = [DATA_KEYS.KEY_KNBASE, DATA_KEYS.KEY_CONTEXT, DATA_KEYS.KEY_THREAD];
-  // const lsKeysToShow = [DATA_KEYS.KEY_RESPONSE, DATA_KEYS.KEY_QUERY, DATA_KEYS.KEY_DOCS];
-  // --- LocalStorage Section ---
-  // jfh.append('<h4>LocalStorage</h4>');
-  //   jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
-  //   for (const key of lsKeysToShow) {
-  //     const description = getDescriptionForKey(key);
-  //     const value = UaDb.read(key);
-  //     const size = value ? value.length : 0;
-  //     jfh.append(
-  //       `<tr>
-  //   <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="ls">${key}</a></td>
-  //   <td>${description}</td>
-  //   <td class="size">${size}</td>
-  // </tr>`
-  //     );
-  //   }
-  //   jfh.append('</tbody></table>');
+  const idbKeysToShow = [
+    DATA_KEYS.PHASE0_CHUNKS, 
+    DATA_KEYS.PHASE1_INDEX, 
+    DATA_KEYS.PHASE2_CONTEXT, 
+    DATA_KEYS.KEY_THREAD
+  ];
+  const lsKeysToShow = [
+    DATA_KEYS.PHASE2_QUERY, 
+    DATA_KEYS.KEY_DOCS,
+    DATA_KEYS.KEY_THEME,
+    DATA_KEYS.KEY_PROVIDER,
+    DATA_KEYS.KEY_DOC_TYPE
+  ];
 
-  // --- IndexedDB Section ---
-  // jfh.append('<h4>IndexedDB</h4>');
+  jfh.append('<h4>Dati in IndexedDB</h4>');
   jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
-  // Mostra sempre le chiavi principali
-  for (const key of idbKeysToShow) {
-    const description = getDescriptionForKey(key);
-    const value = await idbMgr.read(key);
-    const size = value ? JSON.stringify(value).length : 0;
-    jfh.append(
-      `<tr>
-  <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
-  <td>${description}</td>
-  <td class="size">${size}</td>
-</tr>`
-    );
-  }
-  // Mostra le chiavi archiviate solo se esistono
+  
   const allIdbKeys = await idbMgr.getAllKeys();
+
+  for (const key of idbKeysToShow) {
+    if (allIdbKeys.includes(key)) {
+      const description = getDescriptionForKey(key);
+      const value = await idbMgr.read(key);
+      const size = value ? JSON.stringify(value).length : 0;
+      jfh.append(
+        `<tr>
+          <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
+          <td>${description}</td>
+          <td class="size">${size}</td>
+        </tr>`
+      );
+    }
+  }
+  
   const archivedKeys = allIdbKeys.filter(k => !idbKeysToShow.includes(k));
   for (const key of archivedKeys) {
     const description = getDescriptionForKey(key);
@@ -639,13 +690,33 @@ const elencoDati = async () => {
     const size = value ? JSON.stringify(value).length : 0;
     jfh.append(
       `<tr>
-  <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
-  <td>${description}</td>
-  <td class="size">${size}</td>
-</tr>`
+        <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
+        <td>${description}</td>
+        <td class="size">${size}</td>
+      </tr>`
     );
   }
   jfh.append('</tbody></table>');
+
+  jfh.append('<h4>Dati in LocalStorage</h4>');
+  jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
+  for (const key of lsKeysToShow) {
+    const value = UaDb.read(key);
+    if (value) {
+      const description = getDescriptionForKey(key);
+      const size = value.length;
+      jfh.append(
+        `<tr>
+          <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="ls">${key}</a></td>
+          <td>${description}</td>
+          <td class="size">${size}</td>
+        </tr>`
+      );
+    }
+  }
+  jfh.append('</tbody></table>');
+
+
   wnds.winfo.show(jfh.html());
   const element = wnds.winfo.w.getElement();
   element.querySelectorAll(".link-show-data").forEach(link => {
@@ -733,115 +804,6 @@ const elencoDocs = () => {
   });
 };
 
-const elencoKnBase = async () => {
-  const keys = await idbMgr.selectKeys(DATA_KEYS.KEY_KNBASE_PRE);
-  const jfh = UaJtfh();
-  jfh.append('<div class="knbase-dialog">');
-  jfh.append("<h4>Gestione Base di conoscenza</h4>");
-  if (Object.keys(keys).length > 0) {
-    jfh.append('<table class="table-data">');
-    jfh.append('<thead><tr><th>Nome</th><th>Azioni</th></tr></thead>');
-    jfh.append('<tbody>');
-    for (const key of keys) {
-      jfh.append(`
-  <tr> 
-  <td>${key}</td>
-  <td><button class="btn-load-item btn-success" data-item-name="${key}">Carica</button></td>
-  <td><button class="btn-delete-item btn-danger" data-item-name="${key}">Elimina</button></td>
-  </tr>
-  `);
-    }
-    jfh.append("</tbody></table>");
-  } else {
-    jfh.append("<p>Nessuna Base di conoscenza trovata.</p>");
-  }
-  jfh.append("</div>");
-  wnds.winfo.show(jfh.html());
-  const element = wnds.winfo.w.getElement();
-
-  const handleLoadClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    const knbase = await idbMgr.read(key);
-    await idbMgr.create(DATA_KEYS.KEY_KNBASE, knbase);
-    const name = key.slice(DATA_KEYS.KEY_KNBASE_PRE.length);
-    alert(`Base di conoscenza ${name} caricata`)
-  };
-
-  const handleDeleteClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    if (key) {
-      const ok = await confirm(`Confermi Eliminazione : ${key}`);
-      if (!ok) return;
-      await idbMgr.delete(key);
-      wnds.winfo.close();
-      elencoKnBase();
-    }
-  };
-
-  element
-    .querySelectorAll(".btn-load-item")
-    .forEach((btn) => btn.addEventListener("click", handleLoadClick));
-
-  element
-    .querySelectorAll(".btn-delete-item")
-    .forEach((btn) => btn.addEventListener("click", handleDeleteClick));
-};
-
-const elencoContext = async () => {
-  const keys = await idbMgr.selectKeys(DATA_KEYS.KEY_CONTEXT_PRE);
-  const jfh = UaJtfh();
-  jfh.append('<div class="context-dialog">');
-  jfh.append("<h4>Gestione Contesti</h4>");
-  if (Object.keys(keys).length > 0) {
-    jfh.append('<table class="table-data">');
-    jfh.append('<thead><tr><th>Nome</th><th>Azioni</th></tr></thead>');
-    jfh.append('<tbody>');
-    for (const key of keys) {
-      jfh.append(`
-<tr>
-<td>${key}</td>
-<td><button class="btn-load-item btn-success" data-item-name="${key}">Carica</button></td>
-<td><button class="btn-delete-item btn-danger" data-item-name="${key}">Elimina</button></td>
-</tr>
-  `);
-    }
-    jfh.append("</tbody></table>");
-  } else {
-    jfh.append("<p>Nessun Contesto trovato.</p>");
-  }
-  jfh.append("</div>");
-  wnds.winfo.show(jfh.html());
-
-  const element = wnds.winfo.w.getElement();
-
-  const handleLoadClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    const context = await idbMgr.read(key);
-    await idbMgr.create(DATA_KEYS.KEY_CONTEXT, context);
-    const name = key.slice(DATA_KEYS.KEY_CONTEXT_PRE.length);
-    alert(`Contesto ${name} caricatao`)
-  };
-
-  const handleDeleteClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    if (key) {
-      const ok = await confirm(`Confermi Eliminazione del contesto: ${key}`);
-      if (!ok) return;
-      await idbMgr.delete(key);
-      wnds.winfo.close();
-      elencoContext();
-    }
-  };
-
-  element
-    .querySelectorAll(".btn-load-item")
-    .forEach((btn) => btn.addEventListener("click", handleLoadClick));
-
-  element
-    .querySelectorAll(".btn-delete-item")
-    .forEach((btn) => btn.addEventListener("click", handleDeleteClick));
-};
-
 const elencoThreads = async () => {
   const keys = await idbMgr.selectKeys(DATA_KEYS.KEY_THREAD_PRE);
   const jfh = UaJtfh();
@@ -894,77 +856,45 @@ const elencoThreads = async () => {
   element.querySelectorAll(".btn-delete-item").forEach(btn => btn.addEventListener("click", handleDeleteClick));
 };
 
-const calcQuery = () => {
-  const calc = () => {
-    const arr = [];
-    let nptot = 0;
-    arr.push("Documento Num.Parti");
-    arr.push("==================");
-    const docNames = DocsMgr.names();
-    for (let i = 0; i < docNames.length; i++) {
-      const name = docNames[i];
-      const doc = DocsMgr.doc(i);
-      const dl = doc.length;
-      const mpl = AppMgr.promptSize;
-      const np = Math.ceil(dl / mpl);
-      nptot += np;
-      arr.push(`${name}&nbsp;&nbsp;&nbsp;[${np}]`);
-    }
-    arr.push("==================");
-    arr.push(`Totale num. Parti: ${nptot}`);
-    const s = arr.join("\n");
-    return s;
-  };
-  const s = calc();
-  wnds.wpre.show(s);
-};
-
 const deleteAllData = async () => {
   const jfh = UaJtfh();
-  const idbMainKeys = [DATA_KEYS.KEY_KNBASE, DATA_KEYS.KEY_CONTEXT, DATA_KEYS.KEY_THREAD];
-  // const lsKeys = [DATA_KEYS.KEY_PROVIDER, DATA_KEYS.KEY_DOC_TYPE, DATA_KEYS.KEY_THEME, DATA_KEYS.KEY_RESPONSE, DATA_KEYS.KEY_QUERY, DATA_KEYS.KEY_DOCS];
-  const lsKeys = [DATA_KEYS.KEY_RESPONSE, DATA_KEYS.KEY_QUERY, DATA_KEYS.KEY_DOCS];
+  const allIdbKeys = await idbMgr.getAllKeys();
+  const allLsKeys = UaDb.getAllIds();
+
   jfh.append('<div class="delete-dialog">');
   jfh.append('<h4>Seleziona Dati da Cancellare</h4>');
-  jfh.append('<table class="table-data">');
-  // --- LocalStorage Items ---
-  jfh.append('<tr><td colspan=2><b>Dati Correnti:</b></td></tr>');
-  lsKeys.forEach(key => {
-    jfh.append(`
-<tr>
-  <td><input type="checkbox" data-key="${key}" data-storage="ls"> ${key}</td>
-  <td>${getDescriptionForKey(key)}</td>
-</tr>`);
-  });
+  
   // --- IndexedDB Items ---
-  // jfh.append('<tr><td colspan=2><b>Dati Correnti:</b></td></tr>');
-  idbMainKeys.forEach(key => {
-    jfh.append(`
-<tr>
-<td><input type="checkbox" data-key="${key}" data-storage="idb"> ${key} </td>
-<td>${getDescriptionForKey(key)}</td>
-</tr>`);
-  });
-  // Archived keys (only show if they exist)
-  const allIdbPhysicalKeys = await idbMgr.getAllKeys();
-  const archivedKeys = allIdbPhysicalKeys.filter(k => !idbMainKeys.includes(k));
-  if (archivedKeys.length > 0) {
-    jfh.append('<tr><td colspan=2><b>Dati Archiviati:</b></td></tr>');
-    archivedKeys.forEach(key => {
+  if (allIdbKeys.length > 0) {
+    jfh.append('<h5>Dati in IndexedDB</h5><table class="table-data">');
+    allIdbKeys.forEach(key => {
       jfh.append(`
-<tr>
-<td><input type="checkbox" data-key="${key}" data-storage="idb"> ${key}</td>
-<td>${getDescriptionForKey(key)}</td>
-</tr>`);
+        <tr>
+          <td><input type="checkbox" data-key="${key}" data-storage="idb"> ${key}</td>
+          <td>${getDescriptionForKey(key)}</td>
+        </tr>`);
     });
+    jfh.append('</table>');
   }
-  jfh.append('</table>');
+
+  // --- LocalStorage Items ---
+  if (allLsKeys.length > 0) {
+    jfh.append('<h5>Dati in LocalStorage</h5><table class="table-data">');
+    allLsKeys.forEach(key => {
+      jfh.append(`
+        <tr>
+          <td><input type="checkbox" data-key="${key}" data-storage="ls"> ${key}</td>
+          <td>${getDescriptionForKey(key)}</td>
+        </tr>`);
+    });
+    jfh.append('</table>');
+  }
+
   jfh.append('<div class="delete-actions">');
   jfh.append('<button id="delete-selected-btn" class="btn-delete-selected">Cancella Selezionati</button>');
   jfh.append('<button id="delete-all-btn" class="btn-delete-all">Cancella Tutto</button>');
-  jfh.append('</div>');
-  jfh.append('</div>');
-  // console.info(jfh.html())
+  jfh.append('</div></div>');
+  
   wnds.winfo.show(jfh.html());
   const element = wnds.winfo.w.getElement();
 
@@ -974,11 +904,8 @@ const deleteAllData = async () => {
     element.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
       const storage = cb.dataset.storage;
       const key = cb.dataset.key;
-      if (storage === 'ls') {
-        keysToDelete.ls.push(key);
-      } else if (storage === 'idb') {
-        keysToDelete.idb.push(key);
-      }
+      if (storage === 'ls') keysToDelete.ls.push(key);
+      else if (storage === 'idb') keysToDelete.idb.push(key);
     });
 
     if (keysToDelete.ls.length === 0 && keysToDelete.idb.length === 0) {
@@ -989,31 +916,23 @@ const deleteAllData = async () => {
     const ok = await confirm("Confermi la cancellazione degli elementi selezionati?");
     if (ok) {
       for (const key of keysToDelete.ls) {
-        if (key == DATA_KEYS.KEY_DOCS)
-          DocsMgr.deleteAll();
-        else
-          UaDb.delete(key);
+        if (key === DATA_KEYS.KEY_DOCS) DocsMgr.deleteAll();
+        else UaDb.delete(key);
       }
-
       for (const key of keysToDelete.idb) {
         await idbMgr.delete(key);
-        // AAA cancellazione selezionati
-        if ([DATA_KEYS.KEY_THREAD, DATA_KEYS.KEY_THREAD_PRE].includes(key)) {
-          setResponseHtml("");
-        }
       }
-      await alert("Dati selezionati cancellati con successo.");
+      alert("Dati selezionati cancellati con successo.");
       wnds.winfo.close();
     }
   });
 
   element.querySelector("#delete-all-btn").addEventListener("click", async () => {
-    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati gestiti dall'applicazione (LocalStorage e IndexedDB). Confermi?");
+    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB). Confermi?");
     if (ok) {
       UaDb.clear();
-      // Clear entire IDB
       await idbMgr.clearAll();
-      setResponseHtml(""); //AAA cacellazione risposte
+      setResponseHtml("");
       alert("Tutti i dati dell'applicazione sono stati cancellati.");
       wnds.winfo.close();
     }
@@ -1055,28 +974,27 @@ export function bindEventListener() {
   document.getElementById("btn-doctype-settings").addEventListener("click", Commands.docTypeSettings);
   document.getElementById("btn-dark-theme").addEventListener("click", () => setTheme("dark"));
   document.getElementById("btn-light-theme").addEventListener("click", () => setTheme("light"));
-  // commands links
+  
+  // New Menu Items
+  document.getElementById("menu-show-chunks").addEventListener("click", showChunks);
+  document.getElementById("menu-save-chunks").addEventListener("click", saveChunks);
+  document.getElementById("menu-elenco-chunks").addEventListener("click", elencoChunks);
+  document.getElementById("menu-show-index").addEventListener("click", showIndex);
+  document.getElementById("menu-save-index").addEventListener("click", saveIndex);
+  document.getElementById("menu-elenco-index").addEventListener("click", elencoIndex);
+  document.getElementById("menu-show-context").addEventListener("click", showContext);
+  document.getElementById("menu-save-context").addEventListener("click", saveContext);
+  document.getElementById("menu-elenco-context").addEventListener("click", elencoContext);
+
+  // Other Menu Items
   document.getElementById("menu-readme").addEventListener("click", showReadme);
   document.getElementById("menu-quickstart").addEventListener("click", showQuickstart);
   document.getElementById("menu-show-config").addEventListener("click", LlmProvider.showConfig);
-  document.getElementById("menu-show-knbase").addEventListener("click", showKnBase);
-  document.getElementById("menu-save-knbase").addEventListener("click", saveKnBase);
-
-  document.getElementById("menu-show-query").addEventListener("click", showQuery);
-  document.getElementById("show-menu-contextresponse").addEventListener("click", showContextResponse);
   document.getElementById("menu-show-thread").addEventListener("click", showThread);
-  document.getElementById("menu-show-contesto").addEventListener("click", showContesto);
-  document.getElementById("menu-save-contesto").addEventListener("click", saveContesto);
-
   document.getElementById("menu-elenco-dati").addEventListener("click", elencoDati);
   document.getElementById("menu-elenco-docs").addEventListener("click", elencoDocs);
-  document.getElementById("menu-elenco-context").addEventListener("click", elencoContext);
-  document.getElementById("menu-elenco-knbase").addEventListener("click", elencoKnBase);
   document.getElementById("menu-save-thread").addEventListener("click", saveThread);
   document.getElementById("menu-elenco-threads").addEventListener("click", elencoThreads);
-
-  document.getElementById("menu-calc-query").addEventListener("click", calcQuery);
-
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 

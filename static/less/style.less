@@ -545,9 +545,6 @@ div.container {
 }
 
 .input-actions {
-  .send0-input,
-  .send1-input,
-  .send2-input,
   .clear-input {
     box-sizing: border-box;
     border: none;
@@ -559,6 +556,30 @@ div.container {
     margin-bottom: 5px;
     transition: background-color 0.3s;
   }
+
+  #btn-phase0,
+  #btn-phase1,
+  #btn-phase2,
+  #btn-phase3 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 100%;
+    color: #ffffff; // Testo bianco per la maggior parte dei pulsanti
+  }
+
+  #btn-phase0 { background-color: #E57373; &:hover { background-color: lighten(#E57373, 10%); } }
+  #btn-phase1 { background-color: #FFB74D; &:hover { background-color: lighten(#FFB74D, 10%); } }
+  #btn-phase2 { background-color: #FFF176; color: #333; &:hover { background-color: lighten(#FFF176, 5%); } }
+  #btn-phase3 { background-color: #81C784; &:hover { background-color: lighten(#81C784, 10%); } }
 }
 
 .clear-input {
@@ -1215,24 +1236,6 @@ div.container {
     }
   }
   .input-actions {
-    .send0-input {
-      background: @btn-send0-bg;
-      &:hover {
-        background: @btn-send0-hover-bg;
-      }
-    }
-    .send1-input {
-      background: @btn-send1-bg;
-      &:hover {
-        background: @btn-send1-hover-bg;
-      }
-    }
-    .send2-input {
-      background: @btn-send2-bg;
-      &:hover {
-        background: @btn-send2-hover-bg;
-      }
-    }
     .clear-input {
       background-color: @btn-bg;
       .icon {
@@ -1739,4 +1742,15 @@ div.container {
     stroke: @light-text;
     fill: none;
   }
+}
+
+// -------------------
+// Phase Button SVG Icons
+// -------------------
+.btn-icon-svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+  fill: currentColor;
 }

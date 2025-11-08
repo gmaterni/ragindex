@@ -50,39 +50,37 @@ export const help0_html = `
     </div>
     <div>
         <strong>Nuova Conversazione</strong>
-        <p>Cancella la cronologia della conversazione attiva. Non cancella il Contesto né la Knowledge Base.</p>
+        <p>Cancella la cronologia della conversazione attiva. Non cancella il Contesto.</p>
     </div>
     <div>
         <strong>Nuovo Contesto & Conversazione</strong>
-        <p>Cancella il Contesto e la cronologia della conversazione attiva, permettendo di iniziare una nuova analisi da zero.</p>
+        <p>Cancella il Contesto e la cronologia della conversazione attiva, permettendo di iniziare una nuova analisi dalla Fase 2.</p>
     </div>
 
     <hr>
 
     <!-- Pulsanti di Input -->
-    <p class="center">Pulsanti di Input (in basso a destra)</p>
+    <p class="center">Pulsanti del Flusso RAG</p>
     <div>
-        <strong>Pulsante 1 (send0)</strong>
-        <p>
-            <strong>Creazione Knowledge Base:</strong> Avvia il processo principale di analisi dei documenti caricati per creare una "Knowledge Base" unificata.
-        </p>
+        <strong>Fase 0: Segmenta</strong>
+        <p>Analizza i documenti caricati e li suddivide in "Chunks" (frammenti di testo).</p>
     </div>
     <div>
-        <strong>Pulsante 2 (send1)</strong>
-        <p>
-            <strong>Creazione Contesto:</strong> Usa la domanda nell'input per estrarre le informazioni pertinenti dalla "Knowledge Base" e creare un "Contesto" specifico.
-        </p>
+        <strong>Fase 1: Indicizza</strong>
+        <p>Crea un "Indice" di ricerca a partire dai Chunks generati nella fase precedente.</p>
     </div>
     <div>
-                    <strong>Pulsante 3 (send2 / Invio)</strong>
-                <p>
-                    <strong>Conversazione:</strong> Invia la domanda all'LLM usando il "Contesto" creato per continuare o iniziare una conversazione.
-                </p>
-            </div>
-            <div>
-                <strong>Cancella Input</strong>
-                <p>Cancella il testo inserito nel campo di input.</p>
-            </div>
+        <strong>Fase 2: Cerca</strong>
+        <p>Usa la domanda inserita nel campo di testo per cercare nell'Indice e creare un "Contesto" con i risultati più pertinenti.</p>
+    </div>
+    <div>
+        <strong>Fase 3: Genera</strong>
+        <p>Invia la domanda e il Contesto all'LLM per generare una risposta e avviare la conversazione.</p>
+    </div>
+    <div>
+        <strong>Cancella Input</strong>
+        <p>Cancella il testo inserito nel campo di input.</p>
+    </div>
     <hr>
 
     <!-- Menu Laterale -->
@@ -105,39 +103,45 @@ export const help0_html = `
         <strong>Configurazione</strong>
         <ul>
             <li><strong>Configurazione:</strong> Mostra la configurazione corrente del Provider LLM e del Tipo Documento selezionato.</li>
-            <li><strong>Calcolo Richieste:</strong> Calcola e mostra il numero di parti in cui verranno suddivisi i documenti caricati per la creazione della Knowledge Base, utile per stimare le richieste all'LLM.</li>
         </ul>
     </div>
     <div>
-        <strong>Knowledge Base (KnBase)</strong>
+        <strong>Fase 0: Chunks</strong>
         <ul>
-            <li><strong>Visualizza:</strong> Mostra la Knowledge Base attuale.</li>
-            <li><strong>Archivia:</strong> Salva la Knowledge Base attuale con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina le Knowledge Base salvate.</li>
+            <li><strong>Visualizza:</strong> Mostra i Chunks correnti.</li>
+            <li><strong>Salva con Nome:</strong> Salva i Chunks correnti con un nome.</li>
+            <li><strong>Elenco:</strong> Carica o elimina i set di Chunks salvati.</li>
         </ul>
     </div>
     <div>
-        <strong>Contesto</strong>
+        <strong>Fase 1: Indice</strong>
         <ul>
-            <li><strong>Visualizza:</strong> Mostra il Contesto attuale.</li>
-            <li><strong>Archivia:</strong> Salva il Contesto attuale con un nome.</li>
+            <li><strong>Visualizza:</strong> Mostra l'Indice corrente.</li>
+            <li><strong>Salva con Nome:</strong> Salva l'Indice corrente con un nome.</li>
+            <li><strong>Elenco:</strong> Carica o elimina gli Indici salvati.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>Fase 2: Contesto</strong>
+        <ul>
+            <li><strong>Visualizza:</strong> Mostra il Contesto corrente.</li>
+            <li><strong>Salva con Nome:</strong> Salva il Contesto corrente con un nome.</li>
             <li><strong>Elenco:</strong> Carica o elimina i Contesti salvati.</li>
             <li><strong>Domanda iniziale:</strong> Mostra la domanda utilizzata per creare il Contesto corrente.</li>
-            <li><strong>Risposta:</strong> Mostra la risposta generata dall'LLM basata sul Contesto.</li>
         </ul>
     </div>
     <div>
         <strong>Conversazione</strong>
         <ul>
             <li><strong>Visualizza:</strong> Mostra l'intera cronologia della conversazione corrente.</li>
-            <li><strong>Archivia:</strong> Salva la conversazione corrente con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina le conversazioni archiviate.</li>
+            <li><strong>Salva con Nome:</strong> Salva la conversazione corrente con un nome.</li>
+            <li><strong>Elenco:</strong> Carica o elimina le conversazioni salvate.</li>
         </ul>
     </div>
     <div>
         <strong>Gestione Dati</strong>
         <ul>
-            <li><strong>Elenco Dati:</strong> Mostra un riepilogo di tutti i dati salvati nell'applicazione (Knowledge Base, Contesti, Conversazioni, configurazioni).</li>
+            <li><strong>Elenco Dati:</strong> Mostra un riepilogo di tutti i dati salvati nell'applicazione.</li>
             <li><strong>Cancella Dati:</strong> Permette di cancellare selettivamente o totalmente i dati salvati.</li>
         </ul>
     </div>
@@ -209,20 +213,21 @@ export const help2_html = `
 <div class="text">
     <p class="center">Quickstart: Scenari di Utilizzo</p>
     <p>
-        Questa guida ti mostra come usare ragtext in tre scenari principali.
+        Questa guida ti mostra come usare l'applicazione in tre scenari principali.
     </p>
 
     <!-- SCENARIO 1 -->
     <div>
-        <strong>Scenario 1: Inizio da Zero</strong>
+        <strong>Scenario 1: Inizio da Zero (Flusso Completo)</strong>
         <p>
-            Parti dai tuoi documenti per creare una nuova Knowledge Base e iniziare una conversazione.
+            Parti dai tuoi documenti per creare un Indice di ricerca e iniziare una conversazione.
         </p>
         <ol>
             <li><strong>Carica Documenti:</strong> Usa <strong>"Documenti di esempio"</strong> dal menu o <strong>"Upload file"</strong> per caricare i tuoi file.</li>
-            <li><strong>Crea Knowledge Base:</strong> Clicca il pulsante <strong>(1)</strong> per analizzare i documenti e creare la <em>Knowledge Base</em>. Al termine, puoi salvarla usando il menu <strong>Knowledge Base > Archivia</strong>.</li>
-            <li><strong>Crea Contesto:</strong> Scrivi una domanda specifica nel campo di input e clicca il pulsante <strong>(2)</strong>. Questo estrae le informazioni pertinenti dalla Knowledge Base e crea un <em>Contesto</em>.</li>
-            <li><strong>Conversa:</strong> Fai la stessa domanda (o una simile) e premi <strong>Invio</strong> (o il pulsante <strong>(3)</strong>) per avviare la conversazione basata sul Contesto appena creato.</li>
+            <li><strong>Fase 0 (Segmenta):</strong> Clicca il pulsante <strong>(0)</strong> per suddividere i documenti in <em>Chunks</em>. Al termine, puoi salvarli usando il menu <strong>Fase 0: Chunks > Salva con Nome</strong>.</li>
+            <li><strong>Fase 1 (Indicizza):</strong> Clicca il pulsante <strong>(1)</strong> per creare un <em>Indice</em> di ricerca dai chunks. Puoi salvarlo usando il menu <strong>Fase 1: Indice > Salva con Nome</strong>.</li>
+            <li><strong>Fase 2 (Cerca):</strong> Scrivi una domanda specifica nel campo di input e clicca il pulsante <strong>(2)</strong>. Questo crea un <em>Contesto</em> con le informazioni più pertinenti.</li>
+            <li><strong>Fase 3 (Genera):</strong> Clicca il pulsante <strong>(3)</strong> per inviare la domanda e il Contesto all'LLM e ottenere una risposta. Da qui puoi continuare la conversazione.</li>
         </ol>
     </div>
 
@@ -230,19 +235,19 @@ export const help2_html = `
 
     <!-- SCENARIO 2 -->
     <div>
-        <strong>Scenario 2: Inizio da una Knowledge Base Esistente</strong>
+        <strong>Scenario 2: Inizio da un Indice Esistente</strong>
         <p>
-            Usa una <em>Knowledge Base</em> che hai già salvato per iniziare una nuova indagine, senza ri-analizzare i documenti.
+            Usa un <em>Indice</em> che hai già salvato per fare nuove domande, senza ri-processare i documenti.
         </p>
         <ol>
-            <li><strong>Carica Knowledge Base:</strong>
+            <li><strong>Carica Indice:</strong>
                 <ul>
-                    <li>Vai nel menu laterale a <strong>Knowledge Base > Elenco</strong>.</li>
-                    <li>Trova la base dati che ti interessa e clicca su <strong>"Carica"</strong>.</li>
+                    <li>Vai nel menu laterale a <strong>Fase 1: Indice > Elenco</strong>.</li>
+                    <li>Trova l'indice che ti interessa e clicca su <strong>"Carica"</strong>.</li>
                 </ul>
             </li>
-            <li><strong>Crea Contesto:</strong> Scrivi una <strong>nuova domanda</strong> nel campo di input e clicca il pulsante <strong>(2)</strong> per creare un nuovo <em>Contesto</em> specifico per questa domanda.</li>
-            <li><strong>Conversa:</strong> Premi <strong>Invio</strong> (o il pulsante <strong>(3)</strong>) per avviare la conversazione.</li>
+            <li><strong>Fase 2 (Cerca):</strong> Scrivi una <strong>nuova domanda</strong> nel campo di input e clicca il pulsante <strong>(2)</strong> per creare un nuovo <em>Contesto</em>.</li>
+            <li><strong>Fase 3 (Genera):</strong> Clicca il pulsante <strong>(3)</strong> per avviare la conversazione.</li>
         </ol>
     </div>
 
@@ -257,11 +262,11 @@ export const help2_html = `
         <ol>
             <li><strong>Carica Contesto:</strong>
                 <ul>
-                    <li>Vai nel menu laterale a <strong>Contesto > Elenco</strong>.</li>
+                    <li>Vai nel menu laterale a <strong>Fase 2: Contesto > Elenco</strong>.</li>
                     <li>Trova il contesto che ti interessa e clicca su <strong>"Carica"</strong>.</li>
                 </ul>
             </li>
-            <li><strong>Continua la Conversazione:</strong> Scrivi una domanda di approfondimento nel campo di input e premi <strong>Invio</strong> (o il pulsante <strong>(3)</strong>) per continuare la conversazione associata a quel contesto.</li>
+            <li><strong>Continua la Conversazione:</strong> Scrivi una domanda di approfondimento nel campo di input e clicca il pulsante <strong>(3)</strong> per continuare la conversazione associata a quel contesto.</li>
         </ol>
     </div>
 </div>
