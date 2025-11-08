@@ -138,28 +138,15 @@
         <div class="input-wrapper">
           <textarea class="text-input" placeholder="Scrivi qui... " rows="2"></textarea>
           <div class="input-actions">
-            <button class="send0-input tt-leftx" data-tt="Creazione della Knowledge Base  .">
-              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="none" stroke="#FFFFFF" stroke-width="2" />
-              </svg>
-            </button>
-            <button class="send1-input tt-leftx" data-tt="Estrazione => Creazone Conteto della query   .">
-              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="none" stroke="#FFFFFF" stroke-width="2" />
-              </svg>
-            </button>
-            <button class="send2-input tt-leftx" data-tt="Contesto=>Query   .">
-              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="none" stroke="#FFFFFF" stroke-width="2" />
-              </svg>
-            </button>
+            <button id="btn-phase0" class="tt-leftx" data-tt="Esegue la fase di segmentazione dei documenti.">Fase 0: Segmenta</button>
+            <button id="btn-phase1" class="tt-leftx" data-tt="Esegue la fase di indicizzazione dei chunk.">Fase 1: Indicizza</button>
+            <button id="btn-phase2" class="tt-leftx" data-tt="Esegue la ricerca lessicale usando la query.">Fase 2: Cerca</button>
+            <button id="btn-phase3" class="tt-leftx" data-tt="Genera la risposta finale con l'LLM.">Fase 3: Genera</button>
             <button class="clear-input tt-leftx" data-tt="Cancella Input">
               <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M3 6h18v2H3V6zm2 3h14v12H5V9zm3-7h6v2H8V2z" />
               </svg>
             </button>
-
-
           </div>
         </div>
       </div>

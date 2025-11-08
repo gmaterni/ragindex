@@ -268,122 +268,146 @@ export const TextInput = {
   init() {
     this.inp = document.querySelector(".text-input");
   },
-  handleEnter(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      this.send2();
-    }
-  },
 
-  async send0() {
-    const docNames = DocsMgr.names();
-    if (docNames.length == 0) {
-      alert("Non vi sono documenti da elaborare.\n  Se vuoi iniziare una conversazione usa il pulsante verde o return  ");
-      return;
-    }
-    const ok = await confirm("Confermi creazioene Base di conoscenza ?");
-    if (!ok)
-      return;
-    setResponseHtml("");
-    Spinner.show();
-    try {
-      const webid = WebId.get();
-      FirebaseLogger.sendLog("send0", webid)
-      AppMgr.initConfig();
-      const ok = await ragEngine.buildKnBase();
-      if (ok) {
-        alert(" Base di conoscenza creata con successo!");
-      }
-    } catch (error) {
-      console.error("Error send0", error);
-      if (error && error.type === "CancellationError" && error.code === 499) {
-        alert("Richiesta interrotta");
-      } else {
-        let errorMessage = errorDumps(error);
-        alert(errorMessage);
-      }
-    } finally {
-      Spinner.hide();
-    }
-  },
-
-  async send1() {
-    const query = this.inp.value;
-    if (!query) {
-      alert("Ricorda di scrivere la Query  ");
-      return;
-    }
-    let knBase = await idbMgr.exists(DATA_KEYS.KEY_KNBASE);
-    if (!knBase) {
-      alert("Base di conoscenza Vuota;");
-      return;
-    }
-    let context = await idbMgr.exists(DATA_KEYS.KEY_CONTEXT);
-    if (context) {
-      const s = `Vuoi creare un nuovo contesto per la query \n ${query}`;
-      const ok = await confirm(s)
-      if (!ok) return;
-    }
-    try {
-      Spinner.show();
-      const webid = WebId.get();
-      FirebaseLogger.sendLog("send1", webid)
-      AppMgr.initConfig();
-      let history = await ragEngine.buildContext(query);
-      if (!history) history = [];
-      const html = messages2html(history)
-      setResponseHtml(html);
-      TextInput.inp.value = "";
-    } catch (error) {
-      console.error("Error send1", error);
-      if (error && error.type === "CancellationError" && error.code === 499) {
-        alert("Richiesta interrotta");
-      }
-      else {
-        const s = errorDumps(error);
-        alert(s);
-      }
-    } finally {
-      Spinner.hide();
-    }
-  },
-
-  async send2() {
-    const q = this.inp.value;
-    if (!q) {
-      alert("Ricorda di scrivere la Query  ");
-      return;
-    }
-    Spinner.show();
-    const query = this.inp.value.trim();
-    try {
-      const webid = WebId.get();
-      FirebaseLogger.sendLog("send2", webid)
-      AppMgr.initConfig();
-      const history = await ragEngine.runConversation(query);
-      const html = messages2html(history);
-      if (html == "") {
-        return;
-      }
-      setResponseHtml(html);
-      TextInput.inp.value = "";
-    } catch (error) {
-      console.error("Error send2", error);
-      if (error && error.type === "CancellationError" && error.code === 499) {
-        alert("Richiesta interrotta");
-      } else {
-        const s = errorDumps(error);
-        alert(s);
-      }
-    } finally {
-      Spinner.hide();
-    }
-  },
   clear() {
     this.inp.value = "";
     this.inp.focus();
-  }
+  },
 
+  async runPhase0() {
+    UaLog.log("Inizio Fase 0: Segmentazione...");
+    const docNames = DocsMgr.names();
+    if (docNames.length === 0) {
+      alert("Nessun documento caricato. Per favore, carica uno o più documenti prima di iniziare.");
+      return;
+    }
+    
+    setResponseHtml("");
+    Spinner.show();
+    try {
+      let allChunks = [];
+      for (let i = 0; i < docNames.length; i++) {
+        const docName = docNames[i];
+        UaLog.log(` Elaborazione documento ${i + 1}/${docNames.length}: ${docName}`);
+        const docText = DocsMgr.doc(i);
+        const docChunks = await ragEngine.ne0_chunkAndAnnotate(docText);
+        docChunks.forEach((chunk, index) => {
+            chunk.id = `doc${i}-chunk${index}`;
+        });
+        allChunks.push(...docChunks);
+      }
+      
+      UaDb.saveJson(DATA_KEYS.PHASE0_CHUNKS, allChunks);
+      UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in localStorage.`);
+      
+      console.debug("--- FASE 0: CHUNKS CREATI ---");
+      console.debug(allChunks);
+      setResponseHtml(`<h4>Fase 0 Completata</h4><p>${allChunks.length} chunk creati. Controlla la console (F12) per i dettagli.</p>`);
+      alert(`Fase 0 completata: ${allChunks.length} chunk creati.`);
+
+    } catch (error) {
+      console.error("Errore in Fase 0", error);
+      alert(errorDumps(error));
+    } finally {
+      Spinner.hide();
+    }
+  },
+
+  async runPhase1() {
+    UaLog.log("Inizio Fase 1: Indicizzazione...");
+    const chunks = UaDb.readJson(DATA_KEYS.PHASE0_CHUNKS);
+    if (!chunks || chunks.length === 0) {
+      alert("Nessun chunk trovato. Esegui prima la Fase 0.");
+      return;
+    }
+    
+    Spinner.show();
+    try {
+      const index = ragEngine.ne1_buildIndex(chunks);
+      const serializedIndex = JSON.stringify(index);
+      UaDb.save(DATA_KEYS.PHASE1_INDEX, serializedIndex);
+      
+      UaLog.log(`Fase 1 completata: Indice creato e salvato in localStorage.`);
+      console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
+      console.debug(serializedIndex);
+      setResponseHtml(`<h4>Fase 1 Completata</h4><p>Indice creato e salvato. Controlla la console (F12) per i dettagli.</p>`);
+      alert("Fase 1 completata: Indice creato.");
+
+    } catch (error) {
+      console.error("Errore in Fase 1", error);
+      alert(errorDumps(error));
+    } finally {
+      Spinner.hide();
+    }
+  },
+
+  async runPhase2() {
+    UaLog.log("Inizio Fase 2: Ricerca...");
+    const query = this.inp.value.trim();
+    if (!query) {
+      alert("Inserisci una query nell'area di testo.");
+      return;
+    }
+    
+    const serializedIndex = UaDb.read(DATA_KEYS.PHASE1_INDEX);
+    if (!serializedIndex) {
+      alert("Nessun indice trovato. Esegui prima la Fase 1.");
+      return;
+    }
+
+    Spinner.show();
+    try {
+      const index = lunr.Index.load(JSON.parse(serializedIndex));
+      const searchResults = ragEngine.ne2_search(index, query);
+      
+      UaDb.saveJson(DATA_KEYS.PHASE2_SEARCH_RESULTS, searchResults);
+      UaDb.save(DATA_KEYS.PHASE2_QUERY, query);
+
+      UaLog.log(`Fase 2 completata: ${searchResults.length} risultati trovati per la query.`);
+      
+      console.debug("--- FASE 2: RISULTATI RICERCA ---");
+      console.debug(searchResults);
+      setResponseHtml(`<h4>Fase 2 Completata</h4><p>${searchResults.length} risultati trovati. Controlla la console (F12) per i dettagli.</p>`);
+      alert(`Fase 2 completata: ${searchResults.length} risultati trovati.`);
+
+    } catch (error) {
+      console.error("Errore in Fase 2", error);
+      alert(errorDumps(error));
+    } finally {
+      Spinner.hide();
+    }
+  },
+
+  async runPhase3() {
+    UaLog.log("Inizio Fase 3: Generazione Risposta...");
+    const chunks = UaDb.readJson(DATA_KEYS.PHASE0_CHUNKS);
+    const searchResults = UaDb.readJson(DATA_KEYS.PHASE2_SEARCH_RESULTS);
+    const query = UaDb.read(DATA_KEYS.PHASE2_QUERY);
+
+    if (!chunks || !searchResults || !query) {
+        alert("Dati mancanti dalle fasi precedenti. Assicurati di aver completato le Fasi 0, 1 e 2.");
+        return;
+    }
+
+    Spinner.show();
+    try {
+      AppMgr.initConfig(); // Ensure LLM client is ready
+      const answer = await ragEngine.ne3_generateResponse(query, searchResults, chunks);
+      
+      setResponseHtml(`<div class="final-answer">${answer}</div>`);
+      UaLog.log("Fase 3 completata: Risposta generata.");
+
+    } catch (error) {
+      console.error("Errore in Fase 3", error);
+      if (error && error.type === "CancellationError" && error.code === 499) {
+        alert("Richiesta LLM interrotta.");
+      } else {
+        alert(errorDumps(error));
+      }
+    } finally {
+      Spinner.hide();
+    }
+  },
 };
 
 export const TextOutput = {
@@ -1056,12 +1080,11 @@ export function bindEventListener() {
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 
-  // TextInput
-  const textInput = document.querySelector(".text-input");
-  textInput.addEventListener("keydown", (e) => TextInput.handleEnter(e));
-  document.querySelector(".send0-input").addEventListener("click", () => TextInput.send0());
-  document.querySelector(".send1-input").addEventListener("click", () => TextInput.send1());
-  document.querySelector(".send2-input").addEventListener("click", () => TextInput.send2());
+  // New pedagogical workflow buttons
+  document.getElementById("btn-phase0").addEventListener("click", () => TextInput.runPhase0());
+  document.getElementById("btn-phase1").addEventListener("click", () => TextInput.runPhase1());
+  document.getElementById("btn-phase2").addEventListener("click", () => TextInput.runPhase2());
+  document.getElementById("btn-phase3").addEventListener("click", () => TextInput.runPhase3());
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
   // TextOutput

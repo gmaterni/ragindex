@@ -1,5 +1,13 @@
 export const DATA_KEYS = {
+    // Inter-phase data products for pedagogical flow
+    PHASE0_CHUNKS: "phase0_chunks",
+    PHASE1_INDEX: "phase1_index",
+    PHASE2_SEARCH_RESULTS: "phase2_search_results",
+    PHASE2_QUERY: "phase2_query",
+
     // indexDb usare idbMgr
+    KEY_KNBASE_INDEX: "knbase_index",
+    KEY_KNBASE_CHUNKS: "knbase_chunks",
     KEY_KNBASE: "knbase",
     KEY_CONTEXT: "context",
     KEY_THREAD: "thread",
