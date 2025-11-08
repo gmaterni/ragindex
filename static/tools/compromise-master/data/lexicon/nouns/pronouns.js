@@ -1,0 +1,18 @@
+export default [
+  'it',
+  'they',
+  'i',
+  'them',
+  'you',
+  'she',
+  'me',
+  'he',
+  'him',
+  'us',
+  'we',
+  'thou',
+  'thee',
+  'il',
+  'elle',
+  // `'em`,
+]
