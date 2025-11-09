@@ -6,11 +6,11 @@ import { GeminiClient } from './llmclient/gemini_client.js';
 import { GroqClient } from './llmclient/groq_client.js';
 import { MistralClient } from './llmclient/mistral_client.js';
 // import { HuggingFaceClient } from './llmclient/huggingface_client.js';
-import { UaDb } from "./services/uadb.js";
+import { UaJtfh } from "./services/uajtfh.js";
 import { wnds } from "./app_ui.js";
-import { DocType } from "./services/doc_types.js";
 import { UaWindowAdm } from "./services/uawindow.js";
 import { DATA_KEYS } from "./services/data_keys.js";
+import { UaDb } from "./services/uadb.js";
 
 const CLIENTS = {
   "gemini": null,
@@ -217,7 +217,6 @@ export const LlmProvider = {
 
   showConfig() {
     const llmConfig = LlmProvider.getConfig();
-    const docTypeConfig = DocType.getConfig();
 
     const html = `
       <div class="config-confirm">
@@ -226,7 +225,6 @@ export const LlmProvider = {
                 <tr><td>Modello</td><td>${llmConfig.model}</td></tr>
                 <tr><td>Prompt Size</td><td>${llmConfig.windowSize}k</td></tr>
                 <tr><td>client</td><td>${llmConfig.client}</td></tr>
-                <tr><td>Tipo Documento</td><td>${docTypeConfig.docType}</td></tr>
           </table>
       </div>
     `;

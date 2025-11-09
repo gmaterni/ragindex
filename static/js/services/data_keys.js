@@ -17,7 +17,6 @@ export const DATA_KEYS = {
     // localStorage
     KEY_THEME: "ua_theme",
     KEY_PROVIDER: "llm_provider",
-    KEY_DOC_TYPE: "doc_type",
     KEY_DOCS: "docs_list",
     KEY_RESPONSE: "llm_response",
     KEY_QUERY: "llm_query",

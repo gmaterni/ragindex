@@ -224,7 +224,8 @@ async function openApp() {
     const webid = WebId.get();
     FirebaseLogger.sendLog("open", webid)
   } catch (error) {
-    console.error("Si è verificato un errore durante l'inizializzazione dell'app:", error);
+    console.error(error);
+    // console.error("Si è vrificato un errore durante l'inizializzazione dell'app:", error);
   }
 }
 window.addEventListener("load", openApp);

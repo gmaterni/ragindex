@@ -3,7 +3,8 @@
 
 // import { getApiKey } from "./services/key_retriever.js";
 import { LlmProvider } from "./llm_provider.js";
-import { DocType } from "./services/doc_types.js";
+import { DocsMgr } from "./services/docs_mgr.js";
+import { UaLog } from "./services/ualog3.js";
 import { ragEngine } from "./rag_engine.js";
 
 const tokensToBytes = (nk = 32) => {
@@ -14,7 +15,6 @@ const tokensToBytes = (nk = 32) => {
 };
 
 export const AppMgr = {
-  configTD: null,
   configLLM: null,
   clientLLM: null,
   promptSize: 0,
@@ -26,8 +26,6 @@ export const AppMgr = {
 
   initConfig() {
     LlmProvider.initConfig();
-    DocType.init();
-    this.configTD = DocType.getConfig();
     this.configLLM = LlmProvider.getConfig();
     this.promptSize = tokensToBytes(this.configLLM.windowSize);
     console.info("=============================")
@@ -35,12 +33,10 @@ export const AppMgr = {
     console.info(`*** MODEL       : ${this.configLLM.model}`);
     console.info(`*** WINDOW_SIZE : ${this.configLLM.windowSize}`);
     console.info(`*** PROMPT_SIZE : ${this.promptSize}`);
-    console.info(`*** DOC_TYPE    : ${this.configTD.docType}`);
     console.info(`*** CLIENT     : ${this.configLLM.client}`);
     const model = this.configLLM.model;
     const promptSize = this.promptSize;
-    const docType = this.configTD.docType;
     this.clientLLM = LlmProvider.getclient();
-    ragEngine.init(this.clientLLM, model, promptSize, docType);
+    ragEngine.init(this.clientLLM, model, promptSize);
   },
 };

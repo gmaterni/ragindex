@@ -9,7 +9,6 @@ import { AppMgr } from "./app_mgr.js";
 import { UaDb } from "./services/uadb.js";
 import { DocsMgr } from "./services/docs_mgr.js";
 import { LlmProvider } from "./llm_provider.js";
-import { DocType } from "./services/doc_types.js";
 import { textFormatter, messages2html, messages2text } from "./history_utils.js";
 import { ragEngine } from "./rag_engine.js";
 import { DATA_KEYS } from "./services/data_keys.js";
@@ -250,9 +249,6 @@ export const Commands = {
   },
   providerSettings() {
     LlmProvider.toggleTreeView();
-  },
-  docTypeSettings() {
-    DocType.toggleTreeView();
   },
 };
 
@@ -622,7 +618,6 @@ const KEY_DESCRIPTIONS = {
   [DATA_KEYS.KEY_THREAD]: "Conversazione Corrente",
   
   [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
-  [DATA_KEYS.KEY_DOC_TYPE]: "Configurazione Tipo Documento",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
   [DATA_KEYS.PHASE2_QUERY]: "Query Corrente (Fase 2)",
   [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati"
@@ -659,8 +654,7 @@ const elencoDati = async () => {
     DATA_KEYS.PHASE2_QUERY, 
     DATA_KEYS.KEY_DOCS,
     DATA_KEYS.KEY_THEME,
-    DATA_KEYS.KEY_PROVIDER,
-    DATA_KEYS.KEY_DOC_TYPE
+    DATA_KEYS.KEY_PROVIDER
   ];
 
   jfh.append('<h4>Dati in IndexedDB</h4>');
@@ -971,7 +965,6 @@ export function bindEventListener() {
   document.getElementById("btn-upload").addEventListener("click", Commands.upload);
   document.getElementById("id_log").addEventListener("click", Commands.log);
   document.getElementById("btn-provider-settings").addEventListener("click", Commands.providerSettings);
-  document.getElementById("btn-doctype-settings").addEventListener("click", Commands.docTypeSettings);
   document.getElementById("btn-dark-theme").addEventListener("click", () => setTheme("dark"));
   document.getElementById("btn-light-theme").addEventListener("click", () => setTheme("light"));
   
