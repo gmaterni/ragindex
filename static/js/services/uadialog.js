@@ -59,8 +59,10 @@ export const DialogManager = {
       // Chiudi eventuali dialoghi aperti
       const existingOverlay = document.querySelector('.overlay.show');
       if (existingOverlay) {
-        const existingDialog = document.querySelector('.dialog.show');
-        this.closeDialog(existingDialog, existingOverlay);
+        const existingDialog = document.querySelector('[class*="-dialog"].show');
+        if (existingDialog) {
+          this.closeDialog(existingDialog, existingOverlay);
+        }
       }
 
       const { dialog, overlay } = this.createDialog(type, message, defaultValue);
