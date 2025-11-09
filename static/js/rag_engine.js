@@ -90,6 +90,9 @@ export const ragEngine = {
             });
             
             allChunks.push(...docChunks);
+
+            // Cede il controllo al browser per mantenere l'UI reattiva
+            await new Promise(resolve => setTimeout(resolve, 0)); 
         }
         return allChunks;
     },

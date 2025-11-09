@@ -57,6 +57,18 @@ const Spinner = {
   },
 };
 
+const WaitSpinner = {
+  show: () => {
+    const spinner = document.getElementById("spinner-wait");
+    spinner.classList.add("show-spinner-wait");
+  },
+
+  hide: () => {
+    const spinner = document.getElementById("spinner-wait");
+    spinner.classList.remove("show-spinner-wait");
+  },
+};
+
 
 const errorDumps = (err) => {
   const s = JSON.stringify(err, null, 2);
@@ -300,29 +312,27 @@ export const TextInput = {
     const ok = await confirm("Confermi di voler avviare la segmentazione dei documenti? L'operazione suddividerà i testi in frammenti analizzabili.");
     if (!ok) return;
     
-    Spinner.show();
+    WaitSpinner.show();
 
-    // Pausa forzata per dare al browser il tempo di mostrare lo spinner
-    // prima di avviare l'elaborazione pesante e sincrona.
-    await new Promise(resolve => setTimeout(resolve, 50)); 
+    setTimeout(async () => {
+      try {
+        const documents = docNames.map((name, i) => ({ name, text: DocsMgr.doc(i) }));
+        const allChunks = await ragEngine.processDocumentsForPhase0(documents);
+        
+        await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, allChunks);
+        UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in IndexedDB.`);
+        
+        console.debug("--- FASE 0: CHUNKS CREATI ---");
+        console.debug(allChunks);
+        alert(`Segmentazione completata: ${allChunks.length} frammenti creati.`);
 
-    try {
-      const documents = docNames.map((name, i) => ({ name, text: DocsMgr.doc(i) }));
-      const allChunks = await ragEngine.processDocumentsForPhase0(documents);
-      
-      await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, allChunks);
-      UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in IndexedDB.`);
-      
-      console.debug("--- FASE 0: CHUNKS CREATI ---");
-      console.debug(allChunks);
-      alert(`Segmentazione completata: ${allChunks.length} frammenti creati.`);
-
-    } catch (error) {
-      console.error("Errore in Fase 0", error);
-      alert(errorDumps(error));
-    } finally {
-      Spinner.hide();
-    }
+      } catch (error) {
+        console.error("Errore in Fase 0", error);
+        alert(errorDumps(error));
+      } finally {
+        WaitSpinner.hide();
+      }
+    }, 50);
   },
 
   async runPhase1() {
@@ -338,25 +348,26 @@ export const TextInput = {
     const ok = await confirm("Confermi di voler creare l'indice lessicale dai frammenti? Questa operazione è necessaria per la ricerca.");
     if (!ok) return;
     
-    Spinner.show();
-    await new Promise(resolve => setTimeout(resolve, 50)); 
+    WaitSpinner.show();
 
-    try {
-      const index = ragEngine.ne1_buildIndex(chunks);
-      const serializedIndex = JSON.stringify(index);
-      await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
-      
-      UaLog.log(`Fase 1 completata: Indice creato e salvato in IndexedDB.`);
-      console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
-      console.debug(serializedIndex);
-      alert(`Indicizzazione completata: Indice creato e salvato.`);
+    setTimeout(async () => {
+      try {
+        const index = ragEngine.ne1_buildIndex(chunks);
+        const serializedIndex = JSON.stringify(index);
+        await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
+        
+        UaLog.log(`Fase 1 completata: Indice creato e salvato in IndexedDB.`);
+        console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
+        console.debug(serializedIndex);
+        alert(`Indicizzazione completata: Indice creato e salvato.`);
 
-    } catch (error) {
-      console.error("Errore in Fase 1", error);
-      alert(errorDumps(error));
-    } finally {
-      Spinner.hide();
-    }
+      } catch (error) {
+        console.error("Errore in Fase 1", error);
+        alert(errorDumps(error));
+      } finally {
+        WaitSpinner.hide();
+      }
+    }, 50);
   },
 
   async runPhase2() {
@@ -378,27 +389,28 @@ export const TextInput = {
     const ok = await confirm("Confermi di voler avviare la ricerca per creare il contesto?");
     if (!ok) return;
 
-    Spinner.show();
-    await new Promise(resolve => setTimeout(resolve, 50)); 
+    WaitSpinner.show();
 
-    try {
-      const searchResults = ragEngine.ne2_search(serializedIndex, query);
-      
-      await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, searchResults);
-      UaDb.save(DATA_KEYS.PHASE2_QUERY, query); // Query is small, localStorage is fine
+    setTimeout(async () => {
+      try {
+        const searchResults = ragEngine.ne2_search(serializedIndex, query);
+        
+        await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, searchResults);
+        UaDb.save(DATA_KEYS.PHASE2_QUERY, query); // Query is small, localStorage is fine
 
-      UaLog.log(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati per la query.`);
-      
-      console.debug("--- FASE 2: RISULTATI CONTESTO ---");
-      console.debug(searchResults);
-      alert(`Ricerca completata: ${searchResults.length} risultati di contesto trovati.`);
+        UaLog.log(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati per la query.`);
+        
+        console.debug("--- FASE 2: RISULTATI CONTESTO ---");
+        console.debug(searchResults);
+        alert(`Ricerca completata: ${searchResults.length} risultati di contesto trovati.`);
 
-    } catch (error) {
-      console.error("Errore in Fase 2", error);
-      alert(errorDumps(error));
-    } finally {
-      Spinner.hide();
-    }
+      } catch (error) {
+        console.error("Errore in Fase 2", error);
+        alert(errorDumps(error));
+      } finally {
+        WaitSpinner.hide();
+      }
+    }, 50);
   },
 
   async runPhase3() {
