@@ -1,12 +1,19 @@
 /** @format */
 "use strict";
 
-// Core RAG Logic
+/**
+ * @file rag_engine.js
+ * @description
+ * Questo file contiene il "cervello" della logica RAG (Retrieval-Augmented Generation).
+ * È progettato per essere un modulo di "business logic" puro, il che significa che
+ * non interagisce direttamente con il DOM, lo storage o le API di rete.
+ * Le sue funzioni ricevono dati, li elaborano e restituiscono un risultato,
+ * lasciando al chiamante (app_ui.js) il compito di orchestrare il flusso.
+ */
 
 // App Integration Dependencies
 import { UaLog } from "./services/ualog3.js";
 import { promptBuilder } from "./llm_prompts.js";
-import { DATA_KEYS } from "./services/data_keys.js";
 
 // #region LLM Communication (copied from original rag_engine)
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -61,7 +68,37 @@ export const ragEngine = {
         this.promptSize = promptSize;
     },
 
-    // #region Core Logic (ne0, ne1, ne2, ne3)
+    /**
+     * Esegue l'intera logica di business per la Fase 0.
+     * Prende i documenti, li cicla, li segmenta e arricchisce i chunk con metadati.
+     * @param {Array<Object>} documents - Array di oggetti documento, es. [{name: 'doc1.txt', text: '...'}]
+     * @returns {Promise<Array<Object>>} Una promessa che si risolve con l'array completo di tutti i chunk processati.
+     */
+    async processDocumentsForPhase0(documents) {
+        let allChunks = [];
+        for (let i = 0; i < documents.length; i++) {
+            const doc = documents[i];
+            UaLog.log(` Elaborazione documento ${i + 1}/${documents.length}: ${doc.name}`);
+            
+            // La funzione ne0_chunkAndAnnotate usa la libreria globale 'nlp' (compromise.js),
+            // caricata via tag <script> in ragtext.html, per l'analisi del testo.
+            const docChunks = await this.ne0_chunkAndAnnotate(doc.text);
+            
+            // Arricchisce i chunk con un ID univoco basato sul documento di origine.
+            docChunks.forEach((chunk, index) => {
+                chunk.id = `doc${i}-chunk${index}`;
+            });
+            
+            allChunks.push(...docChunks);
+        }
+        return allChunks;
+    },
+
+    /**
+     * Logica interna della Fase 0: Segmentazione e Annotazione di un singolo testo.
+     * @param {string} text - Il contenuto testuale di un documento.
+     * @returns {Promise<Array<Object>>} Un array di oggetti chunk per il documento fornito.
+     */
     async ne0_chunkAndAnnotate(text) {
         const chunks = [];
         const sentences = nlp(text).sentences().out('array');
@@ -109,6 +146,13 @@ export const ragEngine = {
         };
     },
 
+    /**
+     * Fase 1: Indicizzazione.
+     * Input: Array di chunk dalla Fase 0.
+     * Output: Oggetto indice di Lunr.js.
+     * @param {Array<Object>} chunks - L'array di oggetti chunk prodotto dalla Fase 0.
+     * @returns {Object} Un oggetto indice di Lunr.js.
+     */
     ne1_buildIndex(chunks) {
         const idx = lunr(function () {
             this.use(lunr.it);
@@ -123,11 +167,31 @@ export const ragEngine = {
         return idx;
     },
 
-    ne2_search(index, query) {
-        // Note: The index must be deserialized (lunr.Index.load) before being passed here.
+    /**
+     * Fase 2: Ricerca (Creazione del Contesto).
+     * Input: Indice serializzato da IndexedDB e query dall'utente.
+     * Output: Array di risultati di ricerca.
+     * @param {string} serializedIndex - L'indice serializzato (JSON) creato nella Fase 1.
+     * @param {string} query - La domanda dell'utente.
+     * @returns {Array<Object>} Un array di risultati di ricerca di Lunr.js.
+     */
+    ne2_search(serializedIndex, query) {
+        if (!serializedIndex) {
+            throw new Error("Indice serializzato non fornito a ne2_search.");
+        }
+        const index = lunr.Index.load(JSON.parse(serializedIndex));
         return index.search(query);
     },
 
+    /**
+     * Fase 3: Generazione della Risposta.
+     * Input: Query utente, risultati della ricerca (contesto) e tutti i chunk.
+     * Output: Stringa di testo con la risposta dell'LLM.
+     * @param {string} query - La domanda originale dell'utente.
+     * @param {Array<Object>} searchResults - I risultati della ricerca dalla Fase 2.
+     * @param {Array<Object>} allChunks - Tutti i chunk dalla Fase 0.
+     * @returns {Promise<string>} Una promessa che si risolve con la risposta testuale dell'LLM.
+     */
     async ne3_generateResponse(query, searchResults, allChunks) {
         let context = "";
         const MAX_CONTEXT_LENGTH = this.promptSize * 0.7;

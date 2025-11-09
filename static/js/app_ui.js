@@ -1,6 +1,18 @@
 /** @format */
 "use strict";
 
+/**
+ * @file app_ui.js
+ * @description
+ * Questo file agisce come il "Controller" principale dell'applicazione.
+ * Ha le seguenti responsabilità:
+ * 1. Gestire tutti gli eventi dell'interfaccia utente (click dei pulsanti, etc.).
+ * 2. Orchestare il flusso di lavoro RAG chiamando i servizi appropriati (per lo storage)
+ *    e il motore di business logic (rag_engine.js) per l'elaborazione.
+ * 3. Aggiornare l'interfaccia utente con risultati, messaggi e stati di attesa.
+ * 4. Gestire la visualizzazione e l'interazione con finestre di dialogo e informative.
+ */
+
 import { UaWindowAdm } from "./services/uawindow.js";
 import { UaLog } from "./services/ualog3.js";
 import { help0_html, help1_html, help2_html } from "./services/help.js";
@@ -270,36 +282,40 @@ export const TextInput = {
     this.inp.focus();
   },
 
+  /**
+   * Orchestra la Fase 0: Segmentazione.
+   * Chiede conferma, mostra uno spinner, e poi chiama il motore RAG
+   * per processare i documenti. Salva il risultato in IndexedDB.
+   */
   async runPhase0() {
+    // Input: Nessuno (legge i documenti da DocsMgr).
+    // Output: Salva i chunk in IndexedDB (DATA_KEYS.PHASE0_CHUNKS).
     UaLog.log("Inizio Fase 0: Segmentazione...");
     const docNames = DocsMgr.names();
     if (docNames.length === 0) {
       alert("Nessun documento caricato. Per favore, carica uno o più documenti prima di iniziare.");
       return;
     }
+
+    const ok = await confirm("Confermi di voler avviare la segmentazione dei documenti? L'operazione suddividerà i testi in frammenti analizzabili.");
+    if (!ok) return;
     
-    setResponseHtml("");
     Spinner.show();
+
+    // Pausa forzata per dare al browser il tempo di mostrare lo spinner
+    // prima di avviare l'elaborazione pesante e sincrona.
+    await new Promise(resolve => setTimeout(resolve, 50)); 
+
     try {
-      let allChunks = [];
-      for (let i = 0; i < docNames.length; i++) {
-        const docName = docNames[i];
-        UaLog.log(` Elaborazione documento ${i + 1}/${docNames.length}: ${docName}`);
-        const docText = DocsMgr.doc(i);
-        const docChunks = await ragEngine.ne0_chunkAndAnnotate(docText);
-        docChunks.forEach((chunk, index) => {
-            chunk.id = `doc${i}-chunk${index}`;
-        });
-        allChunks.push(...docChunks);
-      }
+      const documents = docNames.map((name, i) => ({ name, text: DocsMgr.doc(i) }));
+      const allChunks = await ragEngine.processDocumentsForPhase0(documents);
       
       await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, allChunks);
       UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in IndexedDB.`);
       
       console.debug("--- FASE 0: CHUNKS CREATI ---");
       console.debug(allChunks);
-      setResponseHtml(`<h4>Fase 0 Completata</h4><p>${allChunks.length} chunk creati. Controlla la console (F12) per i dettagli.</p>`);
-      alert(`Fase 0 completata: ${allChunks.length} chunk creati.`);
+      alert(`Segmentazione completata: ${allChunks.length} frammenti creati.`);
 
     } catch (error) {
       console.error("Errore in Fase 0", error);
@@ -310,14 +326,21 @@ export const TextInput = {
   },
 
   async runPhase1() {
+    // Input: Legge i chunk da IndexedDB (DATA_KEYS.PHASE0_CHUNKS).
+    // Output: Salva l'indice serializzato in IndexedDB (DATA_KEYS.PHASE1_INDEX).
     UaLog.log("Inizio Fase 1: Indicizzazione...");
     const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
     if (!chunks || chunks.length === 0) {
       alert("Nessun chunk trovato in IndexedDB. Esegui prima la Fase 0.");
       return;
     }
+
+    const ok = await confirm("Confermi di voler creare l'indice lessicale dai frammenti? Questa operazione è necessaria per la ricerca.");
+    if (!ok) return;
     
     Spinner.show();
+    await new Promise(resolve => setTimeout(resolve, 50)); 
+
     try {
       const index = ragEngine.ne1_buildIndex(chunks);
       const serializedIndex = JSON.stringify(index);
@@ -326,8 +349,7 @@ export const TextInput = {
       UaLog.log(`Fase 1 completata: Indice creato e salvato in IndexedDB.`);
       console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
       console.debug(serializedIndex);
-      setResponseHtml(`<h4>Fase 1 Completata</h4><p>Indice creato e salvato. Controlla la console (F12) per i dettagli.</p>`);
-      alert("Fase 1 completata: Indice creato.");
+      alert(`Indicizzazione completata: Indice creato e salvato.`);
 
     } catch (error) {
       console.error("Errore in Fase 1", error);
@@ -338,6 +360,8 @@ export const TextInput = {
   },
 
   async runPhase2() {
+    // Input: Legge l'indice da IndexedDB (DATA_KEYS.PHASE1_INDEX) e la query dall'input utente.
+    // Output: Salva i risultati della ricerca (contesto) in IndexedDB (DATA_KEYS.PHASE2_CONTEXT).
     UaLog.log("Inizio Fase 2: Ricerca Contesto...");
     const query = this.inp.value.trim();
     if (!query) {
@@ -351,10 +375,14 @@ export const TextInput = {
       return;
     }
 
+    const ok = await confirm("Confermi di voler avviare la ricerca per creare il contesto?");
+    if (!ok) return;
+
     Spinner.show();
+    await new Promise(resolve => setTimeout(resolve, 50)); 
+
     try {
-      const index = lunr.Index.load(JSON.parse(serializedIndex));
-      const searchResults = ragEngine.ne2_search(index, query);
+      const searchResults = ragEngine.ne2_search(serializedIndex, query);
       
       await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, searchResults);
       UaDb.save(DATA_KEYS.PHASE2_QUERY, query); // Query is small, localStorage is fine
@@ -363,8 +391,7 @@ export const TextInput = {
       
       console.debug("--- FASE 2: RISULTATI CONTESTO ---");
       console.debug(searchResults);
-      setResponseHtml(`<h4>Fase 2 Completata</h4><p>${searchResults.length} risultati di contesto trovati. Controlla la console (F12) per i dettagli.</p>`);
-      alert(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati.`);
+      alert(`Ricerca completata: ${searchResults.length} risultati di contesto trovati.`);
 
     } catch (error) {
       console.error("Errore in Fase 2", error);
