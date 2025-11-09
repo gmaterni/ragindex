@@ -4,18 +4,58 @@
 /**
  * @file rag_engine.js
  * @description
- * Questo file contiene il "cervello" della logica RAG (Retrieval-Augmented Generation).
- * È progettato per essere un modulo di "business logic" puro, il che significa che
- * non interagisce direttamente con il DOM, lo storage o le API di rete.
- * Le sue funzioni ricevono dati, li elaborano e restituiscono un risultato,
- * lasciando al chiamante (app_ui.js) il compito di orchestrare il flusso.
+ * Questo file agisce come un "proxy" verso il Web Worker (rag_worker.js).
+ * Il suo ruolo è di ricevere le richieste da app_ui.js, inviarle come messaggi
+ * al worker, e restituire una Promise che si risolverà con il risultato del worker.
+ * Mantiene anche la logica per la Fase 3 (chiamate LLM), che rimane nel thread principale.
  */
 
-// App Integration Dependencies
 import { UaLog } from "./services/ualog3.js";
 import { promptBuilder } from "./llm_prompts.js";
 
-// #region LLM Communication (copied from original rag_engine)
+// #region Gestione Worker
+let worker;
+let requestPromises = {}; // Oggetto per mappare comandi a promise
+
+function initWorker() {
+    worker = new Worker('./js/rag_worker.js');
+    worker.onmessage = (e) => {
+        const { status, command, result, error, progress } = e.data;
+        
+        if (status === 'progress') {
+            UaLog.log(progress); // Logga i progressi inviati dal worker
+            return;
+        }
+
+        const promise = requestPromises[command];
+        if (promise) {
+            if (status === 'complete') {
+                promise.resolve(result);
+            } else if (status === 'error') {
+                promise.reject(new Error(error));
+            }
+            delete requestPromises[command]; // Pulisce la promise dopo l'uso
+        }
+    };
+    worker.onerror = (e) => {
+        console.error("Errore generico nel Web Worker:", e);
+        // Rifiuta tutte le promise in attesa
+        Object.values(requestPromises).forEach(p => p.reject(new Error("Errore nel worker")));
+        requestPromises = {};
+    };
+}
+
+function postCommandToWorker(command, data) {
+    return new Promise((resolve, reject) => {
+        // Salva la promise in modo che il listener onmessage possa risolverla
+        requestPromises[command] = { resolve, reject };
+        worker.postMessage({ command, data });
+    });
+}
+
+// #endregion
+
+// #region LLM Communication
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const logMessages = (payload) => {
@@ -66,135 +106,27 @@ export const ragEngine = {
         this.client = client;
         this.model = model;
         this.promptSize = promptSize;
-    },
-
-    /**
-     * Esegue l'intera logica di business per la Fase 0.
-     * Prende i documenti, li cicla, li segmenta e arricchisce i chunk con metadati.
-     * @param {Array<Object>} documents - Array di oggetti documento, es. [{name: 'doc1.txt', text: '...'}]
-     * @returns {Promise<Array<Object>>} Una promessa che si risolve con l'array completo di tutti i chunk processati.
-     */
-    async processDocumentsForPhase0(documents) {
-        let allChunks = [];
-        for (let i = 0; i < documents.length; i++) {
-            const doc = documents[i];
-            UaLog.log(` Elaborazione documento ${i + 1}/${documents.length}: ${doc.name}`);
-            
-            // La funzione ne0_chunkAndAnnotate usa la libreria globale 'nlp' (compromise.js),
-            // caricata via tag <script> in ragtext.html, per l'analisi del testo.
-            const docChunks = await this.ne0_chunkAndAnnotate(doc.text);
-            
-            // Arricchisce i chunk con un ID univoco basato sul documento di origine.
-            docChunks.forEach((chunk, index) => {
-                chunk.id = `doc${i}-chunk${index}`;
-            });
-            
-            allChunks.push(...docChunks);
-
-            // Cede il controllo al browser per mantenere l'UI reattiva
-            await new Promise(resolve => setTimeout(resolve, 0)); 
+        if (!worker) {
+            initWorker();
         }
-        return allChunks;
     },
 
-    /**
-     * Logica interna della Fase 0: Segmentazione e Annotazione di un singolo testo.
-     * @param {string} text - Il contenuto testuale di un documento.
-     * @returns {Promise<Array<Object>>} Un array di oggetti chunk per il documento fornito.
-     */
-    async ne0_chunkAndAnnotate(text) {
-        const chunks = [];
-        const sentences = nlp(text).sentences().out('array');
-        let currentChunkText = "";
-        let chunkIdCounter = 0;
+    // --- Funzioni Proxy per il Worker ---
 
-        const MIN_CHUNK_SIZE = 300;
-        const MAX_CHUNK_SIZE = 1500;
-
-        for (const sentence of sentences) {
-            if (currentChunkText.length + sentence.length + 1 > MAX_CHUNK_SIZE && currentChunkText.length >= MIN_CHUNK_SIZE) {
-                chunks.push(await this._processChunk(currentChunkText, chunkIdCounter++));
-                currentChunkText = sentence;
-            } else {
-                currentChunkText += (currentChunkText.length > 0 ? " " : "") + sentence;
-            }
-        }
-
-        if (currentChunkText.length > 0) {
-            chunks.push(await this._processChunk(currentChunkText, chunkIdCounter++));
-        }
-        return chunks;
+    processDocumentsForPhase0(documents) {
+        return postCommandToWorker('phase0', documents);
     },
 
-    async _processChunk(chunkText, id) {
-        const doc = nlp(chunkText);
-        const nouns = doc.nouns().out('array');
-        const verbs = doc.verbs().out('array');
-        const adjectives = doc.adjectives().out('array');
-        const keywords = [...new Set([...nouns, ...verbs, ...adjectives])]
-            .map(word => word.toLowerCase())
-            .filter(word => word.length > 2);
-
-        const people = doc.people().out('array');
-        const places = doc.places().out('array');
-        const organizations = doc.organizations().out('array');
-        const entities = [...new Set([...people, ...places, ...organizations])]
-            .map(entity => entity.toLowerCase());
-
-        return {
-            id: `chunk-${String(id).padStart(3, '0')}`,
-            text: chunkText,
-            keywords: keywords,
-            entities: entities,
-        };
-    },
-
-    /**
-     * Fase 1: Indicizzazione.
-     * Input: Array di chunk dalla Fase 0.
-     * Output: Oggetto indice di Lunr.js.
-     * @param {Array<Object>} chunks - L'array di oggetti chunk prodotto dalla Fase 0.
-     * @returns {Object} Un oggetto indice di Lunr.js.
-     */
     ne1_buildIndex(chunks) {
-        const idx = lunr(function () {
-            this.use(lunr.it);
-            this.ref('id');
-            this.field('body');
-
-            chunks.forEach(chunk => {
-                const fullText = `${chunk.text} ${chunk.keywords.join(" ")} ${chunk.entities.join(" ")}`;
-                this.add({ id: chunk.id, body: fullText });
-            });
-        });
-        return idx;
+        return postCommandToWorker('phase1', chunks);
     },
 
-    /**
-     * Fase 2: Ricerca (Creazione del Contesto).
-     * Input: Indice serializzato da IndexedDB e query dall'utente.
-     * Output: Array di risultati di ricerca.
-     * @param {string} serializedIndex - L'indice serializzato (JSON) creato nella Fase 1.
-     * @param {string} query - La domanda dell'utente.
-     * @returns {Array<Object>} Un array di risultati di ricerca di Lunr.js.
-     */
     ne2_search(serializedIndex, query) {
-        if (!serializedIndex) {
-            throw new Error("Indice serializzato non fornito a ne2_search.");
-        }
-        const index = lunr.Index.load(JSON.parse(serializedIndex));
-        return index.search(query);
+        return postCommandToWorker('phase2', { serializedIndex, query });
     },
 
-    /**
-     * Fase 3: Generazione della Risposta.
-     * Input: Query utente, risultati della ricerca (contesto) e tutti i chunk.
-     * Output: Stringa di testo con la risposta dell'LLM.
-     * @param {string} query - La domanda originale dell'utente.
-     * @param {Array<Object>} searchResults - I risultati della ricerca dalla Fase 2.
-     * @param {Array<Object>} allChunks - Tutti i chunk dalla Fase 0.
-     * @returns {Promise<string>} Una promessa che si risolve con la risposta testuale dell'LLM.
-     */
+    // --- Logica che rimane nel Thread Principale ---
+
     async ne3_generateResponse(query, searchResults, allChunks) {
         let context = "";
         const MAX_CONTEXT_LENGTH = this.promptSize * 0.7;
@@ -202,7 +134,8 @@ export const ragEngine = {
         for (const result of searchResults) {
             const chunk = allChunks.find(c => c.id === result.ref);
             if (chunk) {
-                const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---\n${chunk.text}\n\n`;
+                const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---
+${chunk.text}\n\n`;
                 if ((context + chunkSnippet).length <= MAX_CONTEXT_LENGTH) {
                     context += chunkSnippet;
                 } else {
@@ -232,5 +165,4 @@ export const ragEngine = {
         }
         return rr.data;
     }
-    // #endregion
 };

@@ -653,18 +653,20 @@ div.container {
 }
 
 #spinner-wait {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
+  z-index: 10001; /* Un po' meno prioritario dello spinner con stop */
+  position: absolute;
+  top: 50vh;
+  left: 47vw;
+  transform: translate(-50%, -50%);
+  cursor: wait; /* Cursore di attesa */
+  display: none;
   align-items: center;
-  z-index: 1000;
-  display: none; // Hidden by default
-  cursor: wait; // Indicate waiting state
+
+  .pulse-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
 }
 
 #spinner-wait.show-spinner-wait {
@@ -1089,6 +1091,13 @@ div.container {
       &:hover {
         border: 3px solid @spinner-stop-msg-hover-border;
       }
+    }
+  }
+
+  #spinner-wait { /* Uso l'ID per essere specifico */
+    .pulse-icon {
+      background-color: @color1; /* Stesso colore del tema */
+      animation: @pulse-animation 1.5s ease-in-out infinite; /* Stessa animazione */
     }
   }
 
