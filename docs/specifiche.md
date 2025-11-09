@@ -25,7 +25,6 @@ Gestito tramite `services/uadb.js`, è utilizzato per dati di configurazione leg
 
 **Chiavi Principali:**
 - `KEY_PROVIDER`: Memorizza la configurazione del provider LLM selezionato (es. Gemini, Groq).
-- `KEY_DOC_TYPE`: Salva la configurazione del tipo di documento per ottimizzare il parsing.
 - `KEY_THEME`: Tema dell'interfaccia (`light` o `dark`).
 - `PHASE2_QUERY`: La query testuale inserita dall'utente per la **Fase 2**.
 - `KEY_DOCS`: Elenco dei nomi dei documenti caricati dall'utente (gestito da `DocsMgr`).
@@ -42,7 +41,7 @@ La logica principale della pipeline è implementata in `static/js/rag_engine.js`
 - **Logica Core:** `ragEngine.ne0_chunkAndAnnotate()`
 - **Processo:**
     1.  Recupera i documenti testuali caricati tramite `DocsMgr`.
-    2.  Per ogni documento, utilizza un LLM (tramite `gemini_client_llm.py` o simile) per suddividere il testo in "chunks" (frammenti) significativi e annotarli.
+    2.  Per ogni documento, utilizza la libreria NLP client-side (`compromise.js`) per suddividere il testo in "chunks" (frammenti) basati sulle frasi e per estrarre metadati di base come entità e parole chiave.
     3.  Colleziona tutti i chunks generati.
 - **Output:** Un array di oggetti `chunk` viene salvato in IndexedDB con la chiave `DATA_KEYS.PHASE0_CHUNKS`.
 
@@ -85,7 +84,6 @@ La UI è definita in `static/ragtext.html` e gestita da `static/js/app_ui.js`.
 - **Menu Laterale (`#id-menu-btn`):** Apre/chiude il menu laterale.
 - **Help (`#btn-help`):** Mostra le istruzioni (`Commands.help()`).
 - **Upload (`#btn-upload`):** Apre la finestra di dialogo per il caricamento file (`Commands.upload()`).
-- **Tipo Documento (`#btn-doctype-settings`):** Apre il selettore del tipo di documento (`Commands.docTypeSettings()`).
 - **Provider LLM (`#btn-provider-settings`):** Apre il selettore del provider e modello LLM (`Commands.providerSettings()`).
 - **Log (`#id_log`):** Mostra/nasconde la finestra di log (`Commands.log()`).
 - **Tema (`#btn-dark-theme`, `#btn-light-theme`):** Cambia il tema dell'interfaccia.
@@ -105,7 +103,7 @@ Contiene link per visualizzare, salvare e gestire i dati delle varie fasi.
     - `menu-delete-all`: Apre una finestra per la cancellazione selettiva o totale dei dati.
 - **Altro:**
     - `menu-readme`, `menu-quickstart`: Mostrano documentazione.
-    - `menu-show-config`: Visualizza la configurazione LLM e DocType.
+    - `menu-show-config`: Visualizza la configurazione LLM.
     - `menu-help-esempi`: Carica documenti di esempio.
 
 ### 4.3. Finestra di Output

@@ -479,18 +479,6 @@ const showQuickstart = () => {
   wnds.wdiv.show(help2_html);
 };
 
-const showQuery = () => {
-  const s = UaDb.read(DATA_KEYS.PHASE2_QUERY);
-  if (s)
-    wnds.winfo.show(s);
-};
-
-const showContextResponse = () => {
-  const s = UaDb.read(DATA_KEYS.KEY_RESPONSE);
-  if (s)
-    wnds.wpre.show(s);
-};
-
 const showThread = async () => {
   const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
   if (!lst) return;

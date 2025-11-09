@@ -12,15 +12,10 @@ export const DATA_KEYS = {
     KEY_THREAD_PRE: "keythr_",
 
     // Dati deprecati (da rimuovere in futuro)
-    KEY_KNBASE_PRE: "keyknb_",
     
     // localStorage
     KEY_THEME: "ua_theme",
     KEY_PROVIDER: "llm_provider",
     KEY_DOCS: "docs_list",
-    KEY_RESPONSE: "llm_response",
-    KEY_QUERY: "llm_query",
-    KEY_KNBASE: "knbase",
-    KEY_CONTEXT: "context",
     KEY_THREAD: "thread"
 };

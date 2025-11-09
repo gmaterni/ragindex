@@ -5,11 +5,8 @@
 
 // App Integration Dependencies
 import { UaLog } from "./services/ualog3.js";
-import { DocsMgr } from "./services/docs_mgr.js";
-import { idbMgr } from "./services/idb_mgr.js";
 import { promptBuilder } from "./llm_prompts.js";
 import { DATA_KEYS } from "./services/data_keys.js";
-import { UaDb } from "./services/uadb.js";
 
 // #region LLM Communication (copied from original rag_engine)
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

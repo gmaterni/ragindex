@@ -77,19 +77,19 @@ Questo flusso dimostra la chiara separazione delle responsabilità: l'UI è pass
 
 - **`app.js`**:
   - **Responsabilità:** Inizializzazione globale.
-  - **Funzione Primaria:** `AppMgr.init()` che, al caricamento del DOM, avvia tutti i moduli e collega gli eventi.
+  - **Funzione Primaria:** `openApp()` che, al caricamento della finestra, avvia tutti i moduli e collega gli eventi.
 
 - **`app_ui.js`**:
-  - **Responsabilità:** Controller dell'UI.
-  - **Funzione Primaria:** `bindEventListener()` per la gestione degli eventi; `TextInput.runPhaseX()` per l'orchestrazione del flusso RAG.
+  - **Responsabilità:** Controller dell'UI e orchestratore del flusso di lavoro.
+  - **Funzione Primaria:** `bindEventListener()` per la gestione degli eventi; `TextInput.runPhaseX()` per l'orchestrazione del flusso RAG, chiamando i servizi (come `idbMgr`) per il recupero/salvataggio dei dati e il business layer (`ragEngine`) per l'elaborazione.
 
 - **`rag_engine.js`**:
-  - **Responsabilità:** Logica di business RAG.
-  - **Funzione Primaria:** Esporta le funzioni `ne0_...` a `ne3_...` che implementano le 4 fasi in modo puro.
+  - **Responsabilità:** Logica di business "pura" della pipeline RAG.
+  - **Funzione Primaria:** Esporta le funzioni `ne0_...` a `ne3_...` che implementano le 4 fasi. Queste funzioni sono agnostiche rispetto all'UI e allo storage: ricevono dati come parametri e restituiscono un risultato.
 
 - **`services/idb_mgr.js` & `uadb.js`**:
   - **Responsabilità:** Astrazione dello storage.
-  - **Funzione Primaria:** Fornire metodi semplici (`create`, `read`, `delete`) per nascondere la complessità delle API del browser.
+  - **Funzione Primaria:** Fornire metodi semplici (`create`, `read`, `delete`) per nascondere la complessità delle API del browser (IndexedDB e LocalStorage).
 
 - **`services/data_keys.js`**:
   - **Responsabilità:** Contratto dei dati.
