@@ -6,13 +6,10 @@ export const DATA_KEYS = {
     PHASE2_QUERY: "phase2_query",
 
     // Prefissi per salvataggi nominati in IndexedDB
-    KEY_CHUNKS_PRE: "keychnk_",
-    KEY_INDEX_PRE: "keyidx_",
-    KEY_CONTEXT_PRE: "keyctx_",
-    KEY_THREAD_PRE: "keythr_",
+    KEY_KB_PRE: "ua-rag-kb-",        // Knowledge Base (chunks + index)
+    KEY_CONVO_PRE: "ua-rag-convo-",  // Conversazione (context + thread)
+    KEY_THREAD_PRE: "keythr_",       // Vecchio archivio thread, da mantenere per migrazione
 
-    // Dati deprecati (da rimuovere in futuro)
-    
     // localStorage
     KEY_THEME: "ua_theme",
     KEY_PROVIDER: "llm_provider",

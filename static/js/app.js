@@ -219,7 +219,14 @@ async function openApp() {
     TextOutput.init();
     bindEventListener();
     document.querySelector(".menu-btn").checked = false;
-    await showHtmlThread();
+    
+    try {
+      await showHtmlThread();
+    } catch (e) {
+      console.error("Impossibile caricare la cronologia precedente (potrebbe essere corrotta):", e);
+      UaLog.log("ERRORE: Impossibile caricare la cronologia precedente. Si consiglia di cancellarla dal menu.");
+    }
+
     getTheme();
     const webid = WebId.get();
     FirebaseLogger.sendLog("open", webid)

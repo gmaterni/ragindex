@@ -2,95 +2,77 @@
 
 ## 1. Filosofia Architetturale
 
-L'architettura di questa applicazione è basata su tre principi fondamentali:
+L'architettura è progettata per essere **modulare, client-side e reattiva**, basandosi su tre principi:
 
-1.  **Separazione delle Competenze (Separation of Concerns):** Ogni parte del codice ha una responsabilità chiara e definita. Questo rende l'applicazione più facile da comprendere, manutenere ed estendere.
-2.  **Modularità:** I componenti sono progettati per essere moduli indipendenti e riutilizzabili (es. i servizi di storage, logging, ecc.).
-3.  **Flusso di Dati Unidirezionale (ispirato a):** Le azioni dell'utente scatenano eventi che vengono gestiti da un "controllore", il quale a sua volta invoca la logica di business e i servizi. I risultati vengono quindi utilizzati per aggiornare lo stato dei dati e, di conseguenza, l'interfaccia utente.
+1.  **Separazione delle Competenze:** Ogni modulo ha una responsabilità chiara (UI, controllo, logica di business, servizi).
+2.  **Offloading del Carico Pesante:** Le operazioni computazionalmente intensive (creazione della Knowledge Base) vengono delegate a un **Web Worker** per non bloccare l'interfaccia utente.
+3.  **Flusso di Dati Guidato dagli Eventi:** Le azioni dell'utente attivano funzioni "controllore" che orchestrano le chiamate alla logica di business e ai servizi, per poi aggiornare lo stato e l'UI.
 
-L'intera applicazione è **client-side**, il che significa che non richiede un backend dedicato per le sue funzionalità principali, ma si affida a servizi esterni (LLM) e alle capacità del browser (storage, processing).
+## 2. Layer Architetturali e Componenti Chiave
 
-## 2. Layer Architetturali
+L'applicazione è suddivisa logicamente in più strati, ognuno con componenti specifici.
 
-L'applicazione può essere suddivisa logicamente nei seguenti layer (strati):
+![Diagramma Architettura Semplificato](https://i.imgur.com/9E8Z7Yc.png) <!-- Immagine puramente illustrativa -->
 
-![Diagramma Architettura](https://i.imgur.com/xxxx.png)  <!-- Immagine puramente illustrativa -->
-
-1.  **Presentation Layer (UI):**
+1.  **Presentation Layer (UI)**
     - **Componenti:** `ragtext.html`, `less/*.less`
-    - **Responsabilità:** Definire la struttura e lo stile dell'interfaccia utente. È uno strato "passivo" che contiene gli elementi HTML (pulsanti, menu, aree di testo) con cui l'utente interagisce.
+    - **Responsabilità:** Definisce la struttura e lo stile dell'interfaccia. È uno strato "passivo" che attende l'interazione dell'utente.
 
-2.  **Controller Layer:**
+2.  **Controller Layer**
     - **Componenti:** `app.js`, `app_ui.js`
-    - **Responsabilità:** Agisce come un ponte tra l'UI e la logica di business.
-        - `app.js`: È il punto di ingresso che inizializza l'applicazione.
-        - `app_ui.js`: Cattura gli eventi dell'utente (es. click su un pulsante) tramite `bindEventListener`, orchestra le chiamate alla logica di business e ai servizi, e aggiorna l'interfaccia utente con i risultati.
+    - **Responsabilità:** È il ponte tra l'UI e la logica applicativa.
+        - `app.js`: Punto di ingresso, inizializza l'applicazione e i suoi moduli.
+        - `app_ui.js`: Contiene i gestori di eventi (`bindEventListener`) e le funzioni `runActionX()` che orchestrano il flusso di lavoro. Chiama i servizi per accedere ai dati e il motore RAG per elaborarli.
 
-3.  **Business Logic Layer:**
+3.  **Business Logic Layer (Main Thread)**
     - **Componenti:** `rag_engine.js`
-    - **Responsabilità:** Contiene il "cervello" dell'applicazione. Implementa la logica pura e agnostica della pipeline RAG (le funzioni `ne0`, `ne1`, `ne2`, `ne3`). Questo strato non sa nulla dell'interfaccia utente; riceve dati, li elabora e restituisce un risultato.
+    - **Responsabilità:** Contiene il "cervello" RAG per le operazioni veloci.
+        - `buildContext()`: Esegue la ricerca lessicale sull'indice e costruisce la stringa di contesto.
+        - `generateResponse()`: Prepara il prompt e gestisce la comunicazione con il servizio LLM.
 
-4.  **Service Layer:**
+4.  **Background Processing Layer**
+    - **Componenti:** `rag_worker.js`
+    - **Responsabilità:** Esegue operazioni lunghe e pesanti in un thread separato per non bloccare l'UI.
+        - `createKnowledgeBase`: Riceve i documenti, li segmenta in chunks e crea l'indice di ricerca. Comunica il risultato al thread principale al termine.
+
+5.  **Service Layer**
     - **Componenti:** `services/*.js`
-    - **Responsabilità:** Fornisce funzionalità trasversali e riutilizzabili, astraendo operazioni complesse o di basso livello.
-        - `idb_mgr.js`, `uadb.js`: Forniscono un'API semplificata per interagire con IndexedDB e LocalStorage, nascondendo i dettagli implementativi.
-        - `llm_provider.js`, `gemini_client.js`: Gestiscono la comunicazione con i servizi LLM esterni.
-        - `docs_mgr.js`: Gestisce il ciclo di vita dei documenti caricati.
-        - `data_keys.js`: Centralizza le chiavi di storage, agendo come un "contratto" per i dati.
+    - **Responsabilità:** Fornisce funzionalità trasversali e riutilizzabili.
+        - `idb_mgr.js`, `uadb.js`: API semplificate per lo storage su IndexedDB e LocalStorage.
+        - `llm_provider.js`, `llm_clients/*.js`: Gestiscono la comunicazione con le API degli LLM.
+        - `docs_mgr.js`: Gestisce i documenti caricati dall'utente.
+        - `data_keys.js`: Centralizza le chiavi di storage.
 
-5.  **Data Layer:**
-    - **Componenti:** Browser Storage (IndexedDB, LocalStorage)
-    - **Responsabilità:** È lo strato di persistenza dei dati, dove vengono effettivamente memorizzati gli artefatti RAG e le configurazioni.
+6.  **Data Layer**
+    - **Componenti:** Browser Storage (IndexedDB, LocalStorage).
+    - **Responsabilità:** Persistenza dei dati (KB di lavoro, conversazione attiva, archivi, configurazioni).
 
-## 3. Flusso di una Chiamata: Esempio con la "Fase 2: Cerca"
+## 3. Flusso di una Chiamata: Esempio con "Azione 2: Inizia Conversazione"
 
-Per illustrare come i layer interagiscono, seguiamo il flusso di un'azione dell'utente:
-
-1.  **UI Layer:** L'utente scrive una query nell'area di testo e clicca sul pulsante "Cerca" (`#btn-phase2` in `ragtext.html`).
+1.  **UI Layer:** L'utente scrive una query e clicca sul secondo pulsante "play" (`#btn-action2-start-convo`).
 
 2.  **Controller Layer (`app_ui.js`):**
-    - L'evento `click` viene intercettato dalla funzione `bindEventListener`.
-    - Viene chiamata la funzione `TextInput.runPhase2()`.
-    - `runPhase2` orchestra l'operazione:
-        a. Mostra un'icona di caricamento (spinner) sull'interfaccia.
-        b. Legge la query dall'input.
-        c. Chiama il Service Layer per recuperare i dati necessari.
+    - L'evento `click` viene intercettato da `bindEventListener`.
+    - Viene chiamata la funzione `TextInput.runAction2_StartConversation()`.
+    - `runAction2` orchestra l'operazione:
+        a. Mostra uno spinner di caricamento.
+        b. Chiama il Service Layer per recuperare la KB di lavoro.
 
 3.  **Service Layer (`idb_mgr.js`):**
-    - `runPhase2` invoca `idbMgr.read(DATA_KEYS.PHASE1_INDEX)` per caricare l'indice di ricerca da IndexedDB.
+    - `runAction2` invoca `idbMgr.read()` per caricare i `chunks` e l' `indice` da IndexedDB.
 
 4.  **Business Logic Layer (`rag_engine.js`):**
-    - `runPhase2` chiama `ragEngine.ne2_search()`, passandogli l'indice caricato e la query dell'utente.
-    - `ne2_search` esegue la ricerca lessicale utilizzando Lunr.js e restituisce i risultati.
+    - `runAction2` chiama `ragEngine.buildContext()`, passandogli i dati della KB e la query. Questa funzione, essendo veloce, viene eseguita nel thread principale.
+    - Il contesto (`string`) viene restituito.
+    - `runAction2` chiama `ragEngine.generateResponse()`, passandogli il contesto e la query.
 
-5.  **Service Layer (`idb_mgr.js`):**
-    - `runPhase2` riceve i risultati e li passa a `idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, ...)` per salvarli in IndexedDB.
+5.  **LLM Service Layer (`llm_provider.js`):**
+    - `generateResponse` prepara il payload e invia la richiesta all'LLM tramite il client configurato.
 
-6.  **Controller Layer (`app_ui.js`):**
-    - `runPhase2` conclude l'orchestrazione:
-        a. Nasconde lo spinner.
-        b. Mostra un messaggio di successo all'utente.
+6.  **Controller & Service Layers (`app_ui.js`, `idb_mgr.js`):**
+    - La risposta dell'LLM viene ricevuta.
+    - `runAction2` salva la nuova conversazione (contesto + thread) in IndexedDB tramite `idbMgr.create()`.
+    - Chiama `showHtmlThread()` per aggiornare l'area di output dell'interfaccia.
+    - Nasconde lo spinner.
 
-Questo flusso dimostra la chiara separazione delle responsabilità: l'UI è passiva, il Controller orchestra, la Business Logic calcola e i Servizi forniscono funzionalità di supporto.
-
-## 4. Componenti Chiave e Responsabilità
-
-- **`app.js`**:
-  - **Responsabilità:** Inizializzazione globale.
-  - **Funzione Primaria:** `openApp()` che, al caricamento della finestra, avvia tutti i moduli e collega gli eventi.
-
-- **`app_ui.js`**:
-  - **Responsabilità:** Controller dell'UI e orchestratore del flusso di lavoro.
-  - **Funzione Primaria:** `bindEventListener()` per la gestione degli eventi; `TextInput.runPhaseX()` per l'orchestrazione del flusso RAG, chiamando i servizi (come `idbMgr`) per il recupero/salvataggio dei dati e il business layer (`ragEngine`) per l'elaborazione.
-
-- **`rag_engine.js`**:
-  - **Responsabilità:** Logica di business "pura" della pipeline RAG.
-  - **Funzione Primaria:** Esporta le funzioni `ne0_...` a `ne3_...` che implementano le 4 fasi. Queste funzioni sono agnostiche rispetto all'UI e allo storage: ricevono dati come parametri e restituiscono un risultato.
-
-- **`services/idb_mgr.js` & `uadb.js`**:
-  - **Responsabilità:** Astrazione dello storage.
-  - **Funzione Primaria:** Fornire metodi semplici (`create`, `read`, `delete`) per nascondere la complessità delle API del browser (IndexedDB e LocalStorage).
-
-- **`services/data_keys.js`**:
-  - **Responsabilità:** Contratto dei dati.
-  - **Funzione Primaria:** Esportare costanti stringa per tutte le chiavi di storage, prevenendo errori di battitura e centralizzando la gestione dei nomi.
+Questo flusso dimostra la chiara separazione delle responsabilità e l'uso strategico del thread principale per operazioni veloci e del worker per quelle lente, garantendo un'esperienza utente fluida.

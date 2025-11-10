@@ -73,27 +73,18 @@
           <li><a href="#" id="menu-readme">README</a></li>
           <li><a href="#" id="menu-quickstart">Quick Start</a></li>
           <li><a href="#" id="menu-show-config">Configurazione</a></li>
-          <li><b>Gestione RAG</b></li>
-          <li><a href="#" id="menu-show-chunks">Visualizza Chunks</a></li>
-          <li><a href="#" id="menu-save-chunks">Salva Chunks</a></li>
-          <li><a href="#" id="menu-elenco-chunks">Elenco Chunks</a></li>
-          <!-- <li class="separator"></li> -->
-          <li><a href="#" id="menu-show-index">Visualizza Indice</a></li>
-          <li><a href="#" id="menu-save-index">Salva Indice</a></li>
-          <li><a href="#" id="menu-elenco-index">Elenco Indici</a></li>
-          <!-- <li class="separator"></li> -->
-          <li><a href="#" id="menu-show-context">Visualizza Contesto</a></li>
-          <li><a href="#" id="menu-save-context">Salva Contesto</a></li>
-          <li><a href="#" id="menu-elenco-context">Elenco Contesti</a></li>
+          <li><b>Knowledge Base</b></li>
+          <li><a href="#" id="menu-save-kb">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-kb">Gestisci</a></li>
           <li class="separator"></li>
           <li><b>Conversazione</b></li>
-          <li><a href="#" id="menu-show-thread">Visualizza</a></li>
-          <li><a href="#" id="menu-save-thread">Archivia</a></li>
-          <li><a href="#" id="menu-elenco-threads">Elenco</a></li>
+          <li><a href="#" id="menu-view-convo">Visualizza</a></li>
+          <li><a href="#" id="menu-save-convo">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-convo">Gestisci</a></li>
           <li class="separator"></li>
           <li><b>Gestione Dati</b></li>
           <li><a href="#" id="menu-elenco-docs">Elenco Documenti</a></li>
-          <li><a href="#" id="menu-elenco-dati">Elenco Dati</a></li>
+          <li><a href="#" id="menu-elenco-dati">Elenco Dati Archiviati</a></li>
           <li><a href="#" id="menu-delete-all" class="delete">Cancella Dati</a></li>
           <li class="separator"></li>
           <li><a href="#" id="menu-help-esempi">Documenti Esempio</a></li>
@@ -143,10 +134,15 @@
         <div class="input-wrapper">
           <textarea class="text-input" placeholder="Scrivi qui... " rows="2"></textarea>
           <div class="input-actions">
-            <button id="btn-phase0" class="tt-leftx" data-tt="Segmenta Documenti"><svg class="btn-icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
-            <button id="btn-phase1" class="tt-leftx" data-tt="Crea Indice Lessicale"><svg class="btn-icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
-            <button id="btn-phase2" class="tt-leftx" data-tt="Crea Contesto"><svg class="btn-icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
-            <button id="btn-phase3" class="tt-leftx" data-tt="Genera Risposta"><svg class="btn-icon-svg" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
+            <button id="btn-action1-knowledge" class="tt-leftx" data-tt="Documenti => Knowledge">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button id="btn-action2-start-convo" class="tt-leftx" data-tt="Knowledge + Query => Contesto + Risposta">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button id="btn-action3-continue-convo" class="tt-leftx" data-tt="Conversazione + Query => Risposta">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+            </button>
             <button class="clear-input tt-leftx" data-tt="Cancella Input">
               <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M3 6h18v2H3V6zm2 3h14v12H5V9zm3-7h6v2H8V2z" />

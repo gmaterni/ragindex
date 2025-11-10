@@ -1,6 +1,6 @@
-# Esempio Pratico: Il Viaggio di un Dato attraverso la Pipeline RAG
+# Esempio Pratico: Il Viaggio di un Dato nel Flusso a 3 Azioni
 
-Questo documento illustra con un esempio semplice e concreto come un'informazione viaggia attraverso le 4 fasi della nostra applicazione RAG, dalla sua forma grezza nel documento di testo fino a diventare parte del contesto utilizzato per rispondere a una domanda.
+Questo documento illustra con un esempio concreto come un'informazione viaggia attraverso la pipeline RAG, seguendo il nuovo flusso di lavoro semplificato.
 
 ---
 
@@ -14,110 +14,73 @@ L'intelligenza artificiale generativa è una branca dell'IA. Permette di creare 
 
 ---
 
-### Fase 0: Segmentazione (Creazione dei "Chunks")
+### Azione 1: Crea Knowledge Base
 
-Il testo viene analizzato e suddiviso in frammenti (chunks). In questo caso, essendo il testo breve, verrà creato un solo chunk. Questo chunk non è solo testo, ma un oggetto strutturato con metadati utili per la ricerca.
+**Azione Utente:** L'utente, dopo aver caricato il documento, preme il **primo pulsante "play"** (rosso).
 
-**Output (Dato Temporaneo): Oggetto Chunk**
-*Questo oggetto viene salvato in **IndexedDB** (`phase0_chunks`)*
+**Processo del Sistema:**
+In un thread in background (Web Worker) per non bloccare l'interfaccia, il sistema esegue due passaggi in uno:
+1.  **Segmentazione:** Il testo viene analizzato e suddiviso in frammenti (chunks).
+2.  **Indicizzazione:** Viene costruito un indice di ricerca (`lunr.js`) che mappa le parole chiave ai chunk corrispondenti.
 
-```json
-[
-  {
-    "id": "doc0-chunk0",
-    "text": "L'intelligenza artificiale generativa è una branca dell'IA. Permette di creare nuovi contenuti, come testi e immagini. Roberto Busa è stato un pioniere nell'uso dei computer per l'analisi testuale.",
-    "keywords": ["intelligenza", "artificiale", "generativa", "branca", "ia", "creare", "contenuti", "testi", "immagini", "roberto", "busa", "pioniere", "uso", "computer", "analisi", "testuale"],
-    "entities": ["roberto busa"]
-  }
-]
-```
+**Output (Stato dell'Applicazione):**
+Viene creata la **"Knowledge Base di Lavoro"**, composta da due artefatti salvati in IndexedDB:
+-   **Chunks** (`phase0_chunks`): L'array di frammenti di testo.
+-   **Indice** (`phase1_index`): L'indice di ricerca serializzato.
 
----
-
-### Fase 1: Indicizzazione
-
-L'array di chunk viene utilizzato per costruire un indice di ricerca lessicale (con `lunr.js`). Concettualmente, l'indice è una mappa che collega le parole chiave ai chunk in cui appaiono.
-
-**Output (Dato Temporaneo): Indice Serializzato**
-*Questo indice viene salvato in **IndexedDB** (`phase1_index`)*
-
-**Rappresentazione Concettuale dell'Indice:**
-```
-- "roberto"   -> [doc0-chunk0]
-- "busa"      -> [doc0-chunk0]
-- "pioniere"  -> [doc0-chunk0]
-- "computer"  -> [doc0-chunk0]
-- ... e così via per tutte le parole chiave
-```
+**Rappresentazione Concettuale della KB di Lavoro:**
+-   **Chunk 1:** `{ id: "doc0-chunk0", text: "L'intelligenza artificiale..." }`
+-   **Indice:** `{ "roberto" -> [doc0-chunk0], "busa" -> [doc0-chunk0], "ia" -> [doc0-chunk0], ... }`
 
 ---
 
-### Fase 2: Ricerca
+### Azione 2: Inizia Conversazione
 
-Ora, l'utente inserisce una domanda (query) per cercare informazioni nei documenti.
+**Azione Utente:** L'utente scrive la sua prima domanda (query) e preme il **secondo pulsante "play"** (giallo).
 
-**Input Utente (Query):**
-```
-chi era Roberto Busa?
-```
+**Query:** `chi era Roberto Busa?`
 
-Il motore di ricerca (`lunr.js`) usa l'indice creato nella Fase 1 per trovare i chunk più pertinenti alla query.
+**Processo del Sistema:**
+1.  **Ricerca e Costruzione Contesto:**
+    -   Il sistema carica la KB di Lavoro (chunks e indice).
+    -   Usa l'indice per cercare i chunk più pertinenti alla query. In questo caso, trova `doc0-chunk0`.
+    -   Assembla il testo dei chunk trovati in una singola stringa formattata, il **Contesto**.
 
-**Output (Dato Temporaneo): Risultati della Ricerca**
-*Questo array viene salvato in **IndexedDB** (`phase2_context`)*
+    **Contesto Generato:**
+    ```txt
+    --- Chunk: doc0-chunk0, Score: 0.9800 ---
+    L'intelligenza artificiale generativa è una branca dell'IA. Permette di creare nuovi contenuti, come testi e immagini. Roberto Busa è stato un pioniere nell'uso dei computer per l'analisi testuale.
+    ```
 
-```json
-[
-  {
-    "ref": "doc0-chunk0",
-    "score": 0.98,
-    "matchData": {
-      "metadata": {
-        "chi": { "body": {} },
-        "era": { "body": {} },
-        "roberto": { "body": {} },
-        "busa": { "body": {} }
-      }
-    }
-  }
-]
-```
-Il risultato ci dice che il chunk `doc0-chunk0` è estremamente pertinente (`score: 0.98`) alla nostra domanda.
+2.  **Generazione Risposta:**
+    -   Il sistema prepara un **prompt** per l'LLM che include il **Contesto** appena creato e la **Query** dell'utente.
+    -   Invia il prompt all'LLM.
+
+**Output (Stato dell'Applicazione):**
+-   La risposta dell'LLM (es. "Basandosi sul contesto, Roberto Busa è stato un pioniere...") viene mostrata all'utente.
+-   Viene creata la **"Conversazione Attiva"**, salvando in IndexedDB:
+    -   Il **Contesto** (`phase2_context`).
+    -   La **Cronologia** (`thread`), che ora contiene la domanda dell'utente e la risposta dell'assistente.
 
 ---
 
-### Fase 3: Generazione (Costruzione del Contesto Finale)
+### Azione 3: Continua Conversazione
 
-Questa è la fase cruciale in cui tutto viene assemblato.
+**Azione Utente:** L'utente scrive una seconda domanda di approfondimento e preme il **terzo pulsante "play"** (verde).
 
-1.  Il sistema prende i risultati della ricerca dalla Fase 2 (l'array JSON qui sopra).
-2.  Per ogni risultato, usa il `ref` (`doc0-chunk0`) per recuperare il testo completo del chunk originale (quello creato nella Fase 0).
-3.  Assembla questi testi in un'unica stringa, formattata in modo leggibile.
+**Query:** `e cosa è l'IA generativa?`
 
-**Output (Dato Temporaneo): La Stringa di Contesto**
-*Questa stringa viene costruita in memoria e non viene salvata. È l'input per il prompt.*
+**Processo del Sistema:**
+1.  **Recupero Conversazione Attiva:**
+    -   Il sistema carica il **Contesto originale** e la **Cronologia** esistente da IndexedDB.
+2.  **Aggiornamento Cronologia:**
+    -   La nuova query (`e cosa è l'IA generativa?`) viene aggiunta in fondo alla cronologia.
+3.  **Generazione Nuova Risposta:**
+    -   Il sistema invia un nuovo prompt all'LLM contenente:
+        -   Il **Contesto originale** (quello generato all'Azione 2).
+        -   La **Cronologia completa e aggiornata**.
+    -   L'LLM usa sia il contesto che la cronologia per formulare una risposta pertinente alla nuova domanda, mantenendo il filo del discorso.
 
-```txt
---- Chunk: doc0-chunk0, Score: 0.9800 ---
-L'intelligenza artificiale generativa è una branca dell'IA. Permette di creare nuovi contenuti, come testi e immagini. Roberto Busa è stato un pioniere nell'uso dei computer per l'analisi testuale.
-```
-
-#### L'Obiettivo Finale: Il Prompt per l'LLM
-
-Infine, questa stringa di contesto viene inserita in un template di prompt, insieme alla domanda originale dell'utente, per creare il messaggio finale da inviare all'LLM.
-
-```
-Basandoti esclusivamente sul seguente contesto, rispondi alla domanda dell'utente.
-
-[INIZIO CONTESTO]
-
---- Chunk: doc0-chunk0, Score: 0.9800 ---
-L'intelligenza artificiale generativa è una branca dell'IA. Permette di creare nuovi contenuti, come testi e immagini. Roberto Busa è stato un pioniere nell'uso dei computer per l'analisi testuale.
-
-[FINE CONTESTO]
-
-Domanda dell'utente:
-chi era Roberto Busa?
-```
-
-Questo è il testo esatto che l'LLM riceve, e dal quale genererà la risposta: "Basandosi sul contesto, Roberto Busa è stato un pioniere nell'uso dei computer per l'analisi testuale."
+**Output (Stato dell'Applicazione):**
+-   La nuova risposta viene mostrata all'utente.
+-   La **Cronologia** (`thread`) della Conversazione Attiva viene aggiornata con l'ultimo scambio di messaggi.

@@ -1,12 +1,12 @@
-/**
- * @file rag_worker.js
- * @description Web Worker per eseguire le operazioni pesanti della pipeline RAG in un thread separato,
- * mantenendo l'interfaccia utente reattiva.
- */
 "use strict";
 
-// Importa le librerie necessarie. Vengono caricate una sola volta all'avvio del worker.
-// I percorsi sono relativi alla posizione del file worker.
+/**
+ * @file rag_worker.js
+ * @description Web Worker per eseguire le operazioni pesanti di creazione della Knowledge Base
+ * (chunking e indicizzazione) in un thread separato.
+ */
+
+// Importa le librerie necessarie.
 try {
     importScripts(
         './services/vendor/compromise.js',
@@ -18,30 +18,34 @@ try {
     console.error("Worker: Errore durante l'importazione degli script.", e);
 }
 
-// Oggetto che contiene la logica di business (spostata qui da rag_engine.js)
 const workerLogic = {
-    async processDocumentsForPhase0(documents) {
+    /**
+     * Esegue la creazione della Knowledge Base (chunking e indicizzazione).
+     * @param {Array<Object>} documents - I documenti da processare.
+     * @returns {Promise<Object>} Un oggetto contenente 'chunks' e 'serializedIndex'.
+     */
+    async createKnowledgeBase(documents) {
+        // Fase 0: Chunking
+        self.postMessage({ status: 'progress', command: 'createKnowledgeBase', progress: `Fase 0: Inizio segmentazione...` });
         let allChunks = [];
         for (let i = 0; i < documents.length; i++) {
             const doc = documents[i];
-            // Invia un messaggio di progresso al thread principale (opzionale ma utile)
-            self.postMessage({ status: 'progress', command: 'phase0', progress: ` Elaborazione documento ${i + 1}/${documents.length}: ${doc.name}` });
-            
-            const docChunks = await this.ne0_chunkAndAnnotate(doc.text);
-            
-            docChunks.forEach((chunk, index) => {
-                chunk.id = `doc${i}-chunk${index}`;
-            });
-            
+            self.postMessage({ status: 'progress', command: 'createKnowledgeBase', progress: ` -> Elaboro ${doc.name}` });
+            const docChunks = await this._chunkDocument(doc.text, i);
             allChunks.push(...docChunks);
-
-            // Cede il controllo per mantenere il worker reattivo (anche se non strettamente necessario nel worker)
-            await new Promise(resolve => setTimeout(resolve, 0)); 
         }
-        return allChunks;
+
+        // Fase 1: Indicizzazione
+        self.postMessage({ status: 'progress', command: 'createKnowledgeBase', progress: `Fase 1: Inizio indicizzazione...` });
+        const index = this._buildIndex(allChunks);
+        const serializedIndex = JSON.stringify(index);
+
+        return { chunks: allChunks, serializedIndex: serializedIndex };
     },
 
-    async ne0_chunkAndAnnotate(text) {
+    // --- Metodi di supporto interni ---
+
+    async _chunkDocument(text, docIndex) {
         const chunks = [];
         const sentences = self.nlp(text).sentences().out('array');
         let currentChunkText = "";
@@ -52,7 +56,7 @@ const workerLogic = {
 
         for (const sentence of sentences) {
             if (currentChunkText.length + sentence.length + 1 > MAX_CHUNK_SIZE && currentChunkText.length >= MIN_CHUNK_SIZE) {
-                chunks.push(await this._processChunk(currentChunkText, chunkIdCounter++));
+                chunks.push(await this._processChunk(currentChunkText, docIndex, chunkIdCounter++));
                 currentChunkText = sentence;
             } else {
                 currentChunkText += (currentChunkText.length > 0 ? " " : "") + sentence;
@@ -60,12 +64,12 @@ const workerLogic = {
         }
 
         if (currentChunkText.length > 0) {
-            chunks.push(await this._processChunk(currentChunkText, chunkIdCounter++));
+            chunks.push(await this._processChunk(currentChunkText, docIndex, chunkIdCounter++));
         }
         return chunks;
     },
 
-    async _processChunk(chunkText, id) {
+    async _processChunk(chunkText, docIndex, chunkIndex) {
         const doc = self.nlp(chunkText);
         const nouns = doc.nouns().out('array');
         const verbs = doc.verbs().out('array');
@@ -81,14 +85,14 @@ const workerLogic = {
             .map(entity => entity.toLowerCase());
 
         return {
-            id: `chunk-${String(id).padStart(3, '0')}`,
+            id: `doc${docIndex}-chunk${chunkIndex}`,
             text: chunkText,
             keywords: keywords,
             entities: entities,
         };
     },
 
-    ne1_buildIndex(chunks) {
+    _buildIndex(chunks) {
         const idx = self.lunr(function () {
             this.use(self.lunr.it);
             this.ref('id');
@@ -101,14 +105,6 @@ const workerLogic = {
         });
         return idx;
     },
-
-    ne2_search(serializedIndex, query) {
-        if (!serializedIndex) {
-            throw new Error("Indice serializzato non fornito a ne2_search.");
-        }
-        const index = self.lunr.Index.load(JSON.parse(serializedIndex));
-        return index.search(query);
-    },
 };
 
 // Listener principale per i messaggi dal thread principale
@@ -118,22 +114,14 @@ self.onmessage = async function(e) {
     try {
         let result;
         switch (command) {
-            case 'phase0':
-                result = await workerLogic.processDocumentsForPhase0(data);
-                break;
-            case 'phase1':
-                result = workerLogic.ne1_buildIndex(data);
-                break;
-            case 'phase2':
-                result = workerLogic.ne2_search(data.serializedIndex, data.query);
+            case 'createKnowledgeBase':
+                result = await workerLogic.createKnowledgeBase(data);
                 break;
             default:
                 throw new Error(`Comando non riconosciuto per il worker: ${command}`);
         }
-        // Invia il risultato al thread principale
         self.postMessage({ status: 'complete', command, result });
     } catch (error) {
-        // Invia l'errore al thread principale
         self.postMessage({ status: 'error', command, error: error.message });
     }
 };

@@ -1,8 +1,4 @@
-Il compito che ti chiedo è piuttosto difficile e di alto livello di astrazione.
-In docs hai le specifiche e l'architettura per implementare un'applicazione Javascript con una particolare architettura RAG.
-In static/* hai tutti gli script per un'applicazione Javascript funzionante ma che utilizza un'architettura RAG completamente diversa.
-In py/* hai tutti gli script Python che implementano la nuova architettura e sono quelli a cui si fa riferimento nel documento delle specifiche.
-In tools trovi delle librerie per sostituire spaCy ed implementare BM25, hai tutto il progetto di GitHub, sei tu a dover individuare quello che eventualmente ti serve.
-Mi rendo conto che il compito è gravoso, siccome prevedo una conversazione lunga, quando vedi che stai per esaurire le risorse genera un breakpoint per poter iniziare da quel punto una nuova sessione insieme.
-Quando hai dei dubbi chiedi chiarimenti.
-Rispetta i comportamenti che ti sono stati indicati nei documenti che hai letto.
+Devi assolutamente sistemare le opzioni elenco dati e cancellazione dati.
+Ricorda che i documenti sono gestiti a parte e questi non devono comparire né nell'elenco dati né in cancellazione dati.
+Nell'elenco dati e in cancellazione, ricorda che i chunks e gli indici anche se sono due oggetti diversi sono strettamente collegati e quindi il salvataggio, la cancellazione e il recupero deve sempre prevedere entrambi. In fase di salvataggio il nome è unico e sarà un suffisso o un prefisso (scegli) tu a gestire internamente i due oggetti, ma nell'interfaccia il nome è unico ed è per la knowledge. Scegli tu come organizzare la cosa, ma deve essere ben fatta. Inoltre elimina dal menu la visualizzazione per knowledge (potrebbe essere troppo grande).
+Ricorda una cosa importante per non fare confusione. Nell'elenco di gestione delle knowledge devi evidenziare con un colore e un segno quella che è attualmente attiva. Questo è importante per sapere con quale knowledge si sta lavorando. Però se per te è più semplice, puoi nella barra superiore, prima del bottone del LLM e subito dopo quello dell'upload, indicare il nome della base di conoscenza attiva (se non è stata salvata, indicala con una voce tipo BASE CORRENTE o qualcosa di simile. Probabilmente questa è la soluzione più semplice e migliore).

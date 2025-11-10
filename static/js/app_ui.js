@@ -1,16 +1,8 @@
-/** @format */
 "use strict";
 
 /**
  * @file app_ui.js
- * @description
- * Questo file agisce come il "Controller" principale dell'applicazione.
- * Ha le seguenti responsabilità:
- * 1. Gestire tutti gli eventi dell'interfaccia utente (click dei pulsanti, etc.).
- * 2. Orchestare il flusso di lavoro RAG chiamando i servizi appropriati (per lo storage)
- *    e il motore di business logic (rag_engine.js) per l'elaborazione.
- * 3. Aggiornare l'interfaccia utente con risultati, messaggi e stati di attesa.
- * 4. Gestire la visualizzazione e l'interazione con finestre di dialogo e informative.
+ * @description Controller principale dell'applicazione. Gestisce UI, eventi e orchestra il flusso RAG.
  */
 
 import { UaWindowAdm } from "./services/uawindow.js";
@@ -28,8 +20,8 @@ import { idbMgr } from "./services/idb_mgr.js";
 import { UaJtfh } from "./services/uajtfh.js";
 import { requestGet } from "./services/http_request.js";
 import { cleanDoc } from "./text_cleaner.js"
-import { FirebaseLogger } from "./services/firbaselogger.js";
-import { WebId } from "./services/webuser_id.js";
+// FirebaseLogger e WebId sono usati in AppMgr, quindi l'import qui non è strettamente necessario
+// ma lo manteniamo per chiarezza finché non si sposta la logica di init.
 
 const Spinner = {
   show: () => {
@@ -49,7 +41,7 @@ const Spinner = {
   },
 
   stop: async () => {
-    const ok = await confirm("Confermi Cancellazione Richeista ?");
+    const ok = await confirm("Confermi Cancellazione Richiesta?");
     if (!ok) return;
     const client = AppMgr.clientLLM;
     client.cancelRequest();
@@ -186,7 +178,6 @@ const WndDiv = (id) => {
       const t = pre.textContent;
       try {
         await navigator.clipboard.writeText(t);
-        // console.log("Testo copiato negli appunti");
       } catch (err) {
         console.error("Errore durante la copia: ", err);
       }
@@ -294,148 +285,123 @@ export const TextInput = {
     this.inp.focus();
   },
 
-  /**
-   * Orchestra la Fase 0: Segmentazione.
-   * Chiede conferma, mostra uno spinner, e poi chiama il motore RAG
-   * per processare i documenti. Salva il risultato in IndexedDB.
-   */
-  async runPhase0() {
-    // Input: Nessuno (legge i documenti da DocsMgr).
-    // Output: Salva i chunk in IndexedDB (DATA_KEYS.PHASE0_CHUNKS).
-    UaLog.log("Inizio Fase 0: Segmentazione...");
+  async runAction1_CreateKnowledgeBase() {
+    UaLog.log("Azione 1: Creazione Knowledge Base...");
+    
+    // Controllo di coerenza robusto: verifica sia la lista che il contenuto.
     const docNames = DocsMgr.names();
-    if (docNames.length === 0) {
-      alert("Nessun documento caricato. Per favore, carica uno o più documenti prima di iniziare.");
+    const validDocuments = docNames
+      .map((name, i) => ({ name, text: DocsMgr.doc(i) }))
+      .filter(doc => doc.text && doc.text.trim() !== "");
+
+    if (validDocuments.length === 0) {
+      alert("Nessun documento valido trovato. Carica dei file con contenuto prima di creare una Knowledge Base.");
       return;
     }
 
-    const ok = await confirm("Confermi di voler avviare la segmentazione dei documenti? L'operazione suddividerà i testi in frammenti analizzabili.");
+    const ok = await confirm(`Verrà creata una nuova Knowledge Base da ${validDocuments.length} documenti validi. L'operazione sovrascriverà la KB di lavoro corrente. Confermi?`);
     if (!ok) return;
-    
+
     WaitSpinner.show();
+    setTimeout(async () => {
+      try {
+        // Usa solo i documenti validati
+        const { chunks, serializedIndex } = await ragEngine.createKnowledgeBase(validDocuments);
 
-    try {
-      const documents = docNames.map((name, i) => ({ name, text: DocsMgr.doc(i) }));
-      const allChunks = await ragEngine.processDocumentsForPhase0(documents);
-      
-      await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, allChunks);
-      UaLog.log(`Fase 0 completata: ${allChunks.length} chunk creati e salvati in IndexedDB.`);
-      
-      console.debug("--- FASE 0: CHUNKS CREATI ---");
-      console.debug(allChunks);
-      alert(`Segmentazione completata: ${allChunks.length} frammenti creati.`);
+        await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, chunks);
+        await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
 
-    } catch (error) {
-      console.error("Errore in Fase 0", error);
-      alert(errorDumps(error));
-    } finally {
-      WaitSpinner.hide();
-    }
+        alert(`Knowledge Base creata.\n- ${chunks.length} frammenti generati.\n- Indice di ricerca creato.`);
+      } catch (error) {
+        console.error("Errore durante la creazione della Knowledge Base", error);
+        alert(errorDumps(error));
+      } finally {
+        WaitSpinner.hide();
+      }
+    }, 50);
   },
 
-  async runPhase1() {
-    // Input: Legge i chunk da IndexedDB (DATA_KEYS.PHASE0_CHUNKS).
-    // Output: Salva l'indice serializzato in IndexedDB (DATA_KEYS.PHASE1_INDEX).
-    UaLog.log("Inizio Fase 1: Indicizzazione...");
-    const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
-    if (!chunks || chunks.length === 0) {
-      alert("Nessun chunk trovato in IndexedDB. Esegui prima la Fase 0.");
-      return;
-    }
-
-    const ok = await confirm("Confermi di voler creare l'indice lessicale dai frammenti? Questa operazione è necessaria per la ricerca.");
-    if (!ok) return;
-    
-    WaitSpinner.show();
-
-    try {
-      const index = await ragEngine.ne1_buildIndex(chunks);
-      const serializedIndex = JSON.stringify(index);
-      await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
-      
-      UaLog.log(`Fase 1 completata: Indice creato e salvato in IndexedDB.`);
-      console.debug("--- FASE 1: INDICE SERIALIZZATO ---");
-      console.debug(serializedIndex);
-      alert(`Indicizzazione completata: Indice creato e salvato.`);
-
-    } catch (error) {
-      console.error("Errore in Fase 1", error);
-      alert(errorDumps(error));
-    } finally {
-      WaitSpinner.hide();
-    }
-  },
-
-  async runPhase2() {
-    // Input: Legge l'indice da IndexedDB (DATA_KEYS.PHASE1_INDEX) e la query dall'input utente.
-    // Output: Salva i risultati della ricerca (contesto) in IndexedDB (DATA_KEYS.PHASE2_CONTEXT).
-    UaLog.log("Inizio Fase 2: Ricerca Contesto...");
+  async runAction2_StartConversation() {
+    UaLog.log("Azione 2: Inizio Conversazione...");
     const query = this.inp.value.trim();
     if (!query) {
-      alert("Inserisci una query nell'area di testo.");
+      alert("Inserisci una query per iniziare la conversazione.");
       return;
     }
-    
+
     const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
-    if (!serializedIndex) {
-      alert("Nessun indice trovato in IndexedDB. Esegui prima la Fase 1.");
+    const allChunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+
+    if (!serializedIndex || !allChunks) {
+      alert("Knowledge Base non trovata. Esegui prima l'Azione 1.");
       return;
-    }
-
-    const ok = await confirm("Confermi di voler avviare la ricerca per creare il contesto?");
-    if (!ok) return;
-
-    WaitSpinner.show();
-
-    try {
-      const searchResults = await ragEngine.ne2_search(serializedIndex, query);
-      
-      await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, searchResults);
-      UaDb.save(DATA_KEYS.PHASE2_QUERY, query); // Query is small, localStorage is fine
-
-      UaLog.log(`Fase 2 completata: ${searchResults.length} risultati di contesto trovati per la query.`);
-      
-      console.debug("--- FASE 2: RISULTATI CONTESTO ---");
-      console.debug(searchResults);
-      alert(`Ricerca completata: ${searchResults.length} risultati di contesto trovati.`);
-
-    } catch (error) {
-      console.error("Errore in Fase 2", error);
-      alert(errorDumps(error));
-    } finally {
-      WaitSpinner.hide();
-    }
-  },
-
-  async runPhase3() {
-    UaLog.log("Inizio Fase 3: Generazione Risposta...");
-    const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
-    const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
-    const query = UaDb.read(DATA_KEYS.PHASE2_QUERY);
-
-    if (!chunks || !context || !query) {
-        alert("Dati mancanti dalle fasi precedenti (in IndexedDB o localStorage). Assicurati di aver completato le Fasi 0, 1 e 2.");
-        return;
     }
 
     Spinner.show();
-    try {
-      AppMgr.initConfig(); // Ensure LLM client is ready
-      const answer = await ragEngine.ne3_generateResponse(query, context, chunks);
-      
-      setResponseHtml(`<div class="final-answer">${answer}</div>`);
-      UaLog.log("Fase 3 completata: Risposta generata.");
+    setTimeout(async () => {
+      try {
+        await idbMgr.delete(DATA_KEYS.KEY_THREAD);
+        setResponseHtml("");
 
-    } catch (error) {
-      console.error("Errore in Fase 3", error);
-      if (error && error.type === "CancellationError" && error.code === 499) {
-        alert("Richiesta LLM interrotta.");
-      } else {
+        UaLog.log("...creazione contesto...");
+        const context = ragEngine.buildContext(serializedIndex, allChunks, query);
+        await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, context);
+        UaLog.log(` -> Contesto creato (lunghezza: ${context.length}).`);
+
+        UaLog.log("...generazione prima risposta...");
+        AppMgr.initConfig();
+        const thread = [{ role: 'user', content: query }];
+        const answerText = await ragEngine.generateResponse(query, context, thread);
+        
+        thread.push({ role: 'assistant', content: answerText });
+        await idbMgr.create(DATA_KEYS.KEY_THREAD, thread);
+        showHtmlThread();
+        this.clear();
+      } catch (error) {
+        console.error("Errore durante l'inizio della conversazione", error);
         alert(errorDumps(error));
+      } finally {
+        Spinner.hide();
       }
-    } finally {
-      Spinner.hide();
+    }, 50);
+  },
+
+  async runAction3_ContinueConversation() {
+    UaLog.log("Azione 3: Continuazione Conversazione...");
+    const query = this.inp.value.trim();
+    if (!query) {
+      alert("Inserisci una query per continuare la conversazione.");
+      return;
     }
+
+    Spinner.show();
+    setTimeout(async () => {
+      try {
+        let thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+        let context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+
+        if (!thread) {
+          UaLog.log("Nessuna conversazione attiva, avvio conversazione libera.");
+          thread = []; 
+          context = ""; 
+        }
+        
+        thread.push({ role: 'user', content: query });
+        
+        AppMgr.initConfig();
+        const answerText = await ragEngine.generateResponse(query, context, thread);
+
+        thread.push({ role: 'assistant', content: answerText });
+        await idbMgr.create(DATA_KEYS.KEY_THREAD, thread);
+        showHtmlThread();
+        this.clear();
+      } catch (error) {
+        console.error("Errore durante la continuazione della conversazione", error);
+        alert(errorDumps(error));
+      } finally {
+        Spinner.hide();
+      }
+    }, 50);
   },
 };
 
@@ -512,9 +478,12 @@ const showQuickstart = () => {
   wnds.wdiv.show(help2_html);
 };
 
-const showThread = async () => {
+const viewConversation = async () => {
   const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
-  if (!lst) return;
+  if (!lst) {
+    alert("Nessuna conversazione attiva.");
+    return;
+  }
   const s = messages2text(lst);
   wnds.wpre.show(s);
 };
@@ -526,36 +495,51 @@ export const showHtmlThread = async () => {
   setResponseHtml(html);
 };
 
+
 // ==================================================
-// Generic Menu Handlers for IndexedDB artifacts
+// NUOVA GESTIONE DATI UNIFICATA
 // ==================================================
 
-const showData = async (dataKey, title) => {
-  const data = await idbMgr.read(dataKey);
-  if (!data) {
-    alert(`${title} non presenti in IndexedDB.`);
-    return;
-  }
-  const dataFormat = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-  wnds.wpre.show(dataFormat);
-};
+const saveKnowledgeBase = async () => {
+  const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+  const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
 
-const saveData = async (dataKey, prefix, promptTitle) => {
-  const data = await idbMgr.read(dataKey);
-  if (!data) {
-    alert(`Nessun dato da salvare per: ${promptTitle}`);
+  if (!chunks || !serializedIndex) {
+    alert("Nessuna Knowledge Base di lavoro da archiviare. Esegui prima l'Azione 1.");
     return;
   }
-  let name = await prompt(`Nome per ${promptTitle}:`);
+
+  let name = await prompt("Nome per archiviare la Knowledge Base:");
   if (name) {
     name = name.replace(/\s+/g, '_');
-    const key = `${prefix}${name}`;
-    await idbMgr.create(key, data);
-    alert(`${promptTitle} salvati come: ${name}`);
+    const key = `${DATA_KEYS.KEY_KB_PRE}${name}`;
+    const kb_data = { chunks, serializedIndex };
+    await idbMgr.create(key, kb_data);
+    alert(`Knowledge Base archiviata come: ${name}`);
   }
 };
 
-const elencoData = async (prefix, title, currentDataKey) => {
+const saveConversation = async () => {
+  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+
+  if (!thread || thread.length === 0) {
+    alert("Nessuna conversazione attiva da archiviare.");
+    return;
+  }
+
+  let name = await prompt("Nome per archiviare la Conversazione:");
+  if (name) {
+    name = name.replace(/\s+/g, '_');
+    const key = `${DATA_KEYS.KEY_CONVO_PRE}${name}`;
+    const convo_data = { context, thread };
+    await idbMgr.create(key, convo_data);
+    alert(`Conversazione archiviata come: ${name}`);
+  }
+};
+
+
+const elencoArtefatti = async (prefix, title, loadHandler) => {
   const keys = await idbMgr.selectKeys(prefix);
   const jfh = UaJtfh();
   jfh.append(`<div class="data-dialog"><h4>Gestione ${title}</h4>`);
@@ -582,65 +566,61 @@ const elencoData = async (prefix, title, currentDataKey) => {
 
   element.querySelectorAll(".btn-load-item").forEach(btn => btn.addEventListener("click", async (event) => {
     const key = event.currentTarget.dataset.itemKey;
-    const data = await idbMgr.read(key);
-    await idbMgr.create(currentDataKey, data);
-    const name = key.slice(prefix.length);
-    alert(`${title} '${name}' caricati come correnti.`);
+    await loadHandler(key);
     wnds.winfo.close();
   }));
 
   element.querySelectorAll(".btn-delete-item").forEach(btn => btn.addEventListener("click", async (event) => {
     const key = event.currentTarget.dataset.itemKey;
-    if (key) {
-      const ok = await confirm(`Confermi l'eliminazione di: ${key}?`);
-      if (ok) {
-        await idbMgr.delete(key);
-        wnds.winfo.close();
-        elencoData(prefix, title, currentDataKey); // Refresh list
-      }
+    const displayName = key.slice(prefix.length);
+    const ok = await confirm(`Confermi l'eliminazione di '${displayName}'?`);
+    if (ok) {
+      await idbMgr.delete(key);
+      wnds.winfo.close();
+      elencoArtefatti(prefix, title, loadHandler); // Refresh
     }
   }));
 };
 
 
-// --- Specific Implementations ---
-const showChunks = () => showData(DATA_KEYS.PHASE0_CHUNKS, "Chunks Correnti");
-const saveChunks = () => saveData(DATA_KEYS.PHASE0_CHUNKS, DATA_KEYS.KEY_CHUNKS_PRE, "Chunks");
-const elencoChunks = () => elencoData(DATA_KEYS.KEY_CHUNKS_PRE, "Chunks", DATA_KEYS.PHASE0_CHUNKS);
-
-const showIndex = () => showData(DATA_KEYS.PHASE1_INDEX, "Indice Corrente");
-const saveIndex = () => saveData(DATA_KEYS.PHASE1_INDEX, DATA_KEYS.KEY_INDEX_PRE, "Indice");
-const elencoIndex = () => elencoData(DATA_KEYS.KEY_INDEX_PRE, "Indici", DATA_KEYS.PHASE1_INDEX);
-
-const showContext = () => showData(DATA_KEYS.PHASE2_CONTEXT, "Contesto Corrente");
-const saveContext = () => saveData(DATA_KEYS.PHASE2_CONTEXT, DATA_KEYS.KEY_CONTEXT_PRE, "Contesto");
-const elencoContext = () => elencoData(DATA_KEYS.KEY_CONTEXT_PRE, "Contesti", DATA_KEYS.PHASE2_CONTEXT);
-
-
-const saveThread = async () => {
-  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
-  if (!thread || thread.length === 0) {
-    alert("Nessuna conversazione da salvare.");
-    return;
-  }
-  let name = await prompt("Nome per archiviare la conversazione:");
-  if (name) {
-    name = name.replace(/\s+/g, '_'); // Sostituisce spazi con underscore
-    const key = `${DATA_KEYS.KEY_THREAD_PRE}${name}`;
-    await idbMgr.create(key, thread);
-    alert(`Conversazione salvata come: ${name}`);
+const loadKnowledgeBase = async (key) => {
+  const kb_data = await idbMgr.read(key);
+  if (kb_data && kb_data.chunks && kb_data.serializedIndex) {
+    await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, kb_data.chunks);
+    await idbMgr.create(DATA_KEYS.PHASE1_INDEX, kb_data.serializedIndex);
+    const name = key.slice(DATA_KEYS.KEY_KB_PRE.length);
+    alert(`Knowledge Base '${name}' caricata come KB di lavoro.`);
+  } else {
+    alert("Errore: Dati della Knowledge Base non validi.");
   }
 };
 
+const loadConversation = async (key) => {
+  const convo_data = await idbMgr.read(key);
+  if (convo_data && convo_data.thread) {
+    await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, convo_data.context || ""); // Gestisce vecchi salvataggi senza contesto
+    await idbMgr.create(DATA_KEYS.KEY_THREAD, convo_data.thread);
+    const name = key.slice(DATA_KEYS.KEY_CONVO_PRE.length);
+    alert(`Conversazione '${name}' caricata come conversazione attiva.`);
+    showHtmlThread();
+  } else {
+    alert("Errore: Dati della conversazione non validi.");
+  }
+};
+
+const elencoKnowledgeBases = () => elencoArtefatti(DATA_KEYS.KEY_KB_PRE, "Knowledge Base", loadKnowledgeBase);
+const elencoConversations = () => elencoArtefatti(DATA_KEYS.KEY_CONVO_PRE, "Conversazioni", loadConversation);
+
+
 const KEY_DESCRIPTIONS = {
-  [DATA_KEYS.PHASE0_CHUNKS]: "Chunks Correnti (Fase 0)",
-  [DATA_KEYS.PHASE1_INDEX]: "Indice Corrente (Fase 1)",
-  [DATA_KEYS.PHASE2_CONTEXT]: "Contesto Corrente (Fase 2)",
-  [DATA_KEYS.KEY_THREAD]: "Conversazione Corrente",
+  [DATA_KEYS.PHASE0_CHUNKS]: "Knowledge Base di Lavoro (Chunks)",
+  [DATA_KEYS.PHASE1_INDEX]: "Knowledge Base di Lavoro (Index)",
+  [DATA_KEYS.PHASE2_CONTEXT]: "Conversazione Attiva (Contesto)",
+  [DATA_KEYS.KEY_THREAD]: "Conversazione Attiva (Thread)",
   
   [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
-  [DATA_KEYS.PHASE2_QUERY]: "Query Corrente (Fase 2)",
+  [DATA_KEYS.PHASE2_QUERY]: "Ultima Query",
   [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati"
 };
 
@@ -648,43 +628,27 @@ const getDescriptionForKey = (key) => {
   if (KEY_DESCRIPTIONS[key]) {
     return KEY_DESCRIPTIONS[key];
   }
-  if (key.startsWith(DATA_KEYS.KEY_CHUNKS_PRE)) {
-    return "Archivio Chunks";
+  if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
+    return "Knowledge Base Archiviata";
   }
-  if (key.startsWith(DATA_KEYS.KEY_INDEX_PRE)) {
-    return "Archivio Indice";
-  }
-  if (key.startsWith(DATA_KEYS.KEY_CONTEXT_PRE)) {
-    return "Archivio Contesto";
+  if (key.startsWith(DATA_KEYS.KEY_CONVO_PRE)) {
+    return "Conversazione Archiviata";
   }
   if (key.startsWith(DATA_KEYS.KEY_THREAD_PRE)) {
-    return "Archivio Conversazione";
+    return "Archivio Conversazione (Vecchio formato)";
   }
   return "Dato non classificato";
 };
 
 const elencoDati = async () => {
   const jfh = UaJtfh();
-  const idbKeysToShow = [
-    DATA_KEYS.PHASE0_CHUNKS, 
-    DATA_KEYS.PHASE1_INDEX, 
-    DATA_KEYS.PHASE2_CONTEXT, 
-    DATA_KEYS.KEY_THREAD
-  ];
-  const lsKeysToShow = [
-    DATA_KEYS.PHASE2_QUERY, 
-    DATA_KEYS.KEY_DOCS,
-    DATA_KEYS.KEY_THEME,
-    DATA_KEYS.KEY_PROVIDER
-  ];
+  const allIdbKeys = await idbMgr.getAllKeys();
+  const allLsKeys = UaDb.getAllIds();
 
   jfh.append('<h4>Dati in IndexedDB</h4>');
-  jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
-  
-  const allIdbKeys = await idbMgr.getAllKeys();
-
-  for (const key of idbKeysToShow) {
-    if (allIdbKeys.includes(key)) {
+  if (allIdbKeys.length > 0) {
+    jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
+    for (const key of allIdbKeys) {
       const description = getDescriptionForKey(key);
       const value = await idbMgr.read(key);
       const size = value ? JSON.stringify(value).length : 0;
@@ -696,40 +660,33 @@ const elencoDati = async () => {
         </tr>`
       );
     }
+    jfh.append('</tbody></table>');
+  } else {
+    jfh.append('<p>Nessun dato in IndexedDB.</p>');
   }
-  
-  const archivedKeys = allIdbKeys.filter(k => !idbKeysToShow.includes(k));
-  for (const key of archivedKeys) {
-    const description = getDescriptionForKey(key);
-    const value = await idbMgr.read(key);
-    const size = value ? JSON.stringify(value).length : 0;
-    jfh.append(
-      `<tr>
-        <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
-        <td>${description}</td>
-        <td class="size">${size}</td>
-      </tr>`
-    );
-  }
-  jfh.append('</tbody></table>');
+
 
   jfh.append('<h4>Dati in LocalStorage</h4>');
-  jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
-  for (const key of lsKeysToShow) {
-    const value = UaDb.read(key);
-    if (value) {
-      const description = getDescriptionForKey(key);
-      const size = value.length;
-      jfh.append(
-        `<tr>
-          <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="ls">${key}</a></td>
-          <td>${description}</td>
-          <td class="size">${size}</td>
-        </tr>`
-      );
+  if (allLsKeys.length > 0) {
+    jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
+    for (const key of allLsKeys) {
+      const value = UaDb.read(key);
+      if (value) {
+        const description = getDescriptionForKey(key);
+        const size = value.length;
+        jfh.append(
+          `<tr>
+            <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="ls">${key}</a></td>
+            <td>${description}</td>
+            <td class="size">${size}</td>
+          </tr>`
+        );
+      }
     }
+    jfh.append('</tbody></table>');
+  } else {
+    jfh.append('<p>Nessun dato in LocalStorage.</p>');
   }
-  jfh.append('</tbody></table>');
 
 
   wnds.winfo.show(jfh.html());
@@ -819,58 +776,6 @@ const elencoDocs = () => {
   });
 };
 
-const elencoThreads = async () => {
-  const keys = await idbMgr.selectKeys(DATA_KEYS.KEY_THREAD_PRE);
-  const jfh = UaJtfh();
-  jfh.append('<div class="thread-dialog">');
-  jfh.append("<h4>Gestione Conversazioni Archiviate</h4>");
-  if (keys.length > 0) {
-    jfh.append('<table class="table-data">');
-    jfh.append('<thead><tr><th>Nome</th><th>Azioni</th></tr></thead>');
-    jfh.append('<tbody>');
-    for (const key of keys) {
-      jfh.append(`
-<tr>
-  <td>${key}</td>
-  <td><button class="btn-load-item btn-success" data-item-name="${key}">Carica</button></td>
-  <td><button class="btn-delete-item btn-danger" data-item-name="${key}">Elimina</button></td>
-</tr>
-      `);
-    }
-    jfh.append("</tbody></table>");
-  } else {
-    jfh.append("<p>Nessuna conversazione archiviata trovata.</p>");
-  }
-  jfh.append("</div>");
-  wnds.winfo.show(jfh.html());
-
-  const element = wnds.winfo.w.getElement();
-
-  const handleLoadClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    const thread = await idbMgr.read(key);
-    await idbMgr.create(DATA_KEYS.KEY_THREAD, thread);
-    const name = key.slice(DATA_KEYS.KEY_THREAD_PRE.length);
-    alert(`Conversazione '${name}' caricata come corrente.`);
-    showHtmlThread();
-    wnds.winfo.close();
-  };
-
-  const handleDeleteClick = async (event) => {
-    const key = event.currentTarget.dataset.itemName;
-    if (key) {
-      const ok = await confirm(`Confermi l'eliminazione della conversazione: ${key}?`);
-      if (!ok) return;
-      await idbMgr.delete(key);
-      wnds.winfo.close();
-      elencoThreads(); // Ricarica la lista
-    }
-  };
-
-  element.querySelectorAll(".btn-load-item").forEach(btn => btn.addEventListener("click", handleLoadClick));
-  element.querySelectorAll(".btn-delete-item").forEach(btn => btn.addEventListener("click", handleDeleteClick));
-};
-
 const deleteAllData = async () => {
   const jfh = UaJtfh();
   const allIdbKeys = await idbMgr.getAllKeys();
@@ -879,7 +784,6 @@ const deleteAllData = async () => {
   jfh.append('<div class="delete-dialog">');
   jfh.append('<h4>Seleziona Dati da Cancellare</h4>');
   
-  // --- IndexedDB Items ---
   if (allIdbKeys.length > 0) {
     jfh.append('<h5>Dati in IndexedDB</h5><table class="table-data">');
     allIdbKeys.forEach(key => {
@@ -892,7 +796,6 @@ const deleteAllData = async () => {
     jfh.append('</table>');
   }
 
-  // --- LocalStorage Items ---
   if (allLsKeys.length > 0) {
     jfh.append('<h5>Dati in LocalStorage</h5><table class="table-data">');
     allLsKeys.forEach(key => {
@@ -989,34 +892,28 @@ export function bindEventListener() {
   document.getElementById("btn-dark-theme").addEventListener("click", () => setTheme("dark"));
   document.getElementById("btn-light-theme").addEventListener("click", () => setTheme("light"));
   
-  // New Menu Items
-  document.getElementById("menu-show-chunks").addEventListener("click", showChunks);
-  document.getElementById("menu-save-chunks").addEventListener("click", saveChunks);
-  document.getElementById("menu-elenco-chunks").addEventListener("click", elencoChunks);
-  document.getElementById("menu-show-index").addEventListener("click", showIndex);
-  document.getElementById("menu-save-index").addEventListener("click", saveIndex);
-  document.getElementById("menu-elenco-index").addEventListener("click", elencoIndex);
-  document.getElementById("menu-show-context").addEventListener("click", showContext);
-  document.getElementById("menu-save-context").addEventListener("click", saveContext);
-  document.getElementById("menu-elenco-context").addEventListener("click", elencoContext);
-
-  // Other Menu Items
+  // Menu Items
   document.getElementById("menu-readme").addEventListener("click", showReadme);
   document.getElementById("menu-quickstart").addEventListener("click", showQuickstart);
   document.getElementById("menu-show-config").addEventListener("click", LlmProvider.showConfig);
-  document.getElementById("menu-show-thread").addEventListener("click", showThread);
-  document.getElementById("menu-elenco-dati").addEventListener("click", elencoDati);
+  
+  // --- Nuova Gestione Dati ---
+  document.getElementById("menu-save-kb").addEventListener("click", saveKnowledgeBase);
+  document.getElementById("menu-elenco-kb").addEventListener("click", elencoKnowledgeBases);
+  
+  document.getElementById("menu-view-convo").addEventListener("click", viewConversation);
+  document.getElementById("menu-save-convo").addEventListener("click", saveConversation);
+  document.getElementById("menu-elenco-convo").addEventListener("click", elencoConversations);
+
   document.getElementById("menu-elenco-docs").addEventListener("click", elencoDocs);
-  document.getElementById("menu-save-thread").addEventListener("click", saveThread);
-  document.getElementById("menu-elenco-threads").addEventListener("click", elencoThreads);
+  document.getElementById("menu-elenco-dati").addEventListener("click", elencoDati);
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 
-  // New pedagogical workflow buttons
-  document.getElementById("btn-phase0").addEventListener("click", () => TextInput.runPhase0());
-  document.getElementById("btn-phase1").addEventListener("click", () => TextInput.runPhase1());
-  document.getElementById("btn-phase2").addEventListener("click", () => TextInput.runPhase2());
-  document.getElementById("btn-phase3").addEventListener("click", () => TextInput.runPhase3());
+  // New action buttons
+  document.getElementById("btn-action1-knowledge").addEventListener("click", () => TextInput.runAction1_CreateKnowledgeBase());
+  document.getElementById("btn-action2-start-convo").addEventListener("click", () => TextInput.runAction2_StartConversation());
+  document.getElementById("btn-action3-continue-convo").addEventListener("click", () => TextInput.runAction3_ContinueConversation());
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
   // TextOutput

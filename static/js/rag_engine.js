@@ -1,21 +1,21 @@
-/** @format */
 "use strict";
 
 /**
  * @file rag_engine.js
- * @description
- * Questo file agisce come un "proxy" verso il Web Worker (rag_worker.js).
- * Il suo ruolo è di ricevere le richieste da app_ui.js, inviarle come messaggi
- * al worker, e restituire una Promise che si risolverà con il risultato del worker.
- * Mantiene anche la logica per la Fase 3 (chiamate LLM), che rimane nel thread principale.
+ * @description Motore e orchestratore della logica RAG.
+ * - Chiama il worker per le operazioni pesanti (creazione KB).
+ * - Esegue direttamente le operazioni veloci (creazione contesto).
+ * - Gestisce la comunicazione con l'LLM.
  */
 
 import { UaLog } from "./services/ualog3.js";
 import { promptBuilder } from "./llm_prompts.js";
+// lunr è caricato globalmente tramite script tag in ragtext.html
+// ma lo referenziamo qui per chiarezza.
 
 // #region Gestione Worker
 let worker;
-let requestPromises = {}; // Oggetto per mappare comandi a promise
+let requestPromises = {}; 
 
 function initWorker() {
     worker = new Worker('./js/rag_worker.js');
@@ -23,7 +23,7 @@ function initWorker() {
         const { status, command, result, error, progress } = e.data;
         
         if (status === 'progress') {
-            UaLog.log(progress); // Logga i progressi inviati dal worker
+            UaLog.log(progress);
             return;
         }
 
@@ -34,12 +34,11 @@ function initWorker() {
             } else if (status === 'error') {
                 promise.reject(new Error(error));
             }
-            delete requestPromises[command]; // Pulisce la promise dopo l'uso
+            delete requestPromises[command];
         }
     };
     worker.onerror = (e) => {
         console.error("Errore generico nel Web Worker:", e);
-        // Rifiuta tutte le promise in attesa
         Object.values(requestPromises).forEach(p => p.reject(new Error("Errore nel worker")));
         requestPromises = {};
     };
@@ -47,42 +46,28 @@ function initWorker() {
 
 function postCommandToWorker(command, data) {
     return new Promise((resolve, reject) => {
-        // Salva la promise in modo che il listener onmessage possa risolverla
         requestPromises[command] = { resolve, reject };
         worker.postMessage({ command, data });
     });
 }
-
 // #endregion
 
 // #region LLM Communication
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const logMessages = (payload) => {
-    const msgs = payload.messages;
-    console.debug("*** messages **************************************");
-    for (const m of msgs) {
-        console.debug(m.role);
-        console.debug(m.content);
-        console.debug("-------------------------------------")
-    }
-}
-
 const sendRequest = async (client, payload, errorTag) => {
-    logMessages(payload);
+    // logMessages(payload); // Commentato per pulizia console
     const MAX_RETRIES = 3;
     const RETRY_DELAY_MS = 5000;
-    let last_rr = null;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         const rr = await client.sendRequest(payload, 90);
-        last_rr = rr;
         if (!rr) return rr;
 
         if (rr.ok) return rr;
         const err = rr.error;
         console.error("****\n", `${errorTag} (Attempt ${attempt}/${MAX_RETRIES}):`, err);
         if (err && err.code === 413) {
-            await alert("Prompt troppo grande per questo Mddel");
+            await alert("Prompt troppo grande per questo Modello");
             client.cancelRequest();
             return rr;
         }
@@ -93,7 +78,7 @@ const sendRequest = async (client, payload, errorTag) => {
             return rr;
         }
     }
-    return last_rr;
+    return null; // Ritorna null dopo i tentativi falliti
 };
 // #endregion
 
@@ -111,67 +96,53 @@ export const ragEngine = {
         }
     },
 
-    // --- Funzioni Proxy per il Worker ---
-
-    processDocumentsForPhase0(documents) {
-        return postCommandToWorker('phase0', documents);
+    /**
+     * Azione 1: Chiama il worker per creare la Knowledge Base.
+     * @param {Array<Object>} documents 
+     * @returns Promise<Object> con 'chunks' e 'serializedIndex'.
+     */
+    createKnowledgeBase(documents) {
+        return postCommandToWorker('createKnowledgeBase', documents);
     },
-
-    ne1_buildIndex(chunks) {
-        return postCommandToWorker('phase1', chunks);
-    },
-
-    ne2_search(serializedIndex, query) {
-        return postCommandToWorker('phase2', { serializedIndex, query });
-    },
-
-    // --- Logica che rimane nel Thread Principale ---
 
     /**
-     * Fase 3: Generazione della Risposta.
-     * Costruisce il contesto basandosi sui risultati della ricerca e lo invia all'LLM.
-     * 
-     * La logica di costruzione del contesto è la seguente:
-     * 1. Itera sui risultati della ricerca della Fase 2 (i più pertinenti prima).
-     * 2. Per ogni risultato, trova il testo completo del chunk corrispondente.
-     * 3. Crea uno "snippet" formattato che include l'ID del chunk, il punteggio di pertinenza e il testo.
-     * 4. Aggiunge lo snippet al contesto finale, controllando di non superare una dimensione massima
-     *    (MAX_CONTEXT_LENGTH) per evitare di creare un prompt troppo grande per l'LLM.
-     * 5. Una volta costruito il contesto, lo unisce alla query dell'utente e invia tutto all'LLM.
-     * 
-     * @param {string} query - La domanda originale dell'utente.
-     * @param {Array<Object>} searchResults - I risultati della ricerca dalla Fase 2.
-     * @param {Array<Object>} allChunks - Tutti i chunk dalla Fase 0.
-     * @returns {Promise<string>} Una promessa che si risolve con la risposta testuale dell'LLM.
+     * Azione 2 (parte 1): Costruisce la stringa di contesto.
+     * Operazione veloce, eseguita nel thread principale.
+     * @param {string} serializedIndex 
+     * @param {Array<Object>} allChunks 
+     * @param {string} query 
+     * @returns {string} La stringa di contesto.
      */
-    async ne3_generateResponse(query, searchResults, allChunks) {
-        let context = "";
-        const MAX_CONTEXT_LENGTH = this.promptSize * 0.7; // Usa il 70% dello spazio per il contesto
+    buildContext(serializedIndex, allChunks, query) {
+        const index = lunr.Index.load(JSON.parse(serializedIndex));
+        const searchResults = index.search(query);
 
-        // Costruisce la stringa di contesto iterando sui risultati della ricerca
+        let context = "";
+        const MAX_CONTEXT_LENGTH = this.promptSize * 0.7;
+
         for (const result of searchResults) {
-            // Trova il chunk completo usando l'ID restituito dalla ricerca
             const chunk = allChunks.find(c => c.id === result.ref);
             if (chunk) {
                 const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---\n${chunk.text}\n\n`;
-                
-                // Aggiunge il chunk al contesto solo se non si supera la dimensione massima
                 if ((context + chunkSnippet).length <= MAX_CONTEXT_LENGTH) {
                     context += chunkSnippet;
                 } else {
-                    // Se si supera la dimensione, interrompe il ciclo per non aggiungere altri chunk
                     break;
                 }
             }
         }
+        return context;
+    },
 
-        if (!context) {
-            UaLog.log("Nessun contesto pertinente trovato per la query.");
-            return "Non sono riuscito a trovare informazioni pertinenti nei documenti per rispondere alla tua domanda.";
-        }
-        
-        // Assembla il prompt finale e lo invia all'LLM
-        const messages = promptBuilder.answerPrompt(context, [{role: 'user', content: query}]);
+    /**
+     * Azione 2 (parte 2) e Azione 3: Genera la risposta LLM.
+     * @param {string} query 
+     * @param {string} context 
+     * @param {Array<Object>} thread 
+     * @returns {Promise<string>} La risposta dell'LLM.
+     */
+    async generateResponse(query, context, thread) {
+        const messages = promptBuilder.answerPrompt(context, thread);
         const payload = {
             model: this.model,
             messages: messages,
