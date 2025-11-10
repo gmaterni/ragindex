@@ -483,41 +483,29 @@ const showQuickstart = () => {
 };
 
 const viewConversation = async () => {
-  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
-  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
-
-  if (!thread || thread.length === 0) {
+  const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
+  if (!lst) {
     alert("Nessuna conversazione attiva.");
     return;
   }
-
-  const fullConversation = [];
-  if (context) {
-    fullConversation.push({ role: 'system', content: `CONTESTO:\n${context}` });
-  }
-  fullConversation.push(...thread);
-
-  const s = messages2text(fullConversation);
+  const s = messages2text(lst);
   wnds.wpre.show(s);
 };
 
 export const showHtmlThread = async () => {
-  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
-  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
-
-  if (!thread || thread.length === 0) {
-      setResponseHtml(""); // Clear the display if no thread
-      return;
-  }
-
-  const fullConversation = [];
-  if (context) {
-    fullConversation.push({ role: 'system', content: `CONTESTO:\n${context}` });
-  }
-  fullConversation.push(...thread);
-
-  const html = messages2html(fullConversation);
+  const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
+  if (!lst) return;
+  const html = messages2html(lst);
   setResponseHtml(html);
+};
+
+const viewContext = async () => {
+  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+  if (!context) {
+    alert("Nessun contesto attivo trovato.");
+    return;
+  }
+  wnds.wpre.show(context);
 };
 
 export const updateActiveKbDisplay = async () => {
@@ -710,36 +698,63 @@ const elencoDati = async () => {
         continue; // Skip document keys and already processed keys
       }
 
-      let description = getDescriptionForKey(key);
-      let displayKey = key;
+      let description = "";
+      let displayKey = "";
       let size = 0;
       let value;
 
       if (key === DATA_KEYS.PHASE0_CHUNKS) {
-        // Group PHASE0_CHUNKS and PHASE1_INDEX
+        // Group active KB
         const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
         const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
         if (chunks || index) {
-          displayKey = "Knowledge Base di Lavoro";
-          description = "Knowledge Base di Lavoro (Chunks + Index)";
+          displayKey = "knowledge_attiva";
+          description = "Knowledge Attiva";
           size = (chunks ? JSON.stringify(chunks).length : 0) + (index ? JSON.stringify(index).length : 0);
-          processedIdbKeys.add(DATA_KEYS.PHASE1_INDEX); // Mark index as processed
+          processedIdbKeys.add(DATA_KEYS.PHASE1_INDEX);
         } else {
-          continue; // If both are empty, don't list
+          continue;
+        }
+      } else if (key === DATA_KEYS.KEY_THREAD) {
+        // Group active conversation (thread + context)
+        const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+        const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+        if (thread || context) {
+          displayKey = "th_attiva";
+          description = "Conversazione Attiva";
+          size = (thread ? JSON.stringify(thread).length : 0) + (context ? JSON.stringify(context).length : 0);
+          processedIdbKeys.add(DATA_KEYS.PHASE2_CONTEXT);
+        } else {
+          continue;
         }
       } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
-        // Handle saved KBs
+        // Saved KBs
         value = await idbMgr.read(key);
         if (value && value.chunks && value.serializedIndex) {
-          displayKey = `KB Archiviata: ${key.slice(DATA_KEYS.KEY_KB_PRE.length)}`;
-          description = "Knowledge Base Archiviata (Chunks + Index)";
+          const name = key.slice(DATA_KEYS.KEY_KB_PRE.length);
+          displayKey = `kn_${name}`;
+          description = `knowledge kn${name}`;
           size = JSON.stringify(value.chunks).length + JSON.stringify(value.serializedIndex).length;
         } else {
-          continue; // Skip invalid saved KBs
+          continue;
+        }
+      } else if (key.startsWith(DATA_KEYS.KEY_CONVO_PRE)) {
+        // Saved Conversations
+        value = await idbMgr.read(key);
+        if (value && value.thread) {
+          const name = key.slice(DATA_KEYS.KEY_CONVO_PRE.length);
+          displayKey = `th_${name}`;
+          description = `Conversazione th_${name}`;
+          size = JSON.stringify(value.thread).length + (value.context ? JSON.stringify(value.context).length : 0);
+        } else {
+          continue;
         }
       } else {
+        // Other individual keys (like KEY_PROVIDER, KEY_THEME, etc.)
         value = await idbMgr.read(key);
         size = value ? JSON.stringify(value).length : 0;
+        displayKey = key;
+        description = getDescriptionForKey(key); // Use existing description logic
       }
 
       jfh.append(
@@ -799,7 +814,14 @@ const elencoDati = async () => {
           const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
           const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
           data = { chunks, serializedIndex: index };
+        } else if (key === DATA_KEYS.KEY_THREAD) {
+          // Special handling for active conversation
+          const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+          const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+          data = { thread, context };
         } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
+          data = await idbMgr.read(key);
+        } else if (key.startsWith(DATA_KEYS.KEY_CONVO_PRE)) {
           data = await idbMgr.read(key);
         } else {
           data = await idbMgr.read(key);
@@ -890,31 +912,46 @@ const deleteAllData = async () => {
       continue;
     }
 
+    let description = "";
+    let displayKey = "";
+
     if (key === DATA_KEYS.PHASE0_CHUNKS) {
       // Group active KB
       const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
       const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
       if (chunks || index) {
-        idbKeysToDisplay.push({
-          key: DATA_KEYS.PHASE0_CHUNKS, // Use chunks key as identifier for the group
-          description: "Knowledge Base di Lavoro (Chunks + Index)",
-          displayKey: "Knowledge Base di Lavoro"
-        });
+        displayKey = "knowledge_attiva";
+        description = "Knowledge Attiva";
+        idbKeysToDisplay.push({ key: DATA_KEYS.PHASE0_CHUNKS, description: description, displayKey: displayKey });
         processedIdbKeysForDelete.add(DATA_KEYS.PHASE1_INDEX);
+      }
+    } else if (key === DATA_KEYS.KEY_THREAD) {
+      // Group active conversation (thread + context)
+      const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+      const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+      if (thread || context) {
+        displayKey = "th_attiva";
+        description = "Conversazione Attiva";
+        idbKeysToDisplay.push({ key: DATA_KEYS.KEY_THREAD, description: description, displayKey: displayKey });
+        processedIdbKeysForDelete.add(DATA_KEYS.PHASE2_CONTEXT);
       }
     } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
       // Saved KBs
-      idbKeysToDisplay.push({
-        key: key,
-        description: "Knowledge Base Archiviata",
-        displayKey: `KB Archiviata: ${key.slice(DATA_KEYS.KEY_KB_PRE.length)}`
-      });
+      const name = key.slice(DATA_KEYS.KEY_KB_PRE.length);
+      displayKey = `kn_${name}`;
+      description = `knowledge kn${name}`;
+      idbKeysToDisplay.push({ key: key, description: description, displayKey: displayKey });
+    } else if (key.startsWith(DATA_KEYS.KEY_CONVO_PRE)) {
+      // Saved Conversations
+      const name = key.slice(DATA_KEYS.KEY_CONVO_PRE.length);
+      displayKey = `th_${name}`;
+      description = `Conversazione th_${name}`;
+      idbKeysToDisplay.push({ key: key, description: description, displayKey: displayKey });
     } else {
-      idbKeysToDisplay.push({
-        key: key,
-        description: getDescriptionForKey(key),
-        displayKey: key
-      });
+      // Other individual keys
+      displayKey = key;
+      description = getDescriptionForKey(key);
+      idbKeysToDisplay.push({ key: key, description: description, displayKey: displayKey });
     }
     processedIdbKeysForDelete.add(key);
   }
@@ -978,6 +1015,9 @@ const deleteAllData = async () => {
           await idbMgr.delete(DATA_KEYS.PHASE0_CHUNKS);
           await idbMgr.delete(DATA_KEYS.PHASE1_INDEX);
           UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
+        } else if (key === DATA_KEYS.KEY_THREAD) {
+          await idbMgr.delete(DATA_KEYS.KEY_THREAD);
+          await idbMgr.delete(DATA_KEYS.PHASE2_CONTEXT);
         } else {
           await idbMgr.delete(key);
         }
@@ -1062,6 +1102,7 @@ export function bindEventListener() {
   document.getElementById("menu-view-convo").addEventListener("click", viewConversation);
   document.getElementById("menu-save-convo").addEventListener("click", saveConversation);
   document.getElementById("menu-elenco-convo").addEventListener("click", elencoConversations);
+  document.getElementById("menu-view-context").addEventListener("click", viewContext);
 
   document.getElementById("menu-elenco-docs").addEventListener("click", elencoDocs);
   document.getElementById("menu-elenco-dati").addEventListener("click", elencoDati);
