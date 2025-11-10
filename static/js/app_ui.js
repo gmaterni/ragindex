@@ -483,19 +483,40 @@ const showQuickstart = () => {
 };
 
 const viewConversation = async () => {
-  const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
-  if (!lst) {
+  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+
+  if (!thread || thread.length === 0) {
     alert("Nessuna conversazione attiva.");
     return;
   }
-  const s = messages2text(lst);
+
+  const fullConversation = [];
+  if (context) {
+    fullConversation.push({ role: 'system', content: `CONTESTO:\n${context}` });
+  }
+  fullConversation.push(...thread);
+
+  const s = messages2text(fullConversation);
   wnds.wpre.show(s);
 };
 
 export const showHtmlThread = async () => {
-  const lst = await idbMgr.read(DATA_KEYS.KEY_THREAD)
-  if (!lst) return;
-  const html = messages2html(lst);
+  const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+  const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
+
+  if (!thread || thread.length === 0) {
+      setResponseHtml(""); // Clear the display if no thread
+      return;
+  }
+
+  const fullConversation = [];
+  if (context) {
+    fullConversation.push({ role: 'system', content: `CONTESTO:\n${context}` });
+  }
+  fullConversation.push(...thread);
+
+  const html = messages2html(fullConversation);
   setResponseHtml(html);
 };
 

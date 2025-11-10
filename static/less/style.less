@@ -244,7 +244,8 @@ div.container {
           width: 100%;
           overflow-x: hidden;
           .user,
-          .assistant {
+          .assistant,
+          .system {
             display: inline-block;
             border-radius: 5px;
             padding: 2px 5px;
@@ -263,6 +264,11 @@ div.container {
             margin-right: 1vw;
             text-align: left;
             width: 100%;
+          }
+          .system {
+            margin-right: 1vw;
+            width: 100%;
+            font-style: italic;
           }
         }
       }
@@ -1143,6 +1149,12 @@ div.container {
             border: 2px solid @color1 !important;
             b {
               color: @color2;
+            }
+          }
+          .system {
+            border: 2px dashed @color3 !important;
+            b {
+              color: @color3;
             }
           }
         }
