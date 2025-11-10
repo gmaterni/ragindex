@@ -1,13 +1,5 @@
 "use strict";
 
-/**
- * @file rag_engine.js
- * @description Motore e orchestratore della logica RAG.
- * - Chiama il worker per le operazioni pesanti (creazione KB).
- * - Esegue direttamente le operazioni veloci (creazione contesto).
- * - Gestisce la comunicazione con l'LLM.
- */
-
 import { UaLog } from "./services/ualog3.js";
 import { promptBuilder } from "./llm_prompts.js";
 // lunr è caricato globalmente tramite script tag in ragtext.html
@@ -15,13 +7,13 @@ import { promptBuilder } from "./llm_prompts.js";
 
 // #region Gestione Worker
 let worker;
-let requestPromises = {}; 
+let requestPromises = {};
 
 function initWorker() {
     worker = new Worker('./js/rag_worker.js');
     worker.onmessage = (e) => {
         const { status, command, result, error, progress } = e.data;
-        
+
         if (status === 'progress') {
             UaLog.log(progress);
             return;
@@ -78,9 +70,8 @@ const sendRequest = async (client, payload, errorTag) => {
             return rr;
         }
     }
-    return null; // Ritorna null dopo i tentativi falliti
+    return null;
 };
-// #endregion
 
 export const ragEngine = {
     client: null,

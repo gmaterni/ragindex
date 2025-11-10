@@ -73,9 +73,7 @@ export const messages2text = (history) => {
 
 export const textFormatter = (txt) => {
     if (!txt) return "";
-    // Rimuove i tag HTML
     let plainText = txt.replace(/<[^>]*>/g, "");
-    // Divide il testo in frasi usando delimitatori di fine frase
     let sentences = plainText.split(/([.!?:])(?=\s|$)/);
     let text = "";
     for (let i = 0; i < sentences.length; i += 2) {

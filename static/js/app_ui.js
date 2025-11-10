@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file app_ui.js
- * @description Controller principale dell'applicazione. Gestisce UI, eventi e orchestra il flusso RAG.
- */
-
 import { UaWindowAdm } from "./services/uawindow.js";
 import { UaLog } from "./services/ualog3.js";
 import { help0_html, help1_html, help2_html } from "./services/help.js";
@@ -287,7 +282,7 @@ export const TextInput = {
 
   async runAction1_CreateKnowledgeBase() {
     UaLog.log("Azione 1: Creazione Knowledge Base...");
-    
+
     // Controllo di coerenza robusto: verifica sia la lista che il contenuto.
     const docNames = DocsMgr.names();
     const validDocuments = docNames
@@ -354,7 +349,7 @@ export const TextInput = {
         AppMgr.initConfig();
         const thread = [{ role: 'user', content: query }];
         const answerText = await ragEngine.generateResponse(query, context, thread);
-        
+
         thread.push({ role: 'assistant', content: answerText });
         await idbMgr.create(DATA_KEYS.KEY_THREAD, thread);
         showHtmlThread();
@@ -384,12 +379,12 @@ export const TextInput = {
 
         if (!thread) {
           UaLog.log("Nessuna conversazione attiva, avvio conversazione libera.");
-          thread = []; 
-          context = ""; 
+          thread = [];
+          context = "";
         }
-        
+
         thread.push({ role: 'user', content: query });
-        
+
         AppMgr.initConfig();
         const answerText = await ragEngine.generateResponse(query, context, thread);
 
@@ -659,7 +654,7 @@ const KEY_DESCRIPTIONS = {
   [DATA_KEYS.PHASE1_INDEX]: "Knowledge Base di Lavoro (Index)",
   [DATA_KEYS.PHASE2_CONTEXT]: "Conversazione Attiva (Contesto)",
   [DATA_KEYS.KEY_THREAD]: "Conversazione Attiva (Thread)",
-  
+
   [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
   [DATA_KEYS.PHASE2_QUERY]: "Ultima Query",
@@ -691,7 +686,7 @@ const elencoDati = async () => {
   jfh.append('<h4>Dati in IndexedDB</h4>');
   if (allIdbKeys.length > 0) {
     jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
-    
+
     const processedIdbKeys = new Set();
     for (const key of allIdbKeys) {
       if (key.startsWith("idoc_") || processedIdbKeys.has(key)) {
@@ -903,7 +898,7 @@ const deleteAllData = async () => {
 
   jfh.append('<div class="delete-dialog">');
   jfh.append('<h4>Seleziona Dati da Cancellare</h4>');
-  
+
   const idbKeysToDisplay = [];
   const processedIdbKeysForDelete = new Set();
 
@@ -986,7 +981,7 @@ const deleteAllData = async () => {
   jfh.append('<button id="delete-selected-btn" class="btn-delete-selected">Cancella Selezionati</button>');
   jfh.append('<button id="delete-all-btn" class="btn-delete-all">Cancella Tutto</button>');
   jfh.append('</div></div>');
-  
+
   wnds.winfo.show(jfh.html());
   const element = wnds.winfo.w.getElement();
 
@@ -1089,16 +1084,16 @@ export function bindEventListener() {
   document.getElementById("btn-provider-settings").addEventListener("click", Commands.providerSettings);
   document.getElementById("btn-dark-theme").addEventListener("click", () => setTheme("dark"));
   document.getElementById("btn-light-theme").addEventListener("click", () => setTheme("light"));
-  
+
   // Menu Items
   document.getElementById("menu-readme").addEventListener("click", showReadme);
   document.getElementById("menu-quickstart").addEventListener("click", showQuickstart);
   document.getElementById("menu-show-config").addEventListener("click", LlmProvider.showConfig);
-  
+
   // --- Nuova Gestione Dati ---
   document.getElementById("menu-save-kb").addEventListener("click", saveKnowledgeBase);
   document.getElementById("menu-elenco-kb").addEventListener("click", elencoKnowledgeBases);
-  
+
   document.getElementById("menu-view-convo").addEventListener("click", viewConversation);
   document.getElementById("menu-save-convo").addEventListener("click", saveConversation);
   document.getElementById("menu-elenco-convo").addEventListener("click", elencoConversations);

@@ -29,7 +29,6 @@ export const WebId = (() => {
         console.log('User ID rimosso dal localStorage');
     };
 
-    // API pubblica
     return {
         get,
         clear

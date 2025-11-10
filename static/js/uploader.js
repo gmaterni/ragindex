@@ -62,7 +62,6 @@ export const docuentUploader = {
       dropZone.classList.remove("drag-over");
       const files = e.dataTransfer.files;
       if (files.length > 0) {
-        // Itera su tutti i file trascinati
         for (const file of files) {
           this.handleFile(file);
         }

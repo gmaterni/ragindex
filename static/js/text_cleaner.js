@@ -10,12 +10,10 @@ const removeTag = (txt) => {
   return txt.replace(/<<<|>>>|<<|>>|#/g, "");
 };
 
-// Rimuove link web HTTP/HTTPS, file locali, markdown e HTML
 const removeLinks = (doc) => {
   return doc.replace(/https?:\/\/\S+|file:\/\/\/[^\s]+|\[([^\]]+)\]\([^)]+\)|<a\s+(?:[^>]*?\s+)?href="[^"]*"[^>]*>([^<]+)<\/a>/g, "").trim();
 };
 
-// Pulizia testo
 const cleanText = (text) => {
   text = text.replace(/`/g, ""); // Rimuove i backtick
   text = text.replace(/(\w+)-\s*\n(\w+)/g, "$1$2"); // Unisce parole divise
@@ -34,16 +32,6 @@ const cleanText = (text) => {
   return text.trim();
 };
 
-
-// export function cleanDocLines(text) {
-//   text = removeTag(text);
-//   text = removeLinks(text);
-//   text = cleanText(text);
-//   const pattern = /(?<!\b\w\.)(?<!\b\w\w\.)(?<!\b\w\w\w\.)(?<=[.!?])(?=\s+[A-Z])/;
-//   let lines = text.split(pattern);
-//   lines = lines.map((s) => s.trim()).filter((s) => s.length > 0);
-//   return lines;
-// }
 
 export function cleanDoc(text) {
   text = removeTag(text);

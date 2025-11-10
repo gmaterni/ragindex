@@ -3,8 +3,8 @@
 
 // import { getApiKey } from "./services/key_retriever.js";
 import { LlmProvider } from "./llm_provider.js";
-import { DocsMgr } from "./services/docs_mgr.js";
-import { UaLog } from "./services/ualog3.js";
+// import { DocsMgr } from "./services/docs_mgr.js";
+// import { UaLog } from "./services/ualog3.js";
 import { ragEngine } from "./rag_engine.js";
 
 const tokensToBytes = (nk = 32) => {

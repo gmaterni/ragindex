@@ -1,12 +1,5 @@
 "use strict";
 
-/**
- * @file rag_worker.js
- * @description Web Worker per eseguire le operazioni pesanti di creazione della Knowledge Base
- * (chunking e indicizzazione) in un thread separato.
- */
-
-// Importa le librerie necessarie.
 try {
     importScripts(
         './services/vendor/compromise.js',
@@ -21,8 +14,6 @@ try {
 const workerLogic = {
     /**
      * Esegue la creazione della Knowledge Base (chunking e indicizzazione).
-     * @param {Array<Object>} documents - I documenti da processare.
-     * @returns {Promise<Object>} Un oggetto contenente 'chunks' e 'serializedIndex'.
      */
     async createKnowledgeBase(documents) {
         // Fase 0: Chunking
@@ -43,7 +34,6 @@ const workerLogic = {
         return { chunks: allChunks, serializedIndex: serializedIndex };
     },
 
-    // --- Metodi di supporto interni ---
 
     async _chunkDocument(text, docIndex) {
         const chunks = [];
@@ -108,7 +98,7 @@ const workerLogic = {
 };
 
 // Listener principale per i messaggi dal thread principale
-self.onmessage = async function(e) {
+self.onmessage = async function (e) {
     const { command, data } = e.data;
 
     try {

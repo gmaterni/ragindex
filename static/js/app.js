@@ -205,8 +205,8 @@ import { FirebaseLogger } from "./services/firbaselogger.js";
 import { WebId } from "./services/webuser_id.js";
 import "./services/uadialog.js";
 
-const VERSIONE = " 0.1.8";
-console.log("*** VERSIONE:", VERSIONE)
+const VERSIONE = " 0.1.0";
+console.info("*** VERSIONE:", VERSIONE)
 
 async function openApp() {
   try {
@@ -219,7 +219,7 @@ async function openApp() {
     TextOutput.init();
     bindEventListener();
     document.querySelector(".menu-btn").checked = false;
-    
+
     try {
       await showHtmlThread();
     } catch (e) {

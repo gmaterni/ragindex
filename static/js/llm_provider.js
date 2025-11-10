@@ -6,7 +6,7 @@ import { GeminiClient } from './llmclient/gemini_client.js';
 import { GroqClient } from './llmclient/groq_client.js';
 import { MistralClient } from './llmclient/mistral_client.js';
 // import { HuggingFaceClient } from './llmclient/huggingface_client.js';
-import { UaJtfh } from "./services/uajtfh.js";
+// import { UaJtfh } from "./services/uajtfh.js";
 import { wnds } from "./app_ui.js";
 import { UaWindowAdm } from "./services/uawindow.js";
 import { DATA_KEYS } from "./services/data_keys.js";
