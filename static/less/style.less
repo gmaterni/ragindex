@@ -76,6 +76,7 @@
 // Variabili aggiuntive per tema dark
 @dark-dialog-bg: lighten(@dark-bg, 5%);
 @dark-dialog-text: @dark-text;
+@dark-kb-display-fg: #f6e602; // yellow
 
 // -------------------------------------------------------------------
 // TEMA: Light
@@ -129,6 +130,7 @@
 // Variabili aggiuntive per tema light
 @light-dialog-bg: darken(@light-bg, 1%);
 @light-dialog-text: @light-text;
+@light-kb-display-fg: #E65100; // dark orange for visibility
 
 // ===================================================================
 //  3. STILI GLOBALI E RESET
@@ -390,12 +392,32 @@ div.container {
       }
     }
 
+    .active-kb-display {
+      position: absolute;
+      top: 0;
+      left: 10vw; // Position it after upload button
+      margin: 2px 0;
+      padding: 2px 5px;
+      min-height: 4vh;
+      max-height: 4vh;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      text-transform: lowercase;
+      font-size: @fsize-out;
+      font-style: italic;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 15vw; // Limit width to prevent overflow
+    }
+
     .doctype-settings {
-      left: 10vw;
+      left: 25vw;
       font-weight: normal;
     }
     .active-doctype-display {
-      left: 13.5vw;
+      left: 28.5vw;
       font-size: @fsize-out;
       font-weight: normal;
       // text-decoration: underline;
@@ -411,11 +433,11 @@ div.container {
     }
 
     .provider-settings {
-      left: 35vw;
+      left: 50vw;
       font-weight: normal;
     }
     .active-model-display {
-      left: 40.5vw;
+      left: 55.5vw;
       font-size: @fsize-out;
       font-weight: normal;
       // text-decoration: underline;
@@ -1531,6 +1553,9 @@ div.container {
     // border-color:@active-model-border;
     color: @active-model-fg;
   }
+  .active-kb-display {
+    color: @kb-display-fg;
+  }
 }
 
 // ===================================================================
@@ -1632,6 +1657,7 @@ div.container {
   // @active-model-bg: @dark-color2;
   // @active-model-border: @dark-color2;
   @active-model-fg: lighten(@dark-color2, 5%);
+  @kb-display-fg: @dark-kb-display-fg;
   @dialog-bg: lighten(@dark-bg, 10%);
   @dialog-text: @dark-text;
 
@@ -1752,6 +1778,7 @@ div.container {
   // @active-model-bg:@light-color2;
   // @active-model-border: @light-color2;
   @active-model-fg: darken(@light-color2, 10%);
+  @kb-display-fg: @light-kb-display-fg;
   @dialog-bg: @light-bg;
   @dialog-text: @light-text;
 

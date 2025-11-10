@@ -310,6 +310,8 @@ export const TextInput = {
 
         await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, chunks);
         await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
+        UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME); // New KB is active, but not saved yet
+        updateActiveKbDisplay();
 
         alert(`Knowledge Base creata.\n- ${chunks.length} frammenti generati.\n- Indice di ricerca creato.`);
       } catch (error) {
@@ -444,6 +446,8 @@ export const TextOutput = {
     if (!ok) return;
     await idbMgr.delete(DATA_KEYS.PHASE2_CONTEXT);
     await idbMgr.delete(DATA_KEYS.KEY_THREAD);
+    UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME); // Clear active KB name
+    updateActiveKbDisplay(); // Update display
     setResponseHtml("");
   },
 
@@ -495,6 +499,26 @@ export const showHtmlThread = async () => {
   setResponseHtml(html);
 };
 
+export const updateActiveKbDisplay = async () => {
+  const displayElement = document.getElementById("active-kb-display");
+  if (!displayElement) return;
+
+  const chunksExist = await idbMgr.exists(DATA_KEYS.PHASE0_CHUNKS);
+  const indexExist = await idbMgr.exists(DATA_KEYS.PHASE1_INDEX);
+
+  if (!chunksExist || !indexExist) {
+    displayElement.textContent = "Nessuna KB attiva";
+    UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME); // Ensure it's cleared if KB is gone
+    return;
+  }
+
+  const activeKbName = UaDb.read(DATA_KEYS.ACTIVE_KB_NAME);
+  if (activeKbName) {
+    displayElement.textContent = `KB: ${activeKbName}`;
+  } else {
+    displayElement.textContent = "KB: BASE CORRENTE";
+  }
+};
 
 // ==================================================
 // NUOVA GESTIONE DATI UNIFICATA
@@ -515,6 +539,8 @@ const saveKnowledgeBase = async () => {
     const key = `${DATA_KEYS.KEY_KB_PRE}${name}`;
     const kb_data = { chunks, serializedIndex };
     await idbMgr.create(key, kb_data);
+    UaDb.save(DATA_KEYS.ACTIVE_KB_NAME, name); // Set as active saved KB
+    updateActiveKbDisplay(); // Update display
     alert(`Knowledge Base archiviata come: ${name}`);
   }
 };
@@ -576,6 +602,11 @@ const elencoArtefatti = async (prefix, title, loadHandler) => {
     const ok = await confirm(`Confermi l'eliminazione di '${displayName}'?`);
     if (ok) {
       await idbMgr.delete(key);
+      // If the deleted KB was the active one, clear the active KB name
+      if (prefix === DATA_KEYS.KEY_KB_PRE && UaDb.read(DATA_KEYS.ACTIVE_KB_NAME) === displayName) {
+        UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
+      }
+      updateActiveKbDisplay(); // Update display
       wnds.winfo.close();
       elencoArtefatti(prefix, title, loadHandler); // Refresh
     }
@@ -589,6 +620,8 @@ const loadKnowledgeBase = async (key) => {
     await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, kb_data.chunks);
     await idbMgr.create(DATA_KEYS.PHASE1_INDEX, kb_data.serializedIndex);
     const name = key.slice(DATA_KEYS.KEY_KB_PRE.length);
+    UaDb.save(DATA_KEYS.ACTIVE_KB_NAME, name); // Set as active saved KB
+    updateActiveKbDisplay(); // Update display
     alert(`Knowledge Base '${name}' caricata come KB di lavoro.`);
   } else {
     alert("Errore: Dati della Knowledge Base non validi.");
@@ -621,7 +654,8 @@ const KEY_DESCRIPTIONS = {
   [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
   [DATA_KEYS.PHASE2_QUERY]: "Ultima Query",
-  [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati"
+  [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati",
+  [DATA_KEYS.ACTIVE_KB_NAME]: "Nome KB Attiva"
 };
 
 const getDescriptionForKey = (key) => {
@@ -648,17 +682,53 @@ const elencoDati = async () => {
   jfh.append('<h4>Dati in IndexedDB</h4>');
   if (allIdbKeys.length > 0) {
     jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
+    
+    const processedIdbKeys = new Set();
     for (const key of allIdbKeys) {
-      const description = getDescriptionForKey(key);
-      const value = await idbMgr.read(key);
-      const size = value ? JSON.stringify(value).length : 0;
+      if (key.startsWith("idoc_") || processedIdbKeys.has(key)) {
+        continue; // Skip document keys and already processed keys
+      }
+
+      let description = getDescriptionForKey(key);
+      let displayKey = key;
+      let size = 0;
+      let value;
+
+      if (key === DATA_KEYS.PHASE0_CHUNKS) {
+        // Group PHASE0_CHUNKS and PHASE1_INDEX
+        const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+        const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
+        if (chunks || index) {
+          displayKey = "Knowledge Base di Lavoro";
+          description = "Knowledge Base di Lavoro (Chunks + Index)";
+          size = (chunks ? JSON.stringify(chunks).length : 0) + (index ? JSON.stringify(index).length : 0);
+          processedIdbKeys.add(DATA_KEYS.PHASE1_INDEX); // Mark index as processed
+        } else {
+          continue; // If both are empty, don't list
+        }
+      } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
+        // Handle saved KBs
+        value = await idbMgr.read(key);
+        if (value && value.chunks && value.serializedIndex) {
+          displayKey = `KB Archiviata: ${key.slice(DATA_KEYS.KEY_KB_PRE.length)}`;
+          description = "Knowledge Base Archiviata (Chunks + Index)";
+          size = JSON.stringify(value.chunks).length + JSON.stringify(value.serializedIndex).length;
+        } else {
+          continue; // Skip invalid saved KBs
+        }
+      } else {
+        value = await idbMgr.read(key);
+        size = value ? JSON.stringify(value).length : 0;
+      }
+
       jfh.append(
         `<tr>
-          <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${key}</a></td>
+          <td><a href="#" class="link-show-data" data-key="${key}" data-storage-type="idb">${displayKey}</a></td>
           <td>${description}</td>
           <td class="size">${size}</td>
         </tr>`
       );
+      processedIdbKeys.add(key);
     }
     jfh.append('</tbody></table>');
   } else {
@@ -670,6 +740,9 @@ const elencoDati = async () => {
   if (allLsKeys.length > 0) {
     jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
     for (const key of allLsKeys) {
+      if (key.startsWith("idoc_") || key === DATA_KEYS.KEY_DOCS) {
+        continue; // Skip document related keys
+      }
       const value = UaDb.read(key);
       if (value) {
         const description = getDescriptionForKey(key);
@@ -695,17 +768,21 @@ const elencoDati = async () => {
     link.addEventListener("click", async (event) => {
       event.preventDefault();
       const key = event.currentTarget.dataset.key;
-      if (key === DATA_KEYS.KEY_DOCS) {
-        const s = DocsMgr.names().join("\n");
-        wnds.wpre.show(s, false);
-        return;
-      }
       const storageType = event.currentTarget.dataset.storageType;
       let data;
       if (storageType === 'ls') {
         data = UaDb.read(key);
       } else if (storageType === 'idb') {
-        data = await idbMgr.read(key);
+        if (key === DATA_KEYS.PHASE0_CHUNKS) {
+          // Special handling for active KB
+          const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+          const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
+          data = { chunks, serializedIndex: index };
+        } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
+          data = await idbMgr.read(key);
+        } else {
+          data = await idbMgr.read(key);
+        }
       }
       data = data ?? "";
       const dataFormat = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
@@ -784,21 +861,60 @@ const deleteAllData = async () => {
   jfh.append('<div class="delete-dialog">');
   jfh.append('<h4>Seleziona Dati da Cancellare</h4>');
   
-  if (allIdbKeys.length > 0) {
+  const idbKeysToDisplay = [];
+  const processedIdbKeysForDelete = new Set();
+
+  for (const key of allIdbKeys) {
+    if (key.startsWith("idoc_") || processedIdbKeysForDelete.has(key)) {
+      continue;
+    }
+
+    if (key === DATA_KEYS.PHASE0_CHUNKS) {
+      // Group active KB
+      const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
+      const index = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
+      if (chunks || index) {
+        idbKeysToDisplay.push({
+          key: DATA_KEYS.PHASE0_CHUNKS, // Use chunks key as identifier for the group
+          description: "Knowledge Base di Lavoro (Chunks + Index)",
+          displayKey: "Knowledge Base di Lavoro"
+        });
+        processedIdbKeysForDelete.add(DATA_KEYS.PHASE1_INDEX);
+      }
+    } else if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
+      // Saved KBs
+      idbKeysToDisplay.push({
+        key: key,
+        description: "Knowledge Base Archiviata",
+        displayKey: `KB Archiviata: ${key.slice(DATA_KEYS.KEY_KB_PRE.length)}`
+      });
+    } else {
+      idbKeysToDisplay.push({
+        key: key,
+        description: getDescriptionForKey(key),
+        displayKey: key
+      });
+    }
+    processedIdbKeysForDelete.add(key);
+  }
+
+  if (idbKeysToDisplay.length > 0) {
     jfh.append('<h5>Dati in IndexedDB</h5><table class="table-data">');
-    allIdbKeys.forEach(key => {
+    idbKeysToDisplay.forEach(item => {
       jfh.append(`
         <tr>
-          <td><input type="checkbox" data-key="${key}" data-storage="idb"> ${key}</td>
-          <td>${getDescriptionForKey(key)}</td>
+          <td><input type="checkbox" data-key="${item.key}" data-storage="idb"> ${item.displayKey}</td>
+          <td>${item.description}</td>
         </tr>`);
     });
     jfh.append('</table>');
   }
 
-  if (allLsKeys.length > 0) {
+  const lsKeysToDisplay = allLsKeys.filter(key => !key.startsWith("idoc_") && key !== DATA_KEYS.KEY_DOCS);
+
+  if (lsKeysToDisplay.length > 0) {
     jfh.append('<h5>Dati in LocalStorage</h5><table class="table-data">');
-    allLsKeys.forEach(key => {
+    lsKeysToDisplay.forEach(key => {
       jfh.append(`
         <tr>
           <td><input type="checkbox" data-key="${key}" data-storage="ls"> ${key}</td>
@@ -834,25 +950,46 @@ const deleteAllData = async () => {
     const ok = await confirm("Confermi la cancellazione degli elementi selezionati?");
     if (ok) {
       for (const key of keysToDelete.ls) {
-        if (key === DATA_KEYS.KEY_DOCS) DocsMgr.deleteAll();
-        else UaDb.delete(key);
+        UaDb.delete(key);
       }
       for (const key of keysToDelete.idb) {
-        await idbMgr.delete(key);
+        if (key === DATA_KEYS.PHASE0_CHUNKS) {
+          await idbMgr.delete(DATA_KEYS.PHASE0_CHUNKS);
+          await idbMgr.delete(DATA_KEYS.PHASE1_INDEX);
+          UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
+        } else {
+          await idbMgr.delete(key);
+        }
       }
       alert("Dati selezionati cancellati con successo.");
       wnds.winfo.close();
+      updateActiveKbDisplay(); // Update display after deletion
+      // Re-open delete dialog to show updated state
+      deleteAllData();
     }
   });
 
   element.querySelector("#delete-all-btn").addEventListener("click", async () => {
-    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB). Confermi?");
+    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB), ESCLUSI i documenti caricati. Confermi?");
     if (ok) {
-      UaDb.clear();
-      await idbMgr.clearAll();
+      // Clear LocalStorage, but preserve document-related keys
+      const allLsKeys = UaDb.getAllIds();
+      for (const key of allLsKeys) {
+        if (!key.startsWith("idoc_") && key !== DATA_KEYS.KEY_DOCS) {
+          UaDb.delete(key);
+        }
+      }
+      // Clear IndexedDB, but preserve document-related keys (if any were mistakenly there)
+      const allIdbKeys = await idbMgr.getAllKeys();
+      for (const key of allIdbKeys) {
+        if (!key.startsWith("idoc_")) { // Ensure no idoc_ keys are deleted from idb if they somehow got there
+          await idbMgr.delete(key);
+        }
+      }
       setResponseHtml("");
-      alert("Tutti i dati dell'applicazione sono stati cancellati.");
+      alert("Tutti i dati dell'applicazione (esclusi i documenti) sono stati cancellati.");
       wnds.winfo.close();
+      updateActiveKbDisplay(); // Update display after deletion
     }
   });
 };

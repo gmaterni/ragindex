@@ -74,6 +74,7 @@ Questi rappresentano i salvataggi nominati creati dall'utente.
 - **Chiave `ua_theme`**: `string` (`"light"` o `"dark"`) per il tema dell'UI.
 - **Chiave `docs_list`**: `string` (JSON) con l'elenco dei nomi dei documenti caricati.
 - **Chiave `idoc_{nome_file}`**: `string` con il contenuto testuale di ogni documento.
+- **Chiave `active_kb_name`**: `string` con il nome della Knowledge Base archiviata attualmente attiva.
 
 ---
 
@@ -116,7 +117,10 @@ La logica è orchestrata da `app_ui.js` che invoca `rag_engine.js`.
 
 La UI è definita in `static/ragtext.html` e gestita da `static/js/app_ui.js`.
 
-### 4.1. Menu Laterale (`.menu-box`)
+### 4.1. Barra Superiore (`.head-wrapper`)
+- **Display KB Attiva (`#active-kb-display`)**: Mostra il nome della Knowledge Base attualmente in uso. Se la KB non è stata salvata, mostra "KB: BASE CORRENTE".
+
+### 4.2. Menu Laterale (`.menu-box`)
 Contiene link per la gestione dei dati e la configurazione.
 
 - **Knowledge Base**:
@@ -127,14 +131,14 @@ Contiene link per la gestione dei dati e la configurazione.
     - `menu-save-convo`: Archivia la conversazione attiva.
     - `menu-elenco-convo`: Mostra, carica o elimina le conversazioni archiviate.
 - **Gestione Dati**:
-    - `menu-elenco-docs`: Mostra i documenti caricati.
-    - `menu-elenco-dati`: Riepilogo di tutti i dati archiviati.
-    - `menu-delete-all`: Apre una finestra per la cancellazione dei dati.
+    - `menu-elenco-docs`: Mostra i documenti caricati (gestiti separatamente).
+    - `menu-elenco-dati`: Riepilogo di tutti i dati archiviati (esclusi i documenti).
+    - `menu-delete-all`: Apre una finestra per la cancellazione dei dati (esclusi i documenti).
 - **Altro**:
     - `menu-readme`, `menu-quickstart`: Mostrano documentazione.
     - `menu-show-config`: Visualizza la configurazione LLM.
     - `menu-help-esempi`: Carica documenti di esempio.
 
-### 4.2. Finestra di Output
+### 4.3. Finestra di Output
 - **Nuova Conversazione (`#clear-history1`)**: Cancella solo la cronologia (`thread`).
-- **Nuovo Contesto & Conversazione (`#clear-history2`)**: Cancella contesto e cronologia.
+- **Nuovo Contesto & Conversazione (`#clear-history2`)**: Cancella la KB di lavoro, il contesto e la cronologia.

@@ -12,39 +12,16 @@ export const ROLE_USER = "user";
 export const ROLE_ASSISTANT = "assistant";
 export const ROLE_SYSTEM = "system";
 
-const historyToMessages = (history) => {
-
-    const buildMessage = (str) => {
-        let msg = "";
-        let role = "";
-        if (str.startsWith(QUESTION_PREFIX)) {
-            msg = str.substring(QUESTION_PREFIX.length);
-            role = ROLE_USER;
-        }
-        if (str.startsWith(ANSWER_PREFIX)) {
-            msg = str.substring(ANSWER_PREFIX.length);
-            role = ROLE_ASSISTANT;
-        }
-        // AAA history rimuove il primo termine fino a ":"
-        msg = msg.replace(/^(\S+):\s*/g, '');
-        return [role, msg];
-    };
-
-    const messages = [];
-    for (const str of history) {
-        const msg = buildMessage(str);
-        messages.push(msg);
-    }
-    return messages;
-};
-
 export const messages2html = (history) => {
+    if (!history || !Array.isArray(history)) return "";
     const lst = [];
-    const messages = historyToMessages(history);
-    // console.info("*************\n", messages);
-    for (const msg of messages) {
-        const role = msg[0];
-        let content = msg[1];
+    for (const msg of history) {
+        if (typeof msg !== 'object' || msg === null || !('role' in msg) || !('content' in msg)) {
+            console.error("Malformed history item:", msg);
+            continue;
+        }
+        const role = msg.role;
+        let content = msg.content;
         let text = "";
         content = content.replace(/\n{2,}/g, "\n");
         if (role === ROLE_ASSISTANT) {
@@ -56,23 +33,25 @@ export const messages2html = (history) => {
         } else if (role === ROLE_SYSTEM) {
             text = `<div class="system"><b>System:</b><br>${content}</div>`;
         } else {
-            alert("ERROR in role");
+            console.error("ERROR in role:", role);
             text = `<div>ERROR ROLE</div>`;
         }
         lst.push(text);
     }
-    // Aggiungere una riga di separazione ben visibile tra i messaggi solo se isMenuDisplay è true
-    // const html = isMenuDisplay ? lst.join('<hr class="message-separator">\n') : lst.join("\n");
     const html = lst.join("\n");
     return html;
 };
 
 export const messages2text = (history) => {
+    if (!history || !Array.isArray(history)) return "";
     const lst = [];
-    const messages = historyToMessages(history);
-    for (const msg of messages) {
-        const role = msg[0];
-        let content = msg[1];
+    for (const msg of history) {
+        if (typeof msg !== 'object' || msg === null || !('role' in msg) || !('content' in msg)) {
+            console.error("Malformed history item:", msg);
+            continue;
+        }
+        const role = msg.role;
+        let content = msg.content;
         let text = "";
         content = content.replace(/\n{2,}/g, "\n");
         if (role === ROLE_ASSISTANT) {
@@ -82,7 +61,7 @@ export const messages2text = (history) => {
         } else if (role === ROLE_SYSTEM) {
             text = `System:\n${content.trim()}`;
         } else {
-            alert("ERROR in role");
+            console.error("ERROR in role:", role);
             text = `ERROR ROLE`;
         }
         lst.push(text);

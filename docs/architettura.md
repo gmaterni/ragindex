@@ -22,7 +22,7 @@ L'applicazione è suddivisa logicamente in più strati, ognuno con componenti sp
     - **Componenti:** `app.js`, `app_ui.js`
     - **Responsabilità:** È il ponte tra l'UI e la logica applicativa.
         - `app.js`: Punto di ingresso, inizializza l'applicazione e i suoi moduli.
-        - `app_ui.js`: Contiene i gestori di eventi (`bindEventListener`) e le funzioni `runActionX()` che orchestrano il flusso di lavoro. Chiama i servizi per accedere ai dati e il motore RAG per elaborarli.
+        - `app_ui.js`: Contiene i gestori di eventi (`bindEventListener`), le funzioni `runActionX()` che orchestrano il flusso di lavoro e la logica per aggiornare gli elementi dell'interfaccia (es. il nome della KB attiva). Chiama i servizi per accedere ai dati e il motore RAG per elaborarli.
 
 3.  **Business Logic Layer (Main Thread)**
     - **Componenti:** `rag_engine.js`

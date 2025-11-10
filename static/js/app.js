@@ -199,7 +199,7 @@ limitations under the License.
 "use strict";
 
 import { UaLog } from "./services/ualog3.js";
-import { bindEventListener, showHtmlThread, wnds, Commands, TextInput, TextOutput, getTheme } from "./app_ui.js";
+import { bindEventListener, showHtmlThread, wnds, Commands, TextInput, TextOutput, getTheme, updateActiveKbDisplay } from "./app_ui.js";
 import { AppMgr } from "./app_mgr.js";
 import { FirebaseLogger } from "./services/firbaselogger.js";
 import { WebId } from "./services/webuser_id.js";
@@ -228,6 +228,7 @@ async function openApp() {
     }
 
     getTheme();
+    updateActiveKbDisplay(); // Add this call
     const webid = WebId.get();
     FirebaseLogger.sendLog("open", webid)
   } catch (error) {

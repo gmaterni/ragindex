@@ -14,5 +14,6 @@ export const DATA_KEYS = {
     KEY_THEME: "ua_theme",
     KEY_PROVIDER: "llm_provider",
     KEY_DOCS: "docs_list",
-    KEY_THREAD: "thread"
+    KEY_THREAD: "thread",
+    ACTIVE_KB_NAME: "active_kb_name"
 };
