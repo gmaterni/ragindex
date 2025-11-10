@@ -127,18 +127,39 @@ export const ragEngine = {
 
     // --- Logica che rimane nel Thread Principale ---
 
+    /**
+     * Fase 3: Generazione della Risposta.
+     * Costruisce il contesto basandosi sui risultati della ricerca e lo invia all'LLM.
+     * 
+     * La logica di costruzione del contesto è la seguente:
+     * 1. Itera sui risultati della ricerca della Fase 2 (i più pertinenti prima).
+     * 2. Per ogni risultato, trova il testo completo del chunk corrispondente.
+     * 3. Crea uno "snippet" formattato che include l'ID del chunk, il punteggio di pertinenza e il testo.
+     * 4. Aggiunge lo snippet al contesto finale, controllando di non superare una dimensione massima
+     *    (MAX_CONTEXT_LENGTH) per evitare di creare un prompt troppo grande per l'LLM.
+     * 5. Una volta costruito il contesto, lo unisce alla query dell'utente e invia tutto all'LLM.
+     * 
+     * @param {string} query - La domanda originale dell'utente.
+     * @param {Array<Object>} searchResults - I risultati della ricerca dalla Fase 2.
+     * @param {Array<Object>} allChunks - Tutti i chunk dalla Fase 0.
+     * @returns {Promise<string>} Una promessa che si risolve con la risposta testuale dell'LLM.
+     */
     async ne3_generateResponse(query, searchResults, allChunks) {
         let context = "";
-        const MAX_CONTEXT_LENGTH = this.promptSize * 0.7;
+        const MAX_CONTEXT_LENGTH = this.promptSize * 0.7; // Usa il 70% dello spazio per il contesto
 
+        // Costruisce la stringa di contesto iterando sui risultati della ricerca
         for (const result of searchResults) {
+            // Trova il chunk completo usando l'ID restituito dalla ricerca
             const chunk = allChunks.find(c => c.id === result.ref);
             if (chunk) {
-                const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---
-${chunk.text}\n\n`;
+                const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---\n${chunk.text}\n\n`;
+                
+                // Aggiunge il chunk al contesto solo se non si supera la dimensione massima
                 if ((context + chunkSnippet).length <= MAX_CONTEXT_LENGTH) {
                     context += chunkSnippet;
                 } else {
+                    // Se si supera la dimensione, interrompe il ciclo per non aggiungere altri chunk
                     break;
                 }
             }
@@ -149,6 +170,7 @@ ${chunk.text}\n\n`;
             return "Non sono riuscito a trovare informazioni pertinenti nei documenti per rispondere alla tua domanda.";
         }
         
+        // Assembla il prompt finale e lo invia all'LLM
         const messages = promptBuilder.answerPrompt(context, [{role: 'user', content: query}]);
         const payload = {
             model: this.model,

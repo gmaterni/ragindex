@@ -6,28 +6,104 @@ Questa applicazione implementa un flusso di lavoro **RAG (Retrieval-Augmented Ge
 
 L'architettura è progettata per essere modulare e pedagogica, suddividendo il complesso processo RAG in quattro fasi distinte e gestibili dall'utente.
 
-## 2. Architettura dei Dati
+## 2. Mappa dei Dati Persistenti
 
-L'applicazione utilizza due meccanismi di storage nel browser per persistere dati e configurazioni:
+L'applicazione utilizza due meccanismi di storage del browser per garantire la persistenza dei dati tra le sessioni. La logica è la seguente:
+- **IndexedDB**: Utilizzato per memorizzare dati "pesanti" e strutturati, come gli artefatti generati dalla pipeline RAG. Gestito tramite `services/idb_mgr.js`.
+- **LocalStorage**: Utilizzato per dati di configurazione "leggeri" e stringhe semplici. Gestito tramite `services/uadb.js`.
 
-### 2.1. IndexedDB
-Gestito tramite `services/idb_mgr.js`, è utilizzato per i dati "pesanti" e gli artefatti generati durante il flusso RAG. Questo permette di salvare e ricaricare sessioni di lavoro complesse.
+Di seguito è riportata una mappa dettagliata dei dati salvati durante il flusso di lavoro.
 
-**Chiavi Principali (da `services/data_keys.js`):**
-- `PHASE0_CHUNKS`: (Array di Oggetti) Memorizza i frammenti di testo (chunks) generati dalla **Fase 0**. Ogni chunk è un oggetto con contenuto testuale e metadati.
-- `PHASE1_INDEX`: (Stringa JSON) Contiene l'indice di ricerca lessicale (creato con Lunr.js) serializzato, generato dalla **Fase 1**.
-- `PHASE2_CONTEXT`: (Array di Oggetti) Memorizza i risultati della ricerca (il "contesto") ottenuti dalla **Fase 2**.
-- `KEY_THREAD`: (Array di Oggetti) Contiene la cronologia completa della conversazione con l'LLM.
-- `KEY_CHUNKS_PRE`, `KEY_INDEX_PRE`, `KEY_CONTEXT_PRE`, `KEY_THREAD_PRE`: Prefissi per le chiavi di archiviazione nominate dall'utente, che permettono di salvare diverse versioni di Chunks, Indici, Contesti e Conversazioni.
+---
 
-### 2.2. LocalStorage
-Gestito tramite `services/uadb.js`, è utilizzato per dati di configurazione leggeri e stati transitori.
+### Artefatti della Pipeline RAG (in IndexedDB)
 
-**Chiavi Principali:**
-- `KEY_PROVIDER`: Memorizza la configurazione del provider LLM selezionato (es. Gemini, Groq).
-- `KEY_THEME`: Tema dell'interfaccia (`light` o `dark`).
-- `PHASE2_QUERY`: La query testuale inserita dall'utente per la **Fase 2**.
-- `KEY_DOCS`: Elenco dei nomi dei documenti caricati dall'utente (gestito da `DocsMgr`).
+#### 1. Frammenti dei Documenti (Chunks)
+- **Chiave**: `phase0_chunks`
+- **Fase di Creazione**: Fase 0 (Segmenta)
+- **Descrizione**: Un array contenente tutti i frammenti di testo estratti dai documenti caricati.
+- **Formato**: `Array<Object>`
+- **Esempio di un elemento dell'array**:
+  ```json
+  {
+    "id": "doc0-chunk1",
+    "text": "Questo è un frammento di testo analizzato.",
+    "keywords": ["frammento", "testo", "analizzato"],
+    "entities": []
+  }
+  ```
+
+#### 2. Indice di Ricerca
+- **Chiave**: `phase1_index`
+- **Fase di Creazione**: Fase 1 (Indicizza)
+- **Descrizione**: L'indice di ricerca lessicale creato da `lunr.js`, serializzato in una stringa JSON.
+- **Formato**: `string` (JSON)
+- **Esempio**: `"{ "version": "2.3.9", "fields": [...], ... }"`
+
+#### 3. Contesto della Query
+- **Chiave**: `phase2_context`
+- **Fase di Creazione**: Fase 2 (Crea Contesto)
+- **Descrizione**: I risultati della ricerca effettuata con la query dell'utente. Questo è il "contesto" che verrà passato all'LLM.
+- **Formato**: `Array<Object>`
+- **Esempio di un elemento dell'array**:
+  ```json
+  {
+    "ref": "doc0-chunk1",
+    "score": 0.85,
+    "matchData": { "metadata": {} }
+  }
+  ```
+
+#### 4. Cronologia della Conversazione
+- **Chiave**: `thread`
+- **Fase di Creazione**: Gestita in `app_ui.js` dopo ogni interazione.
+- **Descrizione**: L'intera conversazione tra l'utente e l'assistente.
+- **Formato**: `Array<Object>`
+- **Esempio**:
+  ```json
+  [
+    { "role": "user", "content": "Qual è lo scopo?" },
+    { "role": "assistant", "content": "Lo scopo è..." }
+  ]
+  ```
+
+---
+
+### Dati di Configurazione e Supporto (in LocalStorage)
+
+#### 1. Query dell'Utente
+- **Chiave**: `phase2_query`
+- **Fase di Creazione**: Fase 2 (Crea Contesto)
+- **Descrizione**: L'ultima query inserita dall'utente per la ricerca.
+- **Formato**: `string`
+- **Esempio**: `"spiegami il processo"`
+
+#### 2. Configurazione del Provider LLM
+- **Chiave**: `llm_provider`
+- **Fase di Creazione**: Selezione nel menu LLM
+- **Descrizione**: Un oggetto JSON che memorizza il provider, il modello e la configurazione dell'LLM scelto.
+- **Formato**: `string` (JSON)
+- **Esempio**: `"{ "provider": "gemini", "model": "gemini-2.5-flash-lite", ... }"`
+
+#### 3. Tema dell'Interfaccia
+- **Chiave**: `ua_theme`
+- **Fase di Creazione**: Click sui pulsanti tema
+- **Descrizione**: Salva il tema scelto (`light` o `dark`).
+- **Formato**: `string`
+- **Esempio**: `"dark"`
+
+#### 4. Elenco Documenti Caricati
+- **Chiave**: `docs_list`
+- **Fase di Creazione**: Upload dei file
+- **Descrizione**: Un array JSON contenente i nomi dei file caricati.
+- **Formato**: `string` (JSON)
+- **Esempio**: `["documento1.txt", "specifiche.pdf"]`
+
+#### 5. Contenuto dei Documenti
+- **Chiave**: `idoc_{nome_file}` (es. `idoc_documento1.txt`)
+- **Fase di Creazione**: Upload dei file
+- **Descrizione**: Il contenuto testuale di ogni singolo file caricato.
+- **Formato**: `string`
 
 ---
 
