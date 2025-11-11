@@ -603,8 +603,6 @@ div.container {
     color: #ffffff; // Testo bianco per la maggior parte dei pulsanti
   }
 
-  #btn-action1-knowledge { background-color: #E57373; &:hover { background-color: lighten(#E57373, 10%); } } // Rosso
-  #btn-action2-start-convo { background-color: #FFB74D; &:hover { background-color: lighten(#FFB74D, 10%); } } // Giallo/Arancio
   #btn-action3-continue-convo { background-color: #81C784; &:hover { background-color: lighten(#81C784, 10%); } } // Verde
 }
 
@@ -1296,6 +1294,19 @@ div.container {
     }
   }
   .input-actions {
+    #btn-action1-knowledge {
+      background: @btn-send0-bg;
+      &:hover {
+        background: @btn-send0-hover-bg;
+      }
+    }
+    #btn-action2-start-convo {
+      background: @btn-send1-bg;
+      &:hover {
+        background: @btn-send1-hover-bg;
+      }
+    }
+
     .clear-input {
       background-color: @btn-bg;
       .icon {
