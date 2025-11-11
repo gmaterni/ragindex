@@ -8,7 +8,7 @@ export const DATA_KEYS = {
 
     // Prefissi per salvataggi nominati in IndexedDB
     KEY_KB_PRE: "ua-rag-kb-",        // Knowledge Base (chunks + index)
-    KEY_CONVO_PRE: "ua-rag-convo-",  // Conversazione (context + thread)
+    KEY_CONVO_PRE: "ua-rag-convo-",  // context + thread
     KEY_THREAD_PRE: "keythr_",       // Vecchio archivio thread, da mantenere per migrazione
 
     // localStorage
