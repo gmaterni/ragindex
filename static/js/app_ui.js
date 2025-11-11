@@ -341,7 +341,7 @@ export const TextInput = {
         const context = ragEngine.buildContext(serializedIndex, allChunks, query);
         await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, context);
         // AAA debug
-        console.debug("*** contetso **********\n", contesto)
+        console.debug("*** contetso **********\n", context)
         UaLog.log(` Contesto creato (${context.length}).`);
         UaLog.log("...generazione prima risposta...");
         AppMgr.initConfig();
