@@ -91,10 +91,10 @@ export const FirebaseLogger = (() => {
         sendLog(appId, payload = {}) {
             const host = window.location.hostname;
             // AAA disattivazione log in lcale
-            if (host === '127.0.0.1' || host === 'localhost') {
-                console.info('Registrazione disattivata in ambiente locale');
-                return;
-            }
+            // if (host === '127.0.0.1' || host === 'localhost') {
+            //     console.info('Registrazione disattivata in ambiente locale');
+            //     return;
+            // }
             performLogSend(appId, payload).catch(error => {
                 console.error('Errore durante l\'invio del log:', error);
             });

@@ -303,9 +303,11 @@ export const TextInput = {
         const { chunks, serializedIndex: chunksIndex } = await ragEngine.createKnowledgeBase(validDocuments);
         await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, chunks);
         await idbMgr.create(DATA_KEYS.PHASE1_INDEX, chunksIndex);
+
         //AAA debug
         console.debug("*** chunks *************\n", chunks)
         console.debug("*** index **************\n", chunksIndex)
+
         // New KB is active, but not saved yet
         UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
         updateActiveKbDisplay();
@@ -342,6 +344,7 @@ export const TextInput = {
         await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, context);
         // AAA debug
         console.debug("*** contetso **********\n", context)
+
         UaLog.log(` Contesto creato (${context.length}).`);
         UaLog.log("...generazione prima risposta...");
         AppMgr.initConfig();
@@ -1016,22 +1019,23 @@ const deleteAllData = async () => {
   element.querySelector("#delete-all-btn").addEventListener("click", async () => {
     const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB), ESCLUSI i documenti caricati. Confermi?");
     if (ok) {
-      // Clear LocalStorage, but preserve document-related keys
-      const allLsKeys = UaDb.getAllIds();
-      for (const key of allLsKeys) {
-        if (!key.startsWith("idoc_") && key !== DATA_KEYS.KEY_DOCS) {
-          UaDb.delete(key);
-        }
-      }
-      // Clear IndexedDB, but preserve document-related keys (if any were mistakenly there)
-      const allIdbKeys = await idbMgr.getAllKeys();
-      for (const key of allIdbKeys) {
-        if (!key.startsWith("idoc_")) { // Ensure no idoc_ keys are deleted from idb if they somehow got there
-          await idbMgr.delete(key);
-        }
-      }
+      // AAA cancellzione tutto
+      UaDb.clear();
+      // const allLsKeys = UaDb.getAllIds();
+      // for (const key of allLsKeys) {
+      //   // if (!key.startsWith("idoc_") && key !== DATA_KEYS.KEY_DOCS) {
+      //   UaDb.delete(key);
+      //   // }
+      // }
+      await idbMgr.clearAll();
+      // const allIdbKeys = await idbMgr.getAllKeys();
+      // for (const key of allIdbKeys) {
+      //   if (!key.startsWith("idoc_")) {
+      //     await idbMgr.delete(key);
+      //   }
+      // }
       setResponseHtml("");
-      alert("Tutti i dati dell'applicazione (esclusi i documenti) sono stati cancellati.");
+      alert("Tutti i dati dell'applicazione sono stati cancellati.");
       wnds.winfo.close();
       updateActiveKbDisplay();
     }
@@ -1098,7 +1102,7 @@ export function bindEventListener() {
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
   document.querySelector(".copy-output").addEventListener("click", () => TextOutput.copy());
-  document.querySelector(".wnd-output").addEventListener("click", () => TextOutput.openWnd());
+  // document.querySelector(".wnd-output").addEventListener("click", () => TextOutput.openWnd());
   document.querySelector("#clear-history1").addEventListener("click", () => TextOutput.clearHistory());
   document.querySelector("#clear-history2").addEventListener("click", () => TextOutput.clearHistoryContext());
 
