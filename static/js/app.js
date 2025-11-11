@@ -219,12 +219,12 @@ async function openApp() {
     TextOutput.init();
     bindEventListener();
     document.querySelector(".menu-btn").checked = false;
-
     try {
       await showHtmlThread();
     } catch (e) {
       console.error("Impossibile caricare la cronologia precedente (potrebbe essere corrotta):", e);
-      UaLog.log("ERRORE: Impossibile caricare la cronologia precedente. Si consiglia di cancellarla dal menu.");
+      UaLog.log("ERRORE: Impossibile caricare la cronologia precedente. ");
+      UaLog.log("Si consiglia di cancellarla dal menu.");
     }
 
     getTheme();
@@ -232,8 +232,7 @@ async function openApp() {
     const webid = WebId.get();
     FirebaseLogger.sendLog("open", webid)
   } catch (error) {
-    console.error(error);
-    // console.error("Si è vrificato un errore durante l'inizializzazione dell'app:", error);
+    console.error("Errorre openApp", error);
   }
 }
 window.addEventListener("load", openApp);

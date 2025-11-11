@@ -20,10 +20,6 @@ export const help0_html = `
         <p>Apre la finestra per caricare uno o più documenti (PDF, DOCX, TXT) dal tuo computer.</p>
     </div>
     <div>
-        <strong>TD (Tipo Documento)</strong>
-        <p>Permette di selezionare il tipo di documento che si sta analizzando, per ottimizzare l'estrazione delle informazioni.</p>
-    </div>
-    <div>
         <strong>LLM (Provider/Modello)</strong>
         <p>Apre il menu per scegliere il provider AI (es. Gemini, Mistral) e il modello specifico da usare.</p>
     </div>
@@ -59,23 +55,19 @@ export const help0_html = `
 
     <hr>
 
-    <!-- Pulsanti di Input -->
+    <!-- Pulsanti del Flusso RAG -->
     <p class="center">Pulsanti del Flusso RAG</p>
     <div>
-        <strong>Fase 0: Segmenta</strong>
-        <p>Analizza i documenti caricati e li suddivide in "Chunks" (frammenti di testo).</p>
+        <strong>Azione 1: Crea Knowledge Base</strong>
+        <p>Analizza i documenti caricati, li suddivide in "Chunks" (frammenti di testo) e crea un "Indice" di ricerca. Questo processo crea la Knowledge Base di lavoro.</p>
     </div>
     <div>
-        <strong>Fase 1: Indicizza</strong>
-        <p>Crea un "Indice" di ricerca a partire dai Chunks generati nella fase precedente.</p>
+        <strong>Azione 2: Inizia Conversazione</strong>
+        <p>Usa la domanda inserita nel campo di testo per cercare nella Knowledge Base, creare un "Contesto" con i risultati più pertinenti e generare la prima risposta dall'LLM.</p>
     </div>
     <div>
-        <strong>Fase 2: Cerca</strong>
-        <p>Usa la domanda inserita nel campo di testo per cercare nell'Indice e creare un "Contesto" con i risultati più pertinenti.</p>
-    </div>
-    <div>
-        <strong>Fase 3: Genera</strong>
-        <p>Invia la domanda e il Contesto all'LLM per generare una risposta e avviare la conversazione.</p>
+        <strong>Azione 3: Continua Conversazione</strong>
+        <p>Invia la nuova domanda e la cronologia della conversazione (con il contesto originale) all'LLM per generare una risposta e continuare il dialogo.</p>
     </div>
     <div>
         <strong>Cancella Input</strong>
@@ -86,62 +78,40 @@ export const help0_html = `
     <!-- Menu Laterale -->
     <p class="center">Menu Laterale</p>
     <div>
-        <strong>Informazioni Generali</strong>
+        <strong>Informazioni</strong>
         <ul>
             <li><strong>README:</strong> Mostra la documentazione tecnica approfondita.</li>
-            <li><strong>QUICKSTART:</strong> Guida rapida all'utilizzo dell'applicazione.</li>
+            <li><strong>Quick Start:</strong> Guida rapida all'utilizzo dell'applicazione.</li>
+            <li><strong>Configurazione:</strong> Mostra la configurazione corrente del Provider LLM.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>Knowledge Base</strong>
+        <ul>
+            <li><strong>Archivia:</strong> Salva la Knowledge Base di lavoro corrente con un nome.</li>
+            <li><strong>Gestisci:</strong> Mostra, carica o elimina le Knowledge Base archiviate.</li>
+        </ul>
+    </div>
+    <div>
+        <strong>Conversazione</strong>
+        <ul>
+            <li><strong>Visualizza:</strong> Mostra l'intera cronologia della conversazione corrente (solo domande e risposte).</li>
+            <li><strong>Archivia:</strong> Salva la conversazione attiva (contesto + cronologia) con un nome.</li>
+            <li><strong>Gestisci:</strong> Mostra, carica o elimina le conversazioni archiviate.</li>
+            <li><strong>Visualizza Contesto:</strong> Mostra il contesto di ricerca attivo in una finestra separata.</li>
         </ul>
     </div>
     <div>
         <strong>Documenti</strong>
         <ul>
             <li><strong>Elenco Documenti:</strong> Mostra i documenti caricati. Puoi visualizzarli o cancellarli.</li>
-            <li><strong>Documenti di esempio:</strong> Carica file di testo di esempio per provare subito l'applicazione.</li>
-        </ul>
-    </div>
-    <div>
-        <strong>Configurazione</strong>
-        <ul>
-            <li><strong>Configurazione:</strong> Mostra la configurazione corrente del Provider LLM e del Tipo Documento selezionato.</li>
-        </ul>
-    </div>
-    <div>
-        <strong>Fase 0: Chunks</strong>
-        <ul>
-            <li><strong>Visualizza:</strong> Mostra i Chunks correnti.</li>
-            <li><strong>Salva con Nome:</strong> Salva i Chunks correnti con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina i set di Chunks salvati.</li>
-        </ul>
-    </div>
-    <div>
-        <strong>Fase 1: Indice</strong>
-        <ul>
-            <li><strong>Visualizza:</strong> Mostra l'Indice corrente.</li>
-            <li><strong>Salva con Nome:</strong> Salva l'Indice corrente con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina gli Indici salvati.</li>
-        </ul>
-    </div>
-    <div>
-        <strong>Fase 2: Contesto</strong>
-        <ul>
-            <li><strong>Visualizza:</strong> Mostra il Contesto corrente.</li>
-            <li><strong>Salva con Nome:</strong> Salva il Contesto corrente con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina i Contesti salvati.</li>
-            <li><strong>Domanda iniziale:</strong> Mostra la domanda utilizzata per creare il Contesto corrente.</li>
-        </ul>
-    </div>
-    <div>
-        <strong>Conversazione</strong>
-        <ul>
-            <li><strong>Visualizza:</strong> Mostra l'intera cronologia della conversazione corrente.</li>
-            <li><strong>Salva con Nome:</strong> Salva la conversazione corrente con un nome.</li>
-            <li><strong>Elenco:</strong> Carica o elimina le conversazioni salvate.</li>
+            <li><strong>Documenti Esempio:</strong> Carica file di testo di esempio per provare subito l'applicazione.</li>
         </ul>
     </div>
     <div>
         <strong>Gestione Dati</strong>
         <ul>
-            <li><strong>Elenco Dati:</strong> Mostra un riepilogo di tutti i dati salvati nell'applicazione.</li>
+            <li><strong>Elenco Dati Archiviati:</strong> Mostra un riepilogo di tutti i dati salvati nell'applicazione (Knowledge Base e Conversazioni).</li>
             <li><strong>Cancella Dati:</strong> Permette di cancellare selettivamente o totalmente i dati salvati.</li>
         </ul>
     </div>
@@ -163,7 +133,7 @@ La sequenza di prompt proposta guida il modello attraverso le seguenti fasi:
 
 1. Retrieval: Il modello analizza il documento di input e la domanda fornita, identificando e recuperando le informazioni e i concetti rilevanti per dare seguito alla domanda.
 
-2. Augmentation: Successivamente, il modello integra le informazioni recuperate con eventuali risposte accumulate in precedenza, estraendo nuove informazioni rilevanti e organizzandole in un elenco coerente, evitando ridondanze.
+3. Augmentation: Successivamente, il modello integra le informazioni recuperate con eventuali risposte accumulate in precedenza, estraendo nuove informazioni rilevanti e organizzandole in un elenco coerente, evitando ridondanze.
 
 3. Generation: Infine, il modello utilizza l'insieme di informazioni rilevanti e non ridondanti per generare una risposta completa e concisa alla domanda dell'utente.
 
@@ -211,63 +181,67 @@ Come per qualsiasi nuovo approccio, sarebbe necessario valutarlo attentamente at
 
 export const help2_html = `
 <div class="text">
-    <p class="center">Quickstart: Scenari di Utilizzo</p>
+    <p class="center">Quickstart: Il Flusso di Lavoro a 3 Azioni</p>
     <p>
-        Questa guida ti mostra come usare l'applicazione in tre scenari principali.
+        Questa guida ti mostra come usare l'applicazione seguendo il flusso di lavoro a 3 azioni.
     </p>
 
-    <!-- SCENARIO 1 -->
+    <!-- Azione 1 -->
     <div>
-        <strong>Scenario 1: Inizio da Zero (Flusso Completo)</strong>
+        <strong>Azione 1: Crea Knowledge Base</strong>
         <p>
-            Parti dai tuoi documenti per creare un Indice di ricerca e iniziare una conversazione.
+            Prepara i tuoi documenti per la ricerca.
         </p>
         <ol>
-            <li><strong>Carica Documenti:</strong> Usa <strong>"Documenti di esempio"</strong> dal menu o <strong>"Upload file"</strong> per caricare i tuoi file.</li>
-            <li><strong>Fase 0 (Segmenta):</strong> Clicca il pulsante <strong>(0)</strong> per suddividere i documenti in <em>Chunks</em>. Al termine, puoi salvarli usando il menu <strong>Fase 0: Chunks > Salva con Nome</strong>.</li>
-            <li><strong>Fase 1 (Indicizza):</strong> Clicca il pulsante <strong>(1)</strong> per creare un <em>Indice</em> di ricerca dai chunks. Puoi salvarlo usando il menu <strong>Fase 1: Indice > Salva con Nome</strong>.</li>
-            <li><strong>Fase 2 (Cerca):</strong> Scrivi una domanda specifica nel campo di input e clicca il pulsante <strong>(2)</strong>. Questo crea un <em>Contesto</em> con le informazioni più pertinenti.</li>
-            <li><strong>Fase 3 (Genera):</strong> Clicca il pulsante <strong>(3)</strong> per inviare la domanda e il Contesto all'LLM e ottenere una risposta. Da qui puoi continuare la conversazione.</li>
+            <li><strong>Carica Documenti:</strong> Usa <strong>"Documenti Esempio"</strong> dal menu laterale o il pulsante <strong>"Upload file"</strong> nella barra superiore per caricare i tuoi file (PDF, DOCX, TXT).</li>
+            <li><strong>Esegui Azione 1:</strong> Clicca il pulsante <span style="color: red; font-weight: bold;">(1)</span>. L'applicazione segmenterà i documenti in "Chunks" e creerà un "Indice" di ricerca. Questi due elementi formano la tua Knowledge Base di lavoro.</li>
+            <li><strong>(Opzionale) Archivia Knowledge Base:</strong> Dal menu laterale, vai su <strong>Knowledge Base > Archivia</strong> per salvare la KB di lavoro con un nome.</li>
         </ol>
     </div>
 
     <hr>
 
-    <!-- SCENARIO 2 -->
+    <!-- Azione 2 -->
     <div>
-        <strong>Scenario 2: Inizio da un Indice Esistente</strong>
+        <strong>Azione 2: Inizia Conversazione</strong>
         <p>
-            Usa un <em>Indice</em> che hai già salvato per fare nuove domande, senza ri-processare i documenti.
+            Avvia una nuova conversazione utilizzando la Knowledge Base creata.
         </p>
         <ol>
-            <li><strong>Carica Indice:</strong>
-                <ul>
-                    <li>Vai nel menu laterale a <strong>Fase 1: Indice > Elenco</strong>.</li>
-                    <li>Trova l'indice che ti interessa e clicca su <strong>"Carica"</strong>.</li>
-                </ul>
-            </li>
-            <li><strong>Fase 2 (Cerca):</strong> Scrivi una <strong>nuova domanda</strong> nel campo di input e clicca il pulsante <strong>(2)</strong> per creare un nuovo <em>Contesto</em>.</li>
-            <li><strong>Fase 3 (Genera):</strong> Clicca il pulsante <strong>(3)</strong> per avviare la conversazione.</li>
+            <li><strong>Scrivi la Query:</strong> Inserisci la tua domanda nel campo di testo in basso.</li>
+            <li><strong>Esegui Azione 2:</strong> Clicca il pulsante <span style="color: orange; font-weight: bold;">(2)</span>. L'applicazione userà la tua query per cercare nella Knowledge Base, costruire un "Contesto" con le informazioni più pertinenti e generare la prima risposta dall'LLM.</li>
+            <li><strong>(Opzionale) Visualizza Contesto:</strong> Dal menu laterale, vai su <strong>Conversazione > Visualizza Contesto</strong> per vedere il contesto generato.</li>
+            <li><strong>(Opzionale) Archivia Conversazione:</strong> Dal menu laterale, vai su <strong>Conversazione > Archivia</strong> per salvare la conversazione (contesto + cronologia) con un nome.</li>
         </ol>
     </div>
 
     <hr>
 
-    <!-- SCENARIO 3 -->
+    <!-- Azione 3 -->
     <div>
-        <strong>Scenario 3: Inizio da un Contesto Esistente</strong>
+        <strong>Azione 3: Continua Conversazione</strong>
         <p>
-            Riprendi una conversazione precedente partendo da un <em>Contesto</em> che hai già salvato.
+            Prosegui il dialogo con l'LLM, mantenendo il filo del discorso.
         </p>
         <ol>
-            <li><strong>Carica Contesto:</strong>
-                <ul>
-                    <li>Vai nel menu laterale a <strong>Fase 2: Contesto > Elenco</strong>.</li>
-                    <li>Trova il contesto che ti interessa e clicca su <strong>"Carica"</strong>.</li>
-                </ul>
-            </li>
-            <li><strong>Continua la Conversazione:</strong> Scrivi una domanda di approfondimento nel campo di input e clicca il pulsante <strong>(3)</strong> per continuare la conversazione associata a quel contesto.</li>
+            <li><strong>Scrivi la Nuova Query:</strong> Inserisci la tua domanda di approfondimento nel campo di testo.</li>
+            <li><strong>Esegui Azione 3:</strong> Clicca il pulsante <span style="color: green; font-weight: bold;">(3)</span>. L'LLM utilizzerà il contesto originale e l'intera cronologia della conversazione per formulare una nuova risposta.</li>
         </ol>
+    </div>
+
+    <hr>
+
+    <!-- Gestione Dati -->
+    <div>
+        <strong>Gestione Dati Archiviati</strong>
+        <p>
+            Puoi gestire le Knowledge Base e le Conversazioni che hai archiviato.
+        </p>
+        <ul>
+            <li>Dal menu laterale, vai su <strong>Knowledge Base > Gestisci</strong> per caricare o eliminare le KB salvate.</li>
+            <li>Dal menu laterale, vai su <strong>Conversazione > Gestisci</strong> per caricare o eliminare le conversazioni salvate.</li>
+            <li>Per una panoramica completa e la cancellazione selettiva di tutti i dati, usa <strong>Gestione Dati > Elenco Dati Archiviati</strong> e <strong>Cancella Dati</strong>.</li>
+        </ul>
     </div>
 </div>
 `;

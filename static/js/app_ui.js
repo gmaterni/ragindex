@@ -118,7 +118,7 @@ const WndPre = (id) => {
       try {
         await navigator.clipboard.writeText(t);
       } catch (err) {
-        console.error("Errore  ", err);
+        console.error("Errore in copy:  ", err);
       }
     },
   };
@@ -174,7 +174,7 @@ const WndDiv = (id) => {
       try {
         await navigator.clipboard.writeText(t);
       } catch (err) {
-        console.error("Errore durante la copia: ", err);
+        console.error("Errore in copy: ", err);
       }
     },
   };
@@ -281,36 +281,29 @@ export const TextInput = {
   },
 
   async runAction1_CreateKnowledgeBase() {
-    UaLog.log("Azione 1: Creazione Knowledge Base...");
-
-    // Controllo di coerenza robusto: verifica sia la lista che il contenuto.
+    UaLog.log("Creazione Knowledge Base...");
     const docNames = DocsMgr.names();
     const validDocuments = docNames
       .map((name, i) => ({ name, text: DocsMgr.doc(i) }))
       .filter(doc => doc.text && doc.text.trim() !== "");
-
     if (validDocuments.length === 0) {
       alert("Nessun documento valido trovato. Carica dei file con contenuto prima di creare una Knowledge Base.");
       return;
     }
-
     const ok = await confirm(`Verrà creata una nuova Knowledge Base da ${validDocuments.length} documenti validi. L'operazione sovrascriverà la KB di lavoro corrente. Confermi?`);
     if (!ok) return;
-
     WaitSpinner.show();
     setTimeout(async () => {
       try {
-        // Usa solo i documenti validati
         const { chunks, serializedIndex } = await ragEngine.createKnowledgeBase(validDocuments);
-
         await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, chunks);
         await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
-        UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME); // New KB is active, but not saved yet
+        // New KB is active, but not saved yet
+        UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
         updateActiveKbDisplay();
-
         alert(`Knowledge Base creata.\n- ${chunks.length} frammenti generati.\n- Indice di ricerca creato.`);
       } catch (error) {
-        console.error("Errore durante la creazione della Knowledge Base", error);
+        console.error("Errore runAction1_CreateKnowledgeBase ", error);
         alert(errorDumps(error));
       } finally {
         WaitSpinner.hide();
@@ -319,7 +312,7 @@ export const TextInput = {
   },
 
   async runAction2_StartConversation() {
-    UaLog.log("Azione 2: Inizio Conversazione...");
+    UaLog.log("Inizio Conversazione...");
     const query = this.inp.value.trim();
     if (!query) {
       alert("Inserisci una query per iniziare la conversazione.");
@@ -355,7 +348,7 @@ export const TextInput = {
         showHtmlThread();
         this.clear();
       } catch (error) {
-        console.error("Errore durante l'inizio della conversazione", error);
+        console.error("Errore runAction2_StartConversation", error);
         alert(errorDumps(error));
       } finally {
         Spinner.hide();
@@ -364,7 +357,7 @@ export const TextInput = {
   },
 
   async runAction3_ContinueConversation() {
-    UaLog.log("Azione 3: Continuazione Conversazione...");
+    UaLog.log("Continuazione Conversazione...");
     const query = this.inp.value.trim();
     if (!query) {
       alert("Inserisci una query per continuare la conversazione.");
@@ -378,7 +371,7 @@ export const TextInput = {
         let context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
 
         if (!thread) {
-          UaLog.log("Nessuna conversazione attiva, avvio conversazione libera.");
+          UaLog.log("Avvio conversazione libera.");
           thread = [];
           context = "";
         }
@@ -393,7 +386,7 @@ export const TextInput = {
         showHtmlThread();
         this.clear();
       } catch (error) {
-        console.error("Errore durante la continuazione della conversazione", error);
+        console.error("Errore runAction3_ContinueConversation", error);
         alert(errorDumps(error));
       } finally {
         Spinner.hide();
@@ -419,7 +412,7 @@ export const TextOutput = {
       t = textFormatter(t);
       await navigator.clipboard.writeText(t);
     } catch (err) {
-      console.error("Errore  ", err);
+      console.error("Errore copy", err);
     }
     setTimeout(() => {
       this.copyBtn.classList.remove("copied");
@@ -524,10 +517,6 @@ export const updateActiveKbDisplay = async () => {
   }
 };
 
-// ==================================================
-// NUOVA GESTIONE DATI UNIFICATA
-// ==================================================
-
 const saveKnowledgeBase = async () => {
   const chunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
   const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
@@ -548,7 +537,6 @@ const saveKnowledgeBase = async () => {
     alert(`Knowledge Base archiviata come: ${name}`);
   }
 };
-
 const saveConversation = async () => {
   const context = await idbMgr.read(DATA_KEYS.PHASE2_CONTEXT);
   const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
@@ -567,7 +555,6 @@ const saveConversation = async () => {
     alert(`Conversazione archiviata come: ${name}`);
   }
 };
-
 
 const elencoArtefatti = async (prefix, title, loadHandler) => {
   const keys = await idbMgr.selectKeys(prefix);
@@ -617,7 +604,6 @@ const elencoArtefatti = async (prefix, title, loadHandler) => {
   }));
 };
 
-
 const loadKnowledgeBase = async (key) => {
   const kb_data = await idbMgr.read(key);
   if (kb_data && kb_data.chunks && kb_data.serializedIndex) {
@@ -631,7 +617,6 @@ const loadKnowledgeBase = async (key) => {
     alert("Errore: Dati della Knowledge Base non validi.");
   }
 };
-
 const loadConversation = async (key) => {
   const convo_data = await idbMgr.read(key);
   if (convo_data && convo_data.thread) {
@@ -644,22 +629,20 @@ const loadConversation = async (key) => {
     alert("Errore: Dati della conversazione non validi.");
   }
 };
-
 const elencoKnowledgeBases = () => elencoArtefatti(DATA_KEYS.KEY_KB_PRE, "Knowledge Base", loadKnowledgeBase);
 const elencoConversations = () => elencoArtefatti(DATA_KEYS.KEY_CONVO_PRE, "Conversazioni", loadConversation);
 
-
 const KEY_DESCRIPTIONS = {
-  [DATA_KEYS.PHASE0_CHUNKS]: "Knowledge Base di Lavoro (Chunks)",
-  [DATA_KEYS.PHASE1_INDEX]: "Knowledge Base di Lavoro (Index)",
-  [DATA_KEYS.PHASE2_CONTEXT]: "Conversazione Attiva (Contesto)",
-  [DATA_KEYS.KEY_THREAD]: "Conversazione Attiva (Thread)",
+  [DATA_KEYS.PHASE0_CHUNKS]: "Knowledge di Lavoro (Chunks)",
+  [DATA_KEYS.PHASE1_INDEX]: "Knowledge di Lavoro (Index)",
+  [DATA_KEYS.PHASE2_CONTEXT]: "Contesto & Conversazione Attiva",
+  [DATA_KEYS.KEY_THREAD]: "Conversazione Attiva ",
 
   [DATA_KEYS.KEY_PROVIDER]: "Configurazione Provider LLM",
   [DATA_KEYS.KEY_THEME]: "Tema UI (dark/light)",
   [DATA_KEYS.PHASE2_QUERY]: "Ultima Query",
   [DATA_KEYS.KEY_DOCS]: "Elenco Documenti Caricati",
-  [DATA_KEYS.ACTIVE_KB_NAME]: "Nome KB Attiva"
+  [DATA_KEYS.ACTIVE_KB_NAME]: "KB Attiva"
 };
 
 const getDescriptionForKey = (key) => {
@@ -667,7 +650,7 @@ const getDescriptionForKey = (key) => {
     return KEY_DESCRIPTIONS[key];
   }
   if (key.startsWith(DATA_KEYS.KEY_KB_PRE)) {
-    return "Knowledge Base Archiviata";
+    return "Knowledge Archiviata";
   }
   if (key.startsWith(DATA_KEYS.KEY_CONVO_PRE)) {
     return "Conversazione Archiviata";
@@ -690,7 +673,7 @@ const elencoDati = async () => {
     const processedIdbKeys = new Set();
     for (const key of allIdbKeys) {
       if (key.startsWith("idoc_") || processedIdbKeys.has(key)) {
-        continue; // Skip document keys and already processed keys
+        continue;
       }
 
       let description = "";
@@ -749,7 +732,7 @@ const elencoDati = async () => {
         value = await idbMgr.read(key);
         size = value ? JSON.stringify(value).length : 0;
         displayKey = key;
-        description = getDescriptionForKey(key); // Use existing description logic
+        description = getDescriptionForKey(key);
       }
 
       jfh.append(
@@ -772,7 +755,7 @@ const elencoDati = async () => {
     jfh.append(`<table class="table-data"><thead><tr><th>Chiave</th><th>Descrizione</th><th>Dimensione</th></tr></thead><tbody>`);
     for (const key of allLsKeys) {
       if (key.startsWith("idoc_") || key === DATA_KEYS.KEY_DOCS) {
-        continue; // Skip document related keys
+        continue;
       }
       const value = UaDb.read(key);
       if (value) {
@@ -1019,8 +1002,7 @@ const deleteAllData = async () => {
       }
       alert("Dati selezionati cancellati con successo.");
       wnds.winfo.close();
-      updateActiveKbDisplay(); // Update display after deletion
-      // Re-open delete dialog to show updated state
+      updateActiveKbDisplay();
       deleteAllData();
     }
   });
@@ -1045,7 +1027,7 @@ const deleteAllData = async () => {
       setResponseHtml("");
       alert("Tutti i dati dell'applicazione (esclusi i documenti) sono stati cancellati.");
       wnds.winfo.close();
-      updateActiveKbDisplay(); // Update display after deletion
+      updateActiveKbDisplay();
     }
   });
 };
@@ -1077,7 +1059,6 @@ const showEsempiDocs = async () => {
 
 
 export function bindEventListener() {
-  // Header buttons
   document.getElementById("btn-help").addEventListener("click", Commands.help);
   document.getElementById("btn-upload").addEventListener("click", Commands.upload);
   document.getElementById("id_log").addEventListener("click", Commands.log);
@@ -1085,12 +1066,10 @@ export function bindEventListener() {
   document.getElementById("btn-dark-theme").addEventListener("click", () => setTheme("dark"));
   document.getElementById("btn-light-theme").addEventListener("click", () => setTheme("light"));
 
-  // Menu Items
   document.getElementById("menu-readme").addEventListener("click", showReadme);
   document.getElementById("menu-quickstart").addEventListener("click", showQuickstart);
   document.getElementById("menu-show-config").addEventListener("click", LlmProvider.showConfig);
 
-  // --- Nuova Gestione Dati ---
   document.getElementById("menu-save-kb").addEventListener("click", saveKnowledgeBase);
   document.getElementById("menu-elenco-kb").addEventListener("click", elencoKnowledgeBases);
 
@@ -1104,23 +1083,19 @@ export function bindEventListener() {
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 
-  // New action buttons
   document.getElementById("btn-action1-knowledge").addEventListener("click", () => TextInput.runAction1_CreateKnowledgeBase());
   document.getElementById("btn-action2-start-convo").addEventListener("click", () => TextInput.runAction2_StartConversation());
   document.getElementById("btn-action3-continue-convo").addEventListener("click", () => TextInput.runAction3_ContinueConversation());
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
-  // TextOutput
   document.querySelector(".copy-output").addEventListener("click", () => TextOutput.copy());
   document.querySelector(".wnd-output").addEventListener("click", () => TextOutput.openWnd());
   document.querySelector("#clear-history1").addEventListener("click", () => TextOutput.clearHistory());
   document.querySelector("#clear-history2").addEventListener("click", () => TextOutput.clearHistoryContext());
 
-  // commands
   const btn = document.querySelector("#id-menu-btn");
   btn.addEventListener("change", () => {
     document.querySelector("body").classList.toggle("menu-open", btn.checked);
-    //gestione tootip
     const body = document.querySelector("body");
     const icon = document.querySelector("#id-menu-btn");
     if (body.classList.contains("menu-open")) icon.setAttribute("data-tt", "Close");
