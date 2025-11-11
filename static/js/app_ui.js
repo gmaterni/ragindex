@@ -280,7 +280,7 @@ export const TextInput = {
     this.inp.focus();
   },
 
-  async runAction1_CreateKnowledgeBase() {
+  async createKnowledge() {
     UaLog.log("Creazione Knowledge Base...");
     const docNames = DocsMgr.names();
     const validDocuments = docNames
@@ -295,9 +295,12 @@ export const TextInput = {
     WaitSpinner.show();
     setTimeout(async () => {
       try {
-        const { chunks, serializedIndex } = await ragEngine.createKnowledgeBase(validDocuments);
+        const { chunks, serializedIndex: chunksIndex } = await ragEngine.createKnowledgeBase(validDocuments);
         await idbMgr.create(DATA_KEYS.PHASE0_CHUNKS, chunks);
-        await idbMgr.create(DATA_KEYS.PHASE1_INDEX, serializedIndex);
+        await idbMgr.create(DATA_KEYS.PHASE1_INDEX, chunksIndex);
+        //AAA debug
+        console.debug("*** chunks *************\n", chunks)
+        console.debug("*** index **************\n", chunksIndex)
         // New KB is active, but not saved yet
         UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
         updateActiveKbDisplay();
@@ -311,33 +314,30 @@ export const TextInput = {
     }, 50);
   },
 
-  async runAction2_StartConversation() {
+  async startConversation() {
     UaLog.log("Inizio Conversazione...");
     const query = this.inp.value.trim();
     if (!query) {
       alert("Inserisci una query per iniziare la conversazione.");
       return;
     }
-
     const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
     const allChunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
-
     if (!serializedIndex || !allChunks) {
-      alert("Knowledge Base non trovata. Esegui prima l'Azione 1.");
+      alert("Knowledge non trovata. Esegui prima l'Azione 1.");
       return;
     }
-
     Spinner.show();
     setTimeout(async () => {
       try {
         await idbMgr.delete(DATA_KEYS.KEY_THREAD);
         setResponseHtml("");
-
         UaLog.log("...creazione contesto...");
         const context = ragEngine.buildContext(serializedIndex, allChunks, query);
         await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, context);
-        UaLog.log(` -> Contesto creato (lunghezza: ${context.length}).`);
-
+        // AAA debug
+        console.debug("*** contetso **********\n", contesto)
+        UaLog.log(` Contesto creato (${context.length}).`);
         UaLog.log("...generazione prima risposta...");
         AppMgr.initConfig();
         const thread = [{ role: 'user', content: query }];
@@ -633,8 +633,8 @@ const elencoKnowledgeBases = () => elencoArtefatti(DATA_KEYS.KEY_KB_PRE, "Knowle
 const elencoConversations = () => elencoArtefatti(DATA_KEYS.KEY_CONVO_PRE, "Conversazioni", loadConversation);
 
 const KEY_DESCRIPTIONS = {
-  [DATA_KEYS.PHASE0_CHUNKS]: "Knowledge di Lavoro (Chunks)",
-  [DATA_KEYS.PHASE1_INDEX]: "Knowledge di Lavoro (Index)",
+  [DATA_KEYS.PHASE0_CHUNKS]: "Knowledge Attiva (Chunks)",
+  [DATA_KEYS.PHASE1_INDEX]: "Knowledge Attiva(Index)",
   [DATA_KEYS.PHASE2_CONTEXT]: "Contesto & Conversazione Attiva",
   [DATA_KEYS.KEY_THREAD]: "Conversazione Attiva ",
 
@@ -656,6 +656,7 @@ const getDescriptionForKey = (key) => {
     return "Conversazione Archiviata";
   }
   if (key.startsWith(DATA_KEYS.KEY_THREAD_PRE)) {
+    console.error("Archivio Conversazione (Vecchio formato)")
     return "Archivio Conversazione (Vecchio formato)";
   }
   return "Dato non classificato";
@@ -1083,8 +1084,8 @@ export function bindEventListener() {
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 
-  document.getElementById("btn-action1-knowledge").addEventListener("click", () => TextInput.runAction1_CreateKnowledgeBase());
-  document.getElementById("btn-action2-start-convo").addEventListener("click", () => TextInput.runAction2_StartConversation());
+  document.getElementById("btn-action1-knowledge").addEventListener("click", () => TextInput.createKnowledge());
+  document.getElementById("btn-action2-start-convo").addEventListener("click", () => TextInput.startConversation());
   document.getElementById("btn-action3-continue-convo").addEventListener("click", () => TextInput.runAction3_ContinueConversation());
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
