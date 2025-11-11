@@ -1019,7 +1019,7 @@ const deleteAllData = async () => {
   element.querySelector("#delete-all-btn").addEventListener("click", async () => {
     const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB), ESCLUSI i documenti caricati. Confermi?");
     if (ok) {
-      // AAA cancellzione tutto
+      // AAA cancellazione tutto
       UaDb.clear();
       // const allLsKeys = UaDb.getAllIds();
       // for (const key of allLsKeys) {

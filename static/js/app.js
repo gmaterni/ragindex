@@ -230,7 +230,7 @@ async function openApp() {
     getTheme();
     updateActiveKbDisplay(); // Add this call
     const webid = WebId.get();
-    FirebaseLogger.sendLog("open_noe", webid)
+    FirebaseLogger.sendLog("ne_open", webid)
   } catch (error) {
     console.error("Errorre openApp", error);
   }
