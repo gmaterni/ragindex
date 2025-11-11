@@ -15,8 +15,6 @@ import { idbMgr } from "./services/idb_mgr.js";
 import { UaJtfh } from "./services/uajtfh.js";
 import { requestGet } from "./services/http_request.js";
 import { cleanDoc } from "./text_cleaner.js"
-// FirebaseLogger e WebId sono usati in AppMgr, quindi l'import qui non è strettamente necessario
-// ma lo manteniamo per chiarezza finché non si sposta la logica di init.
 
 const Spinner = {
   show: () => {
@@ -274,6 +272,13 @@ export const TextInput = {
   init() {
     this.inp = document.querySelector(".text-input");
   },
+  handleEnter(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      this.continueConversation();
+    }
+  },
+
 
   clear() {
     this.inp.value = "";
@@ -356,7 +361,7 @@ export const TextInput = {
     }, 50);
   },
 
-  async runAction3_ContinueConversation() {
+  async continueConversation() {
     UaLog.log("Continuazione Conversazione...");
     const query = this.inp.value.trim();
     if (!query) {
@@ -1084,9 +1089,12 @@ export function bindEventListener() {
   document.getElementById("menu-delete-all").addEventListener("click", deleteAllData);
   document.getElementById("menu-help-esempi").addEventListener("click", showEsempiDocs);
 
+
+  const textInput = document.querySelector(".text-input");
+  textInput.addEventListener("keydown", (e) => TextInput.handleEnter(e));
   document.getElementById("btn-action1-knowledge").addEventListener("click", () => TextInput.createKnowledge());
   document.getElementById("btn-action2-start-convo").addEventListener("click", () => TextInput.startConversation());
-  document.getElementById("btn-action3-continue-convo").addEventListener("click", () => TextInput.runAction3_ContinueConversation());
+  document.getElementById("btn-action3-continue-convo").addEventListener("click", () => TextInput.continueConversation());
   document.querySelector(".clear-input").addEventListener("click", () => TextInput.clear());
 
   document.querySelector(".copy-output").addEventListener("click", () => TextOutput.copy());

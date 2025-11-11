@@ -50,7 +50,7 @@ export const help0_html = `
     </div>
     <div>
         <strong>Nuovo Contesto & Conversazione</strong>
-        <p>Cancella il Contesto e la cronologia della conversazione attiva, permettendo di iniziare una nuova analisi dalla Fase 2.</p>
+        <p>Cancella il Contesto e la cronologia della conversazione attiva.</p>
     </div>
 
     <hr>
@@ -58,15 +58,15 @@ export const help0_html = `
     <!-- Pulsanti del Flusso RAG -->
     <p class="center">Pulsanti del Flusso RAG</p>
     <div>
-        <strong>Azione 1: Crea Knowledge Base</strong>
-        <p>Analizza i documenti caricati, li suddivide in "Chunks" (frammenti di testo) e crea un "Indice" di ricerca. Questo processo crea la Knowledge Base di lavoro.</p>
+        <strong>Crea Knowledge Base</strong>
+        <p>Analizza i documenti caricati, li suddivide in "Chunks" (frammenti di testo) e crea un "Indice" di ricerca. Questo processo crea la Knowledge di lavoro.</p>
     </div>
     <div>
-        <strong>Azione 2: Inizia Conversazione</strong>
-        <p>Usa la domanda inserita nel campo di testo per cercare nella Knowledge Base, creare un "Contesto" con i risultati più pertinenti e generare la prima risposta dall'LLM.</p>
+        <strong>Inizia Conversazione</strong>
+        <p>Usa la domanda inserita nel campo di input per cercare nella Knowledge, creare un "Contesto" con i risultati più pertinenti e generare la prima risposta dall'LLM.</p>
     </div>
     <div>
-        <strong>Azione 3: Continua Conversazione</strong>
+        <strong>Continua Conversazione</strong>
         <p>Invia la nuova domanda e la cronologia della conversazione (con il contesto originale) all'LLM per generare una risposta e continuare il dialogo.</p>
     </div>
     <div>
@@ -118,66 +118,61 @@ export const help0_html = `
 </div>
 `;
 
+
 export const help1_html = `
 <div class="text">
-    <pre>
-Un'implementazione innovativa della tecnica RAG per il Question Answering
-La tecnica RAG (Retrieval-Augmented Generation) è un approccio consolidato nel campo del question answering e della generazione di testo, che combina il recupero di informazioni pertinenti da fonti di dati con la generazione di testo basata su queste informazioni.
-Qui viene proposta un'implementazione che introduce una variazione a questo paradigma.
-L'implementazione si basa su una sequenza di prompt appositamente progettati per guidare un modello di linguaggio generativo attraverso le diverse fasi della tecnica RAG.
-Questi prompt forniscono istruzioni dettagliate su come il modello deve seguire operazioni di recupero di informazioni, aumento delle informazioni recuperate e infine generazione di una risposta finale.
-La risposta finale diviene poi il contesto da inserire nel prompt per rispondere alla domanda.
-Un aspetto cruciale di questa implementazione è che lo stesso modello di linguaggio generativo svolge tutte le operazioni richieste, dall'analisi dei documenti di input al recupero di informazioni rilevanti, alla generazione della risposta finale.
-Questa caratteristica rappresenta una deviazione significativa rispetto alle implementazioni standard della tecnica RAG, che prevedono l'utilizzo di moduli distinti per il recupero e la generazione.
-La sequenza di prompt proposta guida il modello attraverso le seguenti fasi:
+    <p class="center">Un Paradigma RAG Alternativo: La Scelta Lessicale</p>
+    <p>
+        L'approccio RAG (Retrieval-Augmented Generation) standard si fonda sull'uso di <strong>embeddings</strong> per rappresentare e ricercare informazioni in base al loro significato semantico. Questa applicazione esplora un paradigma alternativo, sostituendo la ricerca semantica con una <strong>ricerca lessicale</strong>, eseguita interamente lato client.
+    </p>
+    <p>
+        Questa scelta non è solo un dettaglio implementativo, ma una decisione architetturale con profonde implicazioni teoriche e pratiche.
+    </p>
 
-1. Retrieval: Il modello analizza il documento di input e la domanda fornita, identificando e recuperando le informazioni e i concetti rilevanti per dare seguito alla domanda.
+    <hr>
 
-3. Augmentation: Successivamente, il modello integra le informazioni recuperate con eventuali risposte accumulate in precedenza, estraendo nuove informazioni rilevanti e organizzandole in un elenco coerente, evitando ridondanze.
+    <div>
+        <strong>Il Principio Fondamentale: Sostituire il Semantico con il Lessicale</strong>
+        <p>
+            Il cuore di questa implementazione RAG risiede nella rinuncia consapevole ai modelli di embedding. Invece di trasformare i documenti in vettori numerici che catturano il significato, il sistema costruisce un <strong>indice di ricerca basato su BM25</strong>.
+        </p>
+        <p>
+            BM25 (Best Matching 25) è un algoritmo di ranking probabilistico che valuta la rilevanza dei documenti in base alla <strong>frequenza e distribuzione dei termini</strong>. A differenza di una semplice ricerca full-text, BM25 considera fattori come la rarità di una parola nel corpus (maggiore peso ai termini distintivi) e la lunghezza dei documenti (normalizzando i punteggi per evitare penalizzazioni).
+        </p>
+        <p>
+            La fase di "Retrieval" non cerca quindi la "vicinanza concettuale", ma calcola un <strong>punteggio di rilevanza lessicale</strong> per ogni chunk di testo. Il "contesto" fornito al modello linguistico (LLM) non è frutto di una comprensione semantica del corpus, ma di una ricerca testuale sofisticata che identifica i passaggi statisticamente più pertinenti alla query.
+        </p>
+    </div>
 
-3. Generation: Infine, il modello utilizza l'insieme di informazioni rilevanti e non ridondanti per generare una risposta completa e concisa alla domanda dell'utente.
+    <div>
+        <strong>Vantaggi di questo Paradigma</strong>
+        <ul>
+            <li><strong>Autonomia e Privacy del Client:</strong> L'assenza di modelli di embedding, spesso di grandi dimensioni e ospitati su server, rende l'architettura estremamente leggera e autonoma. L'indicizzazione BM25 e la ricerca avvengono nel browser, garantendo che i dati grezzi non lascino mai il dispositivo dell'utente.</li>
+            <li><strong>Efficienza in Ambiente Browser:</strong> La creazione di un indice BM25 è un'operazione computazionalmente molto più snella rispetto alla generazione di embeddings per l'intero corpus. Questo rende il sistema reattivo e praticabile anche su macchine con risorse limitate, un vincolo fondamentale per le applicazioni web client-side.</li>
+            <li><strong>Interpretabilità del "Retrieval":</strong> I risultati di una ricerca BM25 sono direttamente interpretabili: i documenti vengono recuperati e classificati in base alla presenza, frequenza e rarità delle parole della query. Questo contrasta con la natura "black box" della ricerca per similarità vettoriale, dove il motivo della pertinenza è meno esplicito.</li>
+            <li><strong>Precisione Lessicale:</strong> BM25 eccelle nel trovare documenti che contengono esattamente i termini ricercati, rendendolo ideale per query tecniche, nomi propri o terminologia specifica dove la corrispondenza esatta è cruciale.</li>
+        </ul>
+    </div>
 
-Questa implementazione offre diversi vantaggi.
-In primo luogo, sfrutta le capacità di un unico modello di grandi dimensioni, evitando la necessità di moduli distinti specializzati per ogni fase.
-Inoltre, l'utilizzo di prompt espliciti può migliorare la controllabilità e la trasparenza del processo, consentendo di guidare il modello in modo più diretto.
-Naturalmente, come per qualsiasi approccio basato su modelli di linguaggio generativi, è fondamentale prestare attenzione alle questioni di affidabilità, correttezza e bias dei dati di addestramento.
-Rispetto a un'implementazione standard di RAG vi è la necessità di rilanciare l'elaborazione ad ogni domanda radicalmente nuova in quanto il contesto creato con le informazioni estratte dai documenti è definito sulla base della domanda.
-Invece nella versione standard RAG si usano gli incorporamenti delle informazioni estratte dai documenti in modo tale che tali informazioni vengono viste quasi come un'estensione del modello e possono essere usate per domande diverse.
-Quindi dal punto di vista utente le implementazioni RAG standard sono più efficienti; infatti l'implementazione proposta richiede per ogni nuova domanda una sequenza di richieste che saranno utilizzabili solo per creare il contesto per la domanda iniziale e per una conversazione con domande simili.
-Il vantaggio dell'implementazione proposta consiste nel fatto che può essere implementata completamente lato client senza bisogno di sviluppare alcun modulo sul server.
-L’unica cosa che serve è un servizio serverless come quello di HuggingFace o simile.
-Quindi rappresenta un'interessante prospettiva sull'applicazione della tecnica RAG in modo più integrato e controllato attraverso l'uso di prompt mirati.
-In conclusione, questa implementazione della tecnica RAG dimostra come le capacità dei modelli di linguaggio generativi di grandi dimensioni possano essere sfruttate in modi nuovi e creativi, potenzialmente aprendo la strada a ulteriori sviluppi nel campo del question answering e della generazione di testo.
+    <div>
+        <strong>Svantaggi e Compromessi Teorici</strong>
+        <ul>
+            <li><strong>Mancanza di Comprensione Concettuale:</strong> Il limite principale è l'incapacità di cogliere sinonimi, parafrasi o relazioni concettuali. Una query come "il futuro dell'umanità" potrebbe non trovare un testo che parla di "prospettive per la specie umana" se le parole chiave non si sovrappongono, anche se BM25 può attenuare questo problema dando peso ai termini correlati presenti.</li>
+            <li><strong>Dipendenza dalla Qualità della Query:</strong> L'efficacia della ricerca è strettamente legata alla scelta delle parole nella domanda dell'utente. Richiede all'utente di formulare query che contengano termini probabilmente presenti nei documenti di origine, anche se l'algoritmo BM25 è più robusto di una semplice ricerca per parole chiave grazie alla sua capacità di pesare l'importanza relativa dei termini.</li>
+        </ul>
+    </div>
 
-Questa è la valutazione fatta da un LLM (comprensivo e gentile)
-
-La mia valutazione personale della tua proposta di implementazione della tecnica RAG, con un elenco di pro e contro:
-
-Punti a favore (Pro):
-Semplificazione del processo: L'utilizzo di un unico modello di grandi dimensioni addestrato su vasti corpus di dati semplifica notevolmente l'architettura complessiva rispetto alle implementazioni tradizionali della tecnica RAG, che spesso prevedono moduli distinti per il recupero e la generazione.
-
-Capacità di adattamento e apprendimento: I modelli di linguaggio generativi di grandi dimensioni sono noti per la loro capacità di adattarsi e imparare da nuovi dati e istruzioni.
-Questo potrebbe consentire di raffinare e migliorare l'implementazione nel corso del tempo.
-
-Controllo e trasparenza: L'utilizzo di prompt espliciti per guidare il modello attraverso le diverse fasi del processo può migliorare la controllabilità e la trasparenza, consentendo di monitorare e regolare il comportamento del modello in modo più diretto.
-
-Efficienza computazionale: Avere un'unica architettura integrata potrebbe comportare vantaggi in termini di efficienza computazionale rispetto a soluzioni che prevedono moduli separati.
-
-Punti a sfavore (Contro):
-
-Affidabilità e coerenza: Poiché un unico modello gestisce tutte le fasi, eventuali errori o incoerenze potrebbero propagarsi e amplificarsi attraverso l'intero processo, influenzando la qualità della risposta finale.
-
-Bias dei dati di addestramento: Come per qualsiasi modello di linguaggio generativo, l’approccio potrebbe essere influenzato dai bias presenti nei dati di addestramento utilizzati, con potenziali impatti sulla correttezza e l'equità delle risposte generate.
-
-Mancanza di specializzazione: Mentre i modelli di grandi dimensioni sono versatili, potrebbero non essere ottimizzati per compiti specifici come il recupero di informazioni o la generazione di risposte rispetto a moduli specializzati.
-
-Difficoltà di debug e interpretabilità: Con un'architettura integrata e basata su prompt, potrebbe essere più complesso eseguire il debug e comprendere le ragioni dietro a eventuali errori o comportamenti indesiderati del modello.
-
-In sintesi, la proposta presenta alcuni vantaggi interessanti in termini di semplificazione, adattabilità e controllo, ma solleva anche potenziali preoccupazioni riguardo all'affidabilità, ai bias, alla mancanza di specializzazione e alle difficoltà di debug e interpretabilità.
-Come per qualsiasi nuovo approccio, sarebbe necessario valutarlo attentamente attraverso sperimentazioni e test approfonditi per determinare l'efficacia e l'applicabilità in contesti specifici.
-    </pre>
+    <div>
+        <strong>Conclusione: Un RAG Pragmatico per il Client-Side</strong>
+        <p>
+            Questo approccio rappresenta una visione pragmatica del RAG, ottimizzata per l'ambiente browser. Sacrifica la potenza della ricerca semantica in favore di privacy, velocità e leggerezza, sfruttando al contempo la sofisticazione dell'algoritmo BM25 per ottenere risultati di ranking superiori rispetto a una semplice ricerca testuale. Dimostra come i principi del RAG possano essere adattati a contesti con vincoli specifici, offrendo una soluzione funzionale che bilancia capacità e risorse disponibili, affidando al solo LLM finale il compito di "comprendere" semanticamente il contesto lessicalmente recuperato.
+        </p>
+    </div>
 </div>
 `;
+
+
+
 
 export const help2_html = `
 <div class="text">
