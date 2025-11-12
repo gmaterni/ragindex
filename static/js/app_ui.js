@@ -1017,7 +1017,7 @@ const deleteAllData = async () => {
   });
 
   element.querySelector("#delete-all-btn").addEventListener("click", async () => {
-    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB), ESCLUSI i documenti caricati. Confermi?");
+    const ok = await confirm("ATTENZIONE: Stai per cancellare TUTTI i dati dell'applicazione (LocalStorage e IndexedDB). Confermi?");
     if (ok) {
       // AAA cancellazione tutto
       UaDb.clear();

@@ -130,7 +130,7 @@
 // Variabili aggiuntive per tema light
 @light-dialog-bg: darken(@light-bg, 1%);
 @light-dialog-text: @light-text;
-@light-kb-display-fg: #E65100; // dark orange for visibility
+@light-kb-display-fg: #e65100; // dark orange for visibility
 
 // ===================================================================
 //  3. STILI GLOBALI E RESET
@@ -603,7 +603,12 @@ div.container {
     color: #ffffff; // Testo bianco per la maggior parte dei pulsanti
   }
 
-  #btn-action3-continue-convo { background-color: #81C784; &:hover { background-color: lighten(#81C784, 10%); } } // Verde
+  #btn-action3-continue-convo {
+    background-color: #81c784;
+    &:hover {
+      background-color: lighten(#81c784, 10%);
+    }
+  } // Verde
 }
 
 .clear-input {
@@ -852,7 +857,7 @@ div.container {
   }
   #file-list-container {
     margin-top: 1em;
-    max-height: 150px;
+    max-height: 700px;
     overflow-y: auto;
     border: 1px solid;
     padding: 10px;
@@ -1118,7 +1123,8 @@ div.container {
     }
   }
 
-  #spinner-wait { /* Uso l'ID per essere specifico */
+  #spinner-wait {
+    /* Uso l'ID per essere specifico */
     .pulse-icon {
       background-color: @color1; /* Stesso colore del tema */
       animation: @pulse-animation 1.5s ease-in-out infinite; /* Stessa animazione */
