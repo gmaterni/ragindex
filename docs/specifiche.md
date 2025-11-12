@@ -1,4 +1,4 @@
-# Specifiche Tecniche: RAG-NoEmb-JS
+# Specifiche Tecniche: RagIndex
 
 ## 1. Introduzione
 

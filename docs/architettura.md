@@ -1,4 +1,4 @@
-# Architettura dell'Applicazione RAG-NoEmb-JS
+# Architettura dell'Applicazione RagIndex
 
 ## 1. Filosofia Architetturale
 

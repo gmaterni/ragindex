@@ -40,10 +40,7 @@ export const help0_html = `
         <strong>Copia Output</strong>
         <p>Copia l'intero contenuto della finestra di output negli appunti.</p>
     </div>
-    <div>
-        <strong>Apri Output</strong>
-        <p>Mostra la conversazione attuale in una finestra separata e più grande per una migliore leggibilità.</p>
-    </div>
+
     <div>
         <strong>Nuova Conversazione</strong>
         <p>Cancella la cronologia della conversazione attiva. Non cancella il Contesto.</p>
@@ -123,7 +120,7 @@ export const help1_html = `
 <div class="text">
     <p class="center">Un Paradigma RAG Alternativo: La Scelta Lessicale</p>
     <p>
-        L'approccio RAG (Retrieval-Augmented Generation) standard si fonda sull'uso di <strong>embeddings</strong> per rappresentare e ricercare informazioni in base al loro significato semantico. Questa applicazione esplora un paradigma alternativo, sostituendo la ricerca semantica con una <strong>ricerca lessicale</strong>, eseguita interamente lato client.
+        L'approccio RAG (Retrieval-Augmented Generation) standard si fonda sull'uso di <strong>embeddings</strong> per rappresentare e ricercare informazioni in base al loro significato semantico. RagIndex esplora un paradigma alternativo, sostituendo la ricerca semantica con una <strong>ricerca lessicale</strong>, eseguita interamente lato client.
     </p>
     <p>
         Questa scelta non è solo un dettaglio implementativo, ma una decisione architetturale con profonde implicazioni teoriche e pratiche.
