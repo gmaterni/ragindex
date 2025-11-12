@@ -205,7 +205,7 @@ import { FirebaseLogger } from "./services/firbaselogger.js";
 import { WebId } from "./services/webuser_id.js";
 import "./services/uadialog.js";
 
-const VERSIONE = " 0.1.2";
+const VERSIONE = " 0.1.3";
 console.info("*** VERSIONE:", VERSIONE)
 
 async function openApp() {
@@ -226,9 +226,8 @@ async function openApp() {
       UaLog.log("ERRORE: Impossibile caricare la cronologia precedente. ");
       UaLog.log("Si consiglia di cancellarla dal menu.");
     }
-
     getTheme();
-    updateActiveKbDisplay(); // Add this call
+    updateActiveKbDisplay();
     const webid = WebId.get();
     FirebaseLogger.sendLog("idx_open", webid)
   } catch (error) {

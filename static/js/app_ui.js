@@ -513,7 +513,7 @@ export const updateActiveKbDisplay = async () => {
 
   if (!chunksExist || !indexExist) {
     displayElement.textContent = "Nessuna KB attiva";
-    UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME); // Ensure it's cleared if KB is gone
+    UaDb.delete(DATA_KEYS.ACTIVE_KB_NAME);
     return;
   }
 

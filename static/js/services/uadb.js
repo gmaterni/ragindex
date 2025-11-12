@@ -10,7 +10,7 @@ export const UaDb = {
   },
   delete(id) {
     if (!localStorage.getItem(id)) {
-      console.error(`ID ${id} not found.`);
+      console.debug(`UaDb ID ${id} not found.`);
       return;
     }
     localStorage.removeItem(id);

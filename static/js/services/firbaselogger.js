@@ -92,7 +92,7 @@ export const FirebaseLogger = (() => {
             const host = window.location.hostname;
             // AAA disattivazione log in locale
             if (host === '127.0.0.1' || host === 'localhost') {
-                console.info('Registrazione disattivata in ambiente locale');
+                // console.info('Registrazione disattivata in ambiente locale');
                 return;
             }
             performLogSend(appId, payload).catch(error => {
