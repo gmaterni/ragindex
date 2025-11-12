@@ -39,10 +39,11 @@ export const PROVIDER_CONFIG = {
   groq: {
     client: "groq",
     models: {
-      "llama-3.1-8b-instant": { windowSize: 8 },          // Meta, 131,072 tokens  
-      "llama-3.3-70b-versatile": { windowSize: 8 },       // Meta, 131,072 tokens
-      "meta-llama/llama-guard-4-12b": { windowSize: 8 },  // Meta, 131,072 tokens
-      "qwen/qwen3-32b": { windowSize: 8 },                    // Alibaba Cloud, 131,072 tokens
+      "llama-3.1-8b-instant": { windowSize: 8 },
+      "llama-3.3-70b-versatile": { windowSize: 8 },
+      "groq/compound": { windowSize: 8 },
+      "groq/compound-mini": { windowSize: 8 },
+      "qwen/qwen3-32b": { windowSize: 8 },
     },
   }
 };
