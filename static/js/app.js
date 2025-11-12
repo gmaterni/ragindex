@@ -205,7 +205,7 @@ import { FirebaseLogger } from "./services/firbaselogger.js";
 import { WebId } from "./services/webuser_id.js";
 import "./services/uadialog.js";
 
-const VERSIONE = " 0.1.1";
+const VERSIONE = " 0.1.2";
 console.info("*** VERSIONE:", VERSIONE)
 
 async function openApp() {
@@ -230,7 +230,7 @@ async function openApp() {
     getTheme();
     updateActiveKbDisplay(); // Add this call
     const webid = WebId.get();
-    FirebaseLogger.sendLog("ne_open", webid)
+    FirebaseLogger.sendLog("idx_open", webid)
   } catch (error) {
     console.error("Errorre openApp", error);
   }
