@@ -1,8 +1,10 @@
+<!-- @format -->
+
 # RagIndex: Generazione Aumentata da Recupero (RAG) 100% Client-Side
 
 **RagIndex** è un'applicazione web che implementa un'architettura RAG (Retrieval-Augmented Generation) completa, operando interamente nel browser dell'utente. Nessun dato viene inviato a un server, garantendo massima privacy e autonomia.
 
-A differenza degli approcci RAG tradizionali che si basano su *embeddings* e ricerca semantica, RagIndex utilizza una **ricerca lessicale avanzata** (basata sull'algoritmo BM25) per recuperare le informazioni. Questa scelta architetturale rende l'applicazione leggera, veloce e interpretabile, senza la necessità di un backend o di costose API di vettorizzazione.
+A differenza degli approcci RAG tradizionali che si basano su _embeddings_ e ricerca semantica, RagIndex utilizza una **ricerca lessicale avanzata** (basata sull'algoritmo BM25) per recuperare le informazioni. Questa scelta architetturale rende l'applicazione leggera, veloce e interpretabile, senza la necessità di un backend o di costose API di vettorizzazione.
 
 ## Obiettivi del Progetto
 
@@ -28,17 +30,16 @@ L'architettura di RagIndex è modulare e progettata per massimizzare la reattivi
 L'interazione con RagIndex è guidata da un semplice processo in tre fasi:
 
 ### Azione 1: Crea Knowledge Base
+
 - **Scopo**: Preparare i documenti per la ricerca.
 - **Processo**: I documenti caricati vengono inviati al Web Worker, che li segmenta in "Chunks" (frammenti) e costruisce un indice di ricerca efficiente. Il risultato è una "Knowledge Base di Lavoro" salvata localmente in IndexedDB.
 
 ### Azione 2: Inizia Conversazione
+
 - **Scopo**: Avviare un dialogo contestualizzato.
 - **Processo**: L'applicazione utilizza la query dell'utente per cercare nell'indice della Knowledge Base. Costruisce quindi un "Contesto" con i chunk più pertinenti e lo invia, insieme alla domanda, al modello linguistico (LLM) scelto per generare la prima risposta.
 
 ### Azione 3: Continua Conversazione
+
 - **Scopo**: Proseguire il dialogo mantenendo la coerenza.
 - **Processo**: L'LLM riceve la nuova domanda insieme al contesto originale e all'intera cronologia della conversazione. Questo gli permette di formulare risposte che tengono conto di tutto ciò che è stato detto in precedenza.
-
-## Quick Start
-
-Per iniziare a usare l'applicazione, consulta la guida rapida: `docs/quickstart.md`.
