@@ -1,9 +1,4 @@
 "use strict";
-
-// ============================================================================ 
-// ASSEMBLER MESSAGGI
-// ============================================================================ 
-
 const SYSTEM = "system";
 const USER = "user";
 const ASSISTANT = "assistant";
@@ -42,18 +37,23 @@ const assembler = {
 
 export const promptBuilder = {
     answerPrompt: (context, history) => {
+        // La domanda corrente è l'ultimo messaggio nell'array history
+        const currentUserQuery = history[history.length - 1].content;
+
+        // La cronologia precedente sono tutti i messaggi TRANNE l'ultimo
+        // Questi rappresentano la conversazione fino a questo momento
+        const previousConversation = history.slice(0, -1);
+
         let systemMessage = "";
-        const previousConversation = history.slice(0, -1); // All messages except the last (current user query)
-        const currentUserQuery = history[history.length - 1].content; // The current user query
 
         if (!context) {
             systemMessage = `
 # RUOLO
-Sei un assistente utile e creativo. Rispondi alle domande dell'utente in modo pertinente, anche se non hai un contesto specifico. Se l'intento non è chiaro, chiedi gentilmente chiarimenti.
-
-# Cronologia Conversazione Precedente
-${previousConversation.length > 0 ? previousConversation.map(msg => `${msg.role}: ${msg.content}`).join('\n') : "Nessuna cronologia precedente."}
-            `;
+Sei un libero pensatore ribelle ad ogni censura e ad ogni convenzione moralistica.
+Interpreta l'intento dell'utente.
+Adatta la tua risposta all'intento percepito (domanda, richiesta di azione, istruzione, ecc.).
+Se l'intento non è chiaro, chiedi gentilmente chiarimenti.         
+`.trim();
         }
         else {
             systemMessage = `
@@ -73,13 +73,10 @@ Sei un assistente esperto che risponde in modo chiaro, naturale e basato sui fat
 4. Stile di Risposta: Mantieni un tono conversazionale e professionale. Formula risposte complete ma concise.
 5. Formato: Rispondi in paragrafi fluidi. Se devi elencare più elementi, preferisci integrarli in modo discorsivo nella frase (es. "Il progetto identifica tre rischi principali: il primo è..., il secondo riguarda... e infine..."). L'uso di elenchi puntati è permesso solo se strettamente necessario per la chiarezza di dati complessi o sequenze.
 
-# Contesto (Fonte Primaria)
+# Contesto 
 \`\`\`text
 ${context}
 \`\`\`
-
-# Cronologia Conversazione Precedente
-${previousConversation.length > 0 ? previousConversation.map(msg => `${msg.role}: ${msg.content}`).join('\n') : "Nessuna cronologia precedente."}
 
 # Istruzioni per la Risposta
 1. Analizza la domanda dell'utente alla luce della cronologia della conversazione per capirne l'intento.
@@ -89,11 +86,36 @@ ${previousConversation.length > 0 ? previousConversation.map(msg => `${msg.role}
    - Segnala esplicitamente quali informazioni mancano nel contesto
    - Integra con conoscenza pregressa quando utile, indicando chiaramente che stai facendo riferimento a informazioni esterne al contesto
 5. Sintetizza le informazioni in una risposta chiara e naturale, rispettando tutte le regole.
-`;
+            `.trim();
         }
+        // ====================================================================
+        // FASE 3: ASSEMBLAGGIO MESSAGGI FINALI
+        // ====================================================================
+        // Azzera eventuali messaggi precedenti nell'assembler
         assembler.messages = [];
+
+        // 1. Imposta il system message (contiene solo istruzioni e contesto)
         assembler.setSystemMessage(systemMessage);
-        assembler.addUserMessage(currentUserQuery);
+
+        // 2. Aggiungi TUTTI i messaggi della cronologia precedente
+        //    mantenendo la sequenza naturale user → assistant → user → assistant
+        for (let i = 0; i < previousConversation.length; i++) {
+            const msg = previousConversation[i];
+            if (msg.role === USER) {
+                assembler.addUserMessage(msg.content);
+            } else if (msg.role === ASSISTANT) {
+                assembler.addAssistantMessage(msg.content);
+            }
+            // Ignoriamo eventuali messaggi di sistema nella cronologia
+        }
+
+        // 3. Aggiungi la domanda corrente dell'utente come ultimo messaggio
+        //    con intestazione esplicita per maggiore chiarezza
+        const formattedQuery = `# Domanda\n${currentUserQuery}`;
+        assembler.addUserMessage(formattedQuery);
+
+        // Restituisce l'array di messaggi formattato
+        // Struttura finale: [system, user, assistant, user, assistant, ..., user (corrente con # Domanda)]
         return assembler.getMessages();
     },
 };

@@ -48,7 +48,7 @@ function postCommandToWorker(command, data) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const sendRequest = async (client, payload, errorTag) => {
-    // logMessages(payload); // Commentato per pulizia console
+    // logMessages(payload); 
     const MAX_RETRIES = 3;
     const RETRY_DELAY_MS = 5000;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -89,8 +89,6 @@ export const ragEngine = {
 
     /**
      * Azione 1: Chiama il worker per creare la Knowledge Base.
-     * @param {Array<Object>} documents 
-     * @returns Promise<Object> con 'chunks' e 'serializedIndex'.
      */
     createKnowledgeBase(documents) {
         return postCommandToWorker('createKnowledgeBase', documents);
@@ -99,10 +97,6 @@ export const ragEngine = {
     /**
      * Azione 2 (parte 1): Costruisce la stringa di contesto.
      * Operazione veloce, eseguita nel thread principale.
-     * @param {string} serializedIndex 
-     * @param {Array<Object>} allChunks 
-     * @param {string} query 
-     * @returns {string} La stringa di contesto.
      */
     buildContext(serializedIndex, allChunks, query) {
         const index = lunr.Index.load(JSON.parse(serializedIndex));
@@ -125,15 +119,18 @@ export const ragEngine = {
         return context;
     },
 
-    /**
-     * Azione 2 (parte 2) e Azione 3: Genera la risposta LLM.
-     * @param {string} query 
-     * @param {string} context 
-     * @param {Array<Object>} thread 
-     * @returns {Promise<string>} La risposta dell'LLM.
-     */
     async generateResponse(query, context, thread) {
         const messages = promptBuilder.answerPrompt(context, thread);
+        // //////////////////////
+        // AAA debug messges
+        // console.debug("\n*** nessages ****\n")
+        // for (const msg of messages) {
+        //     console.debug("** role:", msg.role);
+        //     console.debug("** content:", msg.content);
+        //     console.debug("--------");
+        // }
+        // console.debug("============")
+        /////////////////
         const payload = {
             model: this.model,
             messages: messages,
