@@ -287,6 +287,12 @@ export const TextInput = {
 
   async createKnowledge() {
     UaLog.log("Creazione Knowledge Base...");
+    // AAA google analyrics
+    gtag('event', 'createKnowledge', {
+      'event_category': 'Conversazione',
+      'event_label': 'avvio'
+    });
+    /////////////
     const docNames = DocsMgr.names();
     const validDocuments = docNames
       .map((name, i) => ({ name, text: DocsMgr.doc(i) }))
@@ -328,6 +334,13 @@ export const TextInput = {
       alert("Inserisci una query per iniziare la conversazione.");
       return;
     }
+    // AAA google analyrics
+    gtag('event', 'startConversation', {
+      'event_category': 'Conversazione',
+      'event_label': 'avvio'
+    });
+    // ///////////
+
     const serializedIndex = await idbMgr.read(DATA_KEYS.PHASE1_INDEX);
     const allChunks = await idbMgr.read(DATA_KEYS.PHASE0_CHUNKS);
     if (!serializedIndex || !allChunks) {
@@ -371,6 +384,12 @@ export const TextInput = {
       alert("Inserisci una query per continuare la conversazione.");
       return;
     }
+    // AAA google analyrics
+    gtag('event', 'continueConversation', {
+      'event_category': 'Conversazione',
+      'event_label': 'avvio'
+    });
+    // ///////////
 
     Spinner.show();
     setTimeout(async () => {
@@ -401,6 +420,7 @@ export const TextInput = {
       }
     }, 50);
   },
+
 };
 
 export const TextOutput = {
