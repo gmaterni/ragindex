@@ -845,12 +845,21 @@ const elencoDocs = () => {
   const arr = DocsMgr.names();
   const jfh = UaJtfh();
   jfh.append('<div class="docs-dialog">');
-  jfh.append("<h4>Elenco Documenti</h4>");
+  jfh.append(`
+    <div class="docs-header">
+      <h4>Elenco Documenti</h4>
+      <label class="select-all-label">
+        <input type="checkbox" id="select-all-docs-checkbox" title="Seleziona/Deseleziona tutto"> Seleziona tutto
+      </label>
+    </div>
+  `);
+
   if (arr.length > 0) {
     jfh.append(`
       <table class="table-data">
         <thead>
           <tr>
+            <th>Selez.</th>
             <th>Nome</th>
             <th>Azioni</th>
           </tr>
@@ -859,21 +868,39 @@ const elencoDocs = () => {
     `);
     arr.forEach((docName, index) => {
       jfh.append(`
-<tr>
-<td>${docName}</td>
-<td><button class="link-show-doc btn-success" data-doc-index="${index}">Visualizza</button></td>
-<td><button class="delete-doc-btn btn-danger" data-doc-index="${index}">Elimina</button></td>
-</tr>
-`);
+        <tr>
+          <td><input type="checkbox" class="doc-checkbox" data-doc-name="${docName}"></td>
+          <td>${docName}</td>
+          <td><button class="link-show-doc btn-success" data-doc-index="${index}">Visualizza</button></td>
+        </tr>
+      `);
     });
     jfh.append(`</tbody></table>`);
+    jfh.append(`
+      <div class="docs-footer">
+        <button id="delete-selected-docs-btn" class="btn-danger">Cancella Selezionati</button>
+      </div>
+    `);
   } else {
     jfh.append("<p>Nessun documento trovato.</p>");
   }
+
   jfh.append("</div>");
   wnds.winfo.show(jfh.html());
   const element = wnds.winfo.w.getElement();
 
+  // Event listener per "Seleziona tutto"
+  const selectAllCheckbox = element.querySelector("#select-all-docs-checkbox");
+  const docCheckboxes = element.querySelectorAll(".doc-checkbox");
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", (event) => {
+      docCheckboxes.forEach(checkbox => {
+        checkbox.checked = event.target.checked;
+      });
+    });
+  }
+
+  // Event listener per il pulsante Visualizza
   element.querySelectorAll(".link-show-doc").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
@@ -886,21 +913,28 @@ const elencoDocs = () => {
     });
   });
 
-  element.querySelectorAll(".delete-doc-btn").forEach((icon) => {
-    icon.addEventListener("click", async (event) => {
-      event.preventDefault();
-      const docIndex = event.currentTarget.dataset.docIndex;
-      if (docIndex !== null) {
-        const n = parseInt(docIndex, 10);
-        const docName = DocsMgr.name(n);
-        const ok = await confirm(`Confermi la cancellazione del documento "${docName}"?`);
-        if (ok) {
+  // Event listener per il pulsante Cancella Selezionati
+  const deleteSelectedBtn = element.querySelector("#delete-selected-docs-btn");
+  if (deleteSelectedBtn) {
+    deleteSelectedBtn.addEventListener("click", async () => {
+      const selectedDocs = Array.from(docCheckboxes)
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.dataset.docName);
+
+      if (selectedDocs.length === 0) {
+        alert("Nessun documento selezionato.");
+        return;
+      }
+
+      const ok = await confirm(`Confermi la cancellazione di ${selectedDocs.length} documenti?`);
+      if (ok) {
+        selectedDocs.forEach(docName => {
           DocsMgr.delete(docName);
-          elencoDocs();
-        }
+        });
+        elencoDocs(); // Aggiorna la vista
       }
     });
-  });
+  }
 };
 
 const deleteAllData = async () => {
