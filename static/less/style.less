@@ -1546,9 +1546,7 @@ div.container {
         color: @table-link-hover-fg;
       }
     }
-    .delete-doc-btn,
-    .btn-danger,
-    .btn-success {
+    .delete-doc-btn {
       cursor: pointer;
       border-radius: 5px;
       padding: 1px 2px;
@@ -1557,30 +1555,38 @@ div.container {
         text-decoration: underline;
       }
     }
-    .delete-doc-btn {
-      color: @table-delete-btn-fg;
-      background: @table-delete-btn-bg;
-      &:hover {
-        background: @table-delete-btn-hover-bg;
-      }
-    }
-    .btn-success {
-      border-color: @btn-success-bg;
-      background-color: @btn-success-bg;
-      color: #ffffff;
-      &:hover {
-        background-color: @btn-success-hover-bg;
-        color: #ffffff;
-      }
-    }
-    .btn-danger {
-      border-color: @btn-danger-bg;
-      background-color: @btn-danger-bg;
-      &:hover {
-        background-color: @btn-danger-hover-bg;
-      }
+  }
+
+  .btn-success,
+  .btn-danger {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 1px 2px;
+    font-weight: normal;
+    &:hover {
+      text-decoration: underline;
     }
   }
+
+  .btn-success {
+    border-color: @btn-success-bg;
+    background-color: @btn-success-bg;
+    color: #ffffff;
+    &:hover {
+      background-color: @btn-success-hover-bg;
+      color: #ffffff;
+    }
+  }
+
+  .btn-danger {
+    border-color: @btn-danger-bg;
+    background-color: @btn-danger-bg;
+    color: #ffffff;
+    &:hover {
+      background-color: @btn-danger-hover-bg;
+    }
+  }
+
   .table-data {
     tr:nth-child(even) {
       background-color: @table-tr-even-bg;
