@@ -6,10 +6,9 @@ import { UaWindowAdm } from "./services/uawindow.js";
 export const docuentUploader = {
   dragoverHandler: null,
   dropHandler: null,
-  uploadMode: "single", // "single" o "directory"
+  uploadMode: "single",
 
   open() {
-    //AAA <h5>Carica Documenti nella Knowledge Base</h5>
     const htmlContent = `
       <div class="window-text">
         <div class="btn-wrapper">
@@ -40,17 +39,15 @@ export const docuentUploader = {
             </div>
             <p id="progress-text">0 / 0 file processati</p>
           </div>
-          
-          <div id="file-list-container"></div>
-          
-          <!-- Riepilogo upload -->
-          <div id="upload-summary" style="display: none;">
-            <strong>Riepilogo:</strong>
-            <div id="summary-content"></div>
-          </div>
+          <div id="file-list-container"></div>        
         </div>
       </div>
     `;
+    // <!-- Riepilogo upload -->
+    // <div id="upload-summary" style="display: none;">
+    //   <strong>Riepilogo:</strong>
+    //   <div id="summary-content"></div>
+    // </div>
 
     const uploadWindow = UaWindowAdm.create("id_upload");
     uploadWindow.drag();
@@ -196,11 +193,11 @@ export const docuentUploader = {
     const progressContainer = document.getElementById("progress-container");
     const progressBar = document.getElementById("progress-bar");
     const progressText = document.getElementById("progress-text");
-    const summaryDiv = document.getElementById("upload-summary");
-    const summaryContent = document.getElementById("summary-content");
+    // const summaryDiv = document.getElementById("upload-summary");
+    // const summaryContent = document.getElementById("summary-content");
 
     progressContainer.style.display = "block";
-    summaryDiv.style.display = "none";
+    // summaryDiv.style.display = "none";
 
     const stats = {
       total: validFiles.length,
@@ -218,7 +215,7 @@ export const docuentUploader = {
       progressBar.style.width = `${percentage}%`;
       progressBar.textContent = `${percentage}%`;
 
-      const result = await this.handleFile(file, true); // true = silenzioso (no alert)
+      const result = await this.handleFile(file, true);
 
       if (result.status === "success") {
         stats.success++;
@@ -231,20 +228,20 @@ export const docuentUploader = {
     }
 
     // Mostra riepilogo finale
-    summaryDiv.style.display = "block";
-    summaryContent.innerHTML = `
-      <div class="success">âœ… Caricati con successo: <strong>${stats.success}</strong></div>
-      <div class="duplicate">âš ï¸ Duplicati (ignorati): <strong>${stats.duplicates}</strong></div>
-      <div class="error">âŒ Errori: <strong>${stats.errors}</strong></div>
-      ${stats.errorFiles.length > 0 ? `
-        <details>
-          <summary>Mostra file con errori</summary>
-          <ul>
-            ${stats.errorFiles.map(f => `<li>${f.name}: ${f.error}</li>`).join("")}
-          </ul>
-        </details>
-      ` : ""}
-    `;
+    // summaryDiv.style.display = "block";
+    // summaryContent.innerHTML = `
+    //   <div class="success">Caricati con successo: <strong>${stats.success}</strong></div>
+    //   <div class="duplicate"> Duplicati (ignorati): <strong>${stats.duplicates}</strong></div>
+    //   <div class="error">Errori: <strong>${stats.errors}</strong></div>
+    //   ${stats.errorFiles.length > 0 ? `
+    //     <details>
+    //       <summary>Mostra file con errori</summary>
+    //       <ul>
+    //         ${stats.errorFiles.map(f => `<li>${f.name}: ${f.error}</li>`).join("")}
+    //       </ul>
+    //     </details>
+    //   ` : ""}
+    // `;
 
     // Nascondi la barra dopo 2 secondi se tutto ok
     if (stats.errors === 0) {
@@ -277,7 +274,7 @@ export const docuentUploader = {
     // Controlla duplicati ma NON blocca il processo
     if (DocsMgr.exists(fileName)) {
       if (!silent) {
-        alert(`Il file "${fileName}" Ã¨ giÃ  in archivio. VerrÃ  ignorato.`);
+        alert(`Il file "${fileName}"già in archivio. Verrà  ignorato.`);
       }
 
       // Aggiunge comunque un elemento visivo
