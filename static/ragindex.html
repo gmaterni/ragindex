@@ -22,11 +22,16 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D5MCXP0RWD"></script>
     <script>
+      console.log("*** URL:\n", window.location.hostname);
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
       gtag('js', new Date());
-      gtag('config', 'G-D5MCXP0RWD');
+      gtag('config', 'G-D5MCXP0RWD', {
+        'cookie_domain': 'auto',
+        'cookie_flags': 'SameSite=None;Secure'
+      });
     </script>
+
   </head>
 
   <body>
@@ -116,19 +121,11 @@
                 <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
               </svg>
             </button>
-
-            <!-- <button class="wnd-output tt-leftx" data-tt="Apri Output">
-              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M10 9v6h4V9h5l-7-7-7 7h5zM5 19v2h14v-2H5z" />
-              </svg>
-            </button> -->
-
             <button id="clear-history1" class="clear-history1 tt-leftx" data-tt="Nuova Conversazione">
               <svg class="icon" viewBox="0 0 24 24">
                 <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z" />
               </svg>
             </button>
-
             <button id="clear-history2" class="clear-history tt-leftx" data-tt="Nuovo Contesto & Conversazione">
               <svg class="icon" viewBox="0 0 24 24">
                 <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z" />
