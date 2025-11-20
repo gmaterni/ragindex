@@ -78,6 +78,21 @@
 @dark-dialog-text: @dark-text;
 @dark-kb-display-fg: #f6e602; // yellow
 
+// Variabili per upload
+@dark-file-list-item-success-bg: lighten(@dark-color2, 20%);
+@dark-file-list-item-success-fg: darken(@dark-color2, 30%);
+@dark-file-list-item-duplicate-bg: lighten(@dark-color3, 10%);
+@dark-file-list-item-duplicate-fg: darken(@dark-color3, 20%);
+@dark-file-list-item-error-bg: lighten(@dark-color1, 10%);
+@dark-file-list-item-error-fg: darken(@dark-color1, 20%);
+@dark-summary-bg: lighten(@dark-bg, 8%);
+@dark-summary-border: lighten(@dark-bg, 15%);
+@dark-summary-success-fg: @dark-color2;
+@dark-summary-duplicate-fg: @dark-color3;
+@dark-summary-error-fg: @dark-color1;
+@dark-progress-bg: #444;
+@dark-progress-bar-bg: @dark-color2;
+
 // -------------------------------------------------------------------
 // TEMA: Light
 // -------------------------------------------------------------------
@@ -131,6 +146,21 @@
 @light-dialog-bg: darken(@light-bg, 1%);
 @light-dialog-text: @light-text;
 @light-kb-display-fg: #e65100; // dark orange for visibility
+
+// Variabili per upload
+@light-file-list-item-success-bg: lighten(@light-color2, 50%);
+@light-file-list-item-success-fg: darken(@light-color2, 20%);
+@light-file-list-item-duplicate-bg: lighten(@light-color3, 40%);
+@light-file-list-item-duplicate-fg: darken(@light-color3, 20%);
+@light-file-list-item-error-bg: lighten(@light-color1, 30%);
+@light-file-list-item-error-fg: darken(@light-color1, 20%);
+@light-summary-bg: lighten(@light-bg, -2%);
+@light-summary-border: lighten(@light-bg, -8%);
+@light-summary-success-fg: @light-color2;
+@light-summary-duplicate-fg: @light-color3;
+@light-summary-error-fg: @light-color1;
+@light-progress-bg: #e0e0e0;
+@light-progress-bar-bg: @light-color2;
 
 // ===================================================================
 //  3. STILI GLOBALI E RESET
@@ -847,6 +877,27 @@ div.container {
     padding: 0;
     margin: 0;
   }
+  .upload-description {
+    margin-bottom: 15px;
+    font-size: @fsize-upload;
+  }
+  .upload-mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    label {
+      margin: 0 15px;
+      cursor: pointer;
+      font-size: @fsize-menu;
+      input[type="radio"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+      }
+      span {
+        font-weight: bold;
+      }
+    }
+  }
   .drop-zone {
     border: 3px dashed;
     border-radius: 10px;
@@ -854,21 +905,94 @@ div.container {
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
     margin-bottom: 1em;
+    p {
+      font-size: @fsize-upload;
+      margin: 0;
+    }
+  }
+  #progress-container {
+    margin-top: 20px;
+    div {
+      width: 100%;
+      border-radius: 5px;
+      overflow: hidden;
+      height: 25px;
+    }
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      line-height: 25px;
+      color: white;
+      text-align: center;
+      transition: width 0.3s ease-in-out;
+      font-weight: bold;
+    }
+    #progress-text {
+      margin-top: 10px;
+      font-size: @fsize-menu;
+      font-weight: bold;
+    }
   }
   #file-list-container {
     margin-top: 1em;
-    max-height: 700px;
+    max-height: 200px;
     overflow-y: auto;
     border: 1px solid;
     padding: 10px;
     border-radius: 5px;
+    text-align: left;
   }
   .file-list-item {
-    padding: 5px;
+    padding: 8px 5px;
     border-bottom: 1px solid;
     animation: fadeIn 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
     &:last-child {
       border-bottom: none;
+    }
+  }
+  #upload-summary {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+    strong {
+      font-size: @fsize-upload;
+      display: block;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    #summary-content {
+      div {
+        padding: 5px 0;
+        font-size: @fsize-menu;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      details {
+        margin-top: 10px;
+        cursor: pointer;
+        font-weight: normal;
+        summary {
+          font-weight: bold;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+        ul {
+          list-style-type: disc;
+          margin-left: 20px;
+          padding-top: 5px;
+          li {
+            font-weight: normal;
+            font-size: @fsize-msg;
+            padding: 2px 0;
+          }
+        }
+      }
     }
   }
 }
@@ -1451,6 +1575,9 @@ div.container {
 
   // --- Upload ---
   .upload-dialog-content {
+    .upload-description {
+      color: @text;
+    }
     .drop-zone {
       border-color: @drop-zone-border;
       p {
@@ -1461,11 +1588,61 @@ div.container {
         border-color: @color2;
       }
     }
+    #progress-container {
+      div {
+        background-color: @progress-bg;
+      }
+      #progress-bar {
+        background-color: @progress-bar-bg;
+      }
+      #progress-text {
+        color: @text;
+      }
+    }
     #file-list-container {
       border-color: @file-list-border;
     }
     .file-list-item {
       border-bottom-color: @file-list-item-border;
+      color: @text;
+      &.success {
+        background-color: @file-list-item-success-bg;
+        color: @file-list-item-success-fg;
+      }
+      &.duplicate {
+        background-color: @file-list-item-duplicate-bg;
+        color: @file-list-item-duplicate-fg;
+      }
+      &.error {
+        background-color: @file-list-item-error-bg;
+        color: @file-list-item-error-fg;
+      }
+    }
+    #upload-summary {
+      background-color: @summary-bg;
+      border: 1px solid @summary-border;
+      strong {
+        color: @text;
+      }
+      #summary-content {
+        .success {
+          color: @summary-success-fg;
+        }
+        .duplicate {
+          color: @summary-duplicate-fg;
+        }
+        .error {
+          color: @summary-error-fg;
+        }
+        details {
+          summary {
+            color: @text;
+          }
+          ul li {
+            color: @text;
+          }
+        }
+      }
     }
   }
 
@@ -1666,6 +1843,19 @@ div.container {
   @file-list-item-border: #555;
   @tree-bg: #2d2d2d;
   @tree-border: #4caf50;
+  @file-list-item-success-bg: @dark-file-list-item-success-bg;
+  @file-list-item-success-fg: @dark-file-list-item-success-fg;
+  @file-list-item-duplicate-bg: @dark-file-list-item-duplicate-bg;
+  @file-list-item-duplicate-fg: @dark-file-list-item-duplicate-fg;
+  @file-list-item-error-bg: @dark-file-list-item-error-bg;
+  @file-list-item-error-fg: @dark-file-list-item-error-fg;
+  @summary-bg: @dark-summary-bg;
+  @summary-border: @dark-summary-border;
+  @summary-success-fg: @dark-summary-success-fg;
+  @summary-duplicate-fg: @dark-summary-duplicate-fg;
+  @summary-error-fg: @dark-summary-error-fg;
+  @progress-bg: @dark-progress-bg;
+  @progress-bar-bg: @dark-progress-bar-bg;
   @tree-header-fg: #eee;
   @tree-close-btn-fg: #ccc;
   @tree-node-fg: #87ceeb;
@@ -1787,6 +1977,19 @@ div.container {
   @file-list-item-border: #ddd;
   @tree-bg: #fafafa;
   @tree-border: @light-color2;
+  @file-list-item-success-bg: @light-file-list-item-success-bg;
+  @file-list-item-success-fg: @light-file-list-item-success-fg;
+  @file-list-item-duplicate-bg: @light-file-list-item-duplicate-bg;
+  @file-list-item-duplicate-fg: @light-file-list-item-duplicate-fg;
+  @file-list-item-error-bg: @light-file-list-item-error-bg;
+  @file-list-item-error-fg: @light-file-list-item-error-fg;
+  @summary-bg: @light-summary-bg;
+  @summary-border: @light-summary-border;
+  @summary-success-fg: @light-summary-success-fg;
+  @summary-duplicate-fg: @light-summary-duplicate-fg;
+  @summary-error-fg: @light-summary-error-fg;
+  @progress-bg: @light-progress-bg;
+  @progress-bar-bg: @light-progress-bar-bg;
   @tree-header-fg: @light-text;
   @tree-close-btn-fg: #555;
   @tree-node-fg: #007acc;
