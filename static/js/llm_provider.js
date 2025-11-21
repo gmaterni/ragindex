@@ -31,7 +31,6 @@ export const PROVIDER_CONFIG = {
   gemini: {
     client: "gemini",
     models: {
-      "gemini-3-pro-preview": { windowSize: 200 },
       "gemini-2.0-flash": { windowSize: 200 },
       "gemini-2.5-flash": { windowSize: 200 },
       "gemini-2.5-flash-lite": { windowSize: 200 }

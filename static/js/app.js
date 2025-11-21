@@ -205,7 +205,7 @@ import { AppMgr } from "./app_mgr.js";
 import { WebId } from "./services/webuser_id.js";
 import "./services/uadialog.js";
 
-const VERSIONE = " 0.1.4";
+const VERSIONE = " 0.1.5";
 console.info("*** VERSIONE:", VERSIONE)
 
 async function openApp() {
