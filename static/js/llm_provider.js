@@ -22,12 +22,15 @@ export const PROVIDER_CONFIG = {
   mistral: {
     client: "mistral",
     models: {
-      "mistral-large-2512": { windowSize: 260 },
+      "mistral-large-latest": { windowSize: 260 },
+      "mistral-medium-latest": { windowSize: 130 },
+      "mistral-small-latest": { windowSize: 130 },
+      "devstral-latest": { windowSize: 230 },
+      "devstral-medium-latest": { windowSize: 130 },
+      "devstral-small-latest": { windowSize: 130 },
       "ministral-14b-2512": { windowSize: 260 },
       "ministral-8b-2512": { windowSize: 260 },
       "ministral-3b-2512": { windowSize: 120 },
-      "mistral-medium-latest": { windowSize: 130 },
-      "mistral-small-latest": { windowSize: 130 },
     },
   },
   gemini: {
