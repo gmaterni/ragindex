@@ -22,18 +22,21 @@ export const PROVIDER_CONFIG = {
   mistral: {
     client: "mistral",
     models: {
-      "mistral-large-latest": { windowSize: 128 },
-      "mistral-medium-latest": { windowSize: 128 },
-      "mistral-small-latest": { windowSize: 128 },
-      "open-mixtral-8x7b": { windowSize: 32 },
+      "mistral-large-2512": { windowSize: 260 },
+      "ministral-14b-2512": { windowSize: 260 },
+      "ministral-8b-2512": { windowSize: 260 },
+      "ministral-3b-2512": { windowSize: 120 },
+      "mistral-medium-latest": { windowSize: 130 },
+      "mistral-small-latest": { windowSize: 130 },
     },
   },
   gemini: {
     client: "gemini",
     models: {
-      "gemini-2.0-flash": { windowSize: 200 },
-      "gemini-2.5-flash": { windowSize: 200 },
-      "gemini-2.5-flash-lite": { windowSize: 200 }
+      "gemini-2.5-flash": { windowSize: 600 },
+      "gemini-2.5-flash-lite": { windowSize: 600 },
+      "gemini-3-flash-preview": { windowSize: 600 },
+      // "gemini-3-pro-preview": { windowSize: 600 }
     },
   },
   groq: {
@@ -51,7 +54,7 @@ export const PROVIDER_CONFIG = {
 const DEFAULT_PROVIDER_CONFIG = {
   provider: "gemini",
   model: "gemini-2.5-flash-lite",
-  windowSize: 200,
+  windowSize: 600,
   client: "gemini",
 };
 

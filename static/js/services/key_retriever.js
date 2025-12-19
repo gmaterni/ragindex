@@ -8,19 +8,21 @@
 // const gemini_giu=['Rk5/Zlh+R0s=', 'X3xmXX1uWWw=', 'V2Y9fF07Ukk=', 'X1pWbFlGMnk=', 'OzxfT151cA==']
 // const gemini_gm=['Rk5/Zlh+SFc=', 'NldcTzxtOm8=', 'S3heTTtwVns=', 'eU5ReT5LSj4=', 'WF9+VVp/Tg==']
 // const gemini_rgq1=['Rk5/Zlh+SFw=', 'Nm19VUg3cXg=', 'OHdkbUlRalg=', 'X1xPeW86TW0=', 'cV5cU211Xg==']
-// XXX     const gemini_rgq7=['Rk5/Zlh+R2g=', 'eHs1blxRZGg=', 'XTsyOTVqVnw=', 'TlVobGt3WjI=', 'OnVJRkp0OQ==']
+// const gemini_rgq7=['Rk5/Zlh+R2g=', 'eHs1blxRZGg=', 'XTsyOTVqVnw=', 'TlVobGt3WjI=', 'OnVJRkp0OQ==']
+// const geini_gem=['Rk5/Zlh+R2g=', 'eHs1blxRZGg=', 'XTsyOTVqVnw=', 'TlVobGt3WjI=', 'OnVJRkp0OQ==']
 
 // const groq=['bHhwZHp5WlU=', 'VX9JS0p8TFM=', 'eVl6XX9dPno=', 'XExpfmc4S14=', 'aVVOdX1vb3g=', 'VHVsNjxZbW8=', 'XWt3SGh+R2w=']
 
 // const hf=['bWtkanZ9UHM=', 'V1xLWF5bfUc=', 'R1ZQellXeUY=', 'SF5RclVRak4=', 'fmlXfXw=']
 
-//XXX const mistral_giu=['VnhZVXJvWW0=', 'dVteU243clU=', 'eXpvWUleXm8=', 'XWtrb3lTOlM=']
+//const mistral_giu=['VnhZVXJvWW0=', 'dVteU243clU=', 'eXpvWUleXm8=', 'XWtrb3lTOlM=']
 // const mistral_rgn=['bmdvd39PTns=', 'XXRJbzU7fm0=', 'VXh3Uk1rdHg=', 'Pk9/X2l0cDg=']
 // const mistral_ua=['eTt3NTlbWm8=', 'TGxWTX0+R18=', 'aVhGclZtXGY=', 'OUtxfTdudG4=']
- 
- 
+
+
 const keys = {
-  gemini: ['Rk5/Zlh+R2g=', 'eHs1blxRZGg=', 'XTsyOTVqVnw=', 'TlVobGt3WjI=', 'OnVJRkp0OQ=='],
+  // gem gemini: ['Rk5/Zlh+R2g=', 'eHs1blxRZGg=', 'XTsyOTVqVnw=', 'TlVobGt3WjI=', 'OnVJRkp0OQ=='],
+  gemini: ['Rk5/Zlh+SFc=', 'NldcTzxtOm8=', 'S3heTTtwVns=', 'eU5ReT5LSj4=', 'WF9+VVp/Tg=='],
   mistral: ['VnhZVXJvWW0=', 'dVteU243clU=', 'eXpvWUleXm8=', 'XWtrb3lTOlM='],
   groq: ['bHhwZHp5WlU=', 'VX9JS0p8TFM=', 'eVl6XX9dPno=', 'XExpfmc4S14=', 'aVVOdX1vb3g=', 'VHVsNjxZbW8=', 'XWt3SGh+R2w='],
   huggingface: ['bWtkanZ9UHM=', 'V1xLWF5bfUc=', 'R1ZQellXeUY=', 'SF5RclVRak4=', 'fmlXfXw=']
