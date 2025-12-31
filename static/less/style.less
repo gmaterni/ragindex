@@ -1098,47 +1098,50 @@ div.container {
 .table-data {
   box-sizing: border-box;
   width: 100%;
-  // width:auto;
   table-layout: auto;
-  border-collapse: collapse;
-  margin: 1em auto;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
+  border-collapse: separate; // Cambiato da collapse per gestire border-radius
+  border-spacing: 0; // Necessario per border-collapse: separate
+  margin: 1.5em auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   overflow: hidden;
+  border: 1px solid transparent; // Placeholder per il colore del bordo gestito dal tema
 
   th,
   td {
-    border: 1px solid;
-    padding: 2px 5px 2px 5px;
+    border: none;
+    border-bottom: 1px solid; // Solo linee orizzontali
+    padding: 12px 15px; // Più spazio
     text-align: left;
-    margin: 0 5px 0 5px;
     white-space: nowrap;
+    
     b {
-      font-weight: bold;
-      font-size: 1em;
-      padding-left: 5vw;
-      font-style: italic;
+      font-weight: 600;
+      font-size: 0.9em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-style: normal;
     }
   }
 
   th {
-    font-weight: bold;
-    font-size: 1em;
-    text-align: center;
+    font-weight: 600;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  tr:last-child td {
+    border-bottom: none; // Rimuovi bordo dall'ultima riga
   }
 
   .link-show-data,
   .link-show-doc {
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .delete-doc-btn {
-    cursor: pointer;
-    border: 1px solid;
-    border-radius: 5px;
-    padding: 1px 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
     &:hover {
       text-decoration: underline;
     }
@@ -1146,6 +1149,23 @@ div.container {
 
   td.size {
     text-align: right;
+    font-family: monospace;
+    opacity: 0.8;
+  }
+  
+  // Stili bottoni interni
+  button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: background-color 0.2s, transform 0.1s;
+    
+    &:active {
+      transform: translateY(1px);
+    }
   }
 }
 

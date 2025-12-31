@@ -1,0 +1,12 @@
+[debug] [2025-12-31T17:31:03.734Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:03.737Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)
+[debug] [2025-12-31T17:31:03.755Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:03.755Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)
+[debug] [2025-12-31T17:31:03.987Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:03.987Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)
+[debug] [2025-12-31T17:31:03.989Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:03.989Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)
+[debug] [2025-12-31T17:31:04.086Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:04.086Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)
+[debug] [2025-12-31T17:31:04.089Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-31T17:31:04.089Z] > authorizing via signed-in user (giuseppe.materni@gmail.com)

@@ -105,14 +105,29 @@ export const ragEngine = {
         let context = "";
         const MAX_CONTEXT_LENGTH = this.promptSize * 0.7;
 
+        // Parent-Child Logic:
+        // L'indice contiene riferimenti ai "Child" (frasi), ma noi vogliamo recuperare
+        // i "Parent" (interi paragrafi) per il contesto.
+        const usedParentIds = new Set();
+
         for (const result of searchResults) {
-            const chunk = allChunks.find(c => c.id === result.ref);
-            if (chunk) {
-                const chunkSnippet = `--- Chunk: ${chunk.id}, Score: ${result.score.toFixed(4)} ---\n${chunk.text}\n\n`;
-                if ((context + chunkSnippet).length <= MAX_CONTEXT_LENGTH) {
-                    context += chunkSnippet;
-                } else {
-                    break;
+            // result.ref è nel formato "parentID#childID" (es. "d0p5#3")
+            // A noi serve "d0p5".
+            const parentId = result.ref.split('#')[0];
+
+            if (!usedParentIds.has(parentId)) {
+                usedParentIds.add(parentId);
+
+                // 'allChunks' contiene i Parent Chunks
+                const chunk = allChunks.find(c => c.id === parentId);
+                if (chunk) {
+                    const chunkSnippet = `--- Context: ${chunk.id} (Score: ${result.score.toFixed(4)}) ---\n${chunk.text}\n\n`;
+                    
+                    if ((context + chunkSnippet).length <= MAX_CONTEXT_LENGTH) {
+                        context += chunkSnippet;
+                    } else {
+                        break;
+                    }
                 }
             }
         }
