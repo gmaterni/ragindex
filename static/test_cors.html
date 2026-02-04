@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Cross-Origin Script Loading</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; padding: 40px; }
+        h1 { color: #007acc; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .log { background: #111; padding: 20px; border: 1px solid #333; border-radius: 4px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; font-size: 0.9em; min-height: 200px; }
+        .success { color: #4ec9b0; }
+        .error { color: #f44747; }
+        button { background: #333; color: white; border: 1px solid #444; padding: 12px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; transition: all 0.2s; }
+        button:hover { background: #007acc; border-color: #007acc; }
+        b { color: #ce9178; }
+    </style>
+</head>
+<body>
+    <h1>Test Caricamento Script Cross-Origin</h1>
+    <p>Questo test proverà a caricare le chiavi API da <b>http://127.0.0.1:8081/api_keys_remote.js</b>.</p>
+    <p><i>Assicurati di aver avviato il server Python sulla porta 8081 nella cartella 'data_test' o root!</i></p>
+    
+    <button id="btnLoad">Carica Chiavi da Remoto (Porta 8081)</button>
+    <button id="btnClear">Pulisci DB Locale</button>
+    
+    <div id="output" class="log">In attesa...</div>
+
+    <script type="module">
+        import { fetchApiKeysNew } from './js/services/key_retriever.js';
+        import { UaDb } from './js/services/uadb.js';
+        import { DATA_KEYS } from './js/services/data_keys.js';
+
+        const output = document.getElementById('output');
+        // URL del "secondo server" (simula un dominio diverso)
+        const REMOTE_URL = 'http://127.0.0.1:8081/data_test/api_keys_remote.js'; 
+
+        function log(msg, type = '') {
+            output.innerHTML += `<div class="${type}">${msg}</div>`;
+        }
+
+        document.getElementById('btnClear').addEventListener('click', async () => {
+            await UaDb.saveJson(DATA_KEYS.KEY_API_KEYS, null); // O cancella la chiave
+            log("Database locale pulito. Le prossime richieste forzeranno il download.", 'success');
+        });
+
+        document.getElementById('btnLoad').addEventListener('click', async () => {
+            log(`Tentativo di caricamento da: ${REMOTE_URL}...`);
+            try {
+                // Passiamo l'URL remoto per sovrascrivere il default
+                const result = await fetchApiKeysNew(REMOTE_URL);
+                
+                if (result) {
+                    log("SUCCESSO! Dati ricevuti:", 'success');
+                    log(JSON.stringify(result, null, 2));
+                    
+                    if (result.gemini && result.gemini.includes("REMOTE")) {
+                        log("Verifica superata: Le chiavi provengono effettivamente dal file remoto.", 'success');
+                    }
+                } else {
+                    log("Nessun dato ricevuto (forse già in DB o errore?)", 'error');
+                }
+            } catch (err) {
+                log("ERRORE: " + err.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

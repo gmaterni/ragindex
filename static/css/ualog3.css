@@ -1,0 +1,62 @@
+/** @format */
+#ualog_id {
+  box-sizing: border-box;
+  width: auto;
+  max-width: 60vw;
+  height: auto;
+  text-align: center;
+  padding: 2px;
+  margin: 2px 0 0 0;
+  background: #121212;
+  color: #ffffff;
+  font-size: 12px !important;
+  font-weight: normal;
+  border-radius: 9px;
+  border: 2px solid #01d30f;
+}
+#ualog_id button {
+  padding: 2px 5px 2px 5px;
+  margin: 0 5px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  color: #ffffff;
+}
+#ualog_id button:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+#ualog_id button.close {
+  background: #ea1c0d;
+}
+#ualog_id button.close:hover {
+  background: #f99d97;
+  border-color: #ba160a;
+}
+#ualog_id button.clear {
+  background: #3d8b40;
+}
+#ualog_id button.clear:hover {
+  background: #92cf94;
+  border-color: #2d682f;
+}
+#ualog_id pre {
+  box-sizing: border-box;
+  width: auto;
+  min-width: 50vw;
+  max-height: 60vh;
+  text-align: left;
+  font-family: "Courier New", Courier, monospace;
+  padding: 2px;
+  margin: 2px 2px 2px 2px;
+  color: #ffffff;
+  background: #323232;
+  overflow: auto;
+  scrollbar-color: #23eb04 #454444;
+  scrollbar-width: auto;
+  white-space: pre;
+  font-size: 8px !important;
+}
+#ualogmsg_ {
+  font-size: 8px !important;
+}

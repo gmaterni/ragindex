@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Author:Giuseppe Materni" />
+    <title>ragindex</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <!--
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/uadialog.css" />
+    <link rel="stylesheet" href="css/ualog3.css" />
+    <link rel="stylesheet" href="css/tooltip.css" />
+  -->
+    <link rel="stylesheet/less" href="less/style.less" />
+    <link rel="stylesheet/less" href="less/uadialog.less" />
+    <link rel="stylesheet/less" href="less/ualog3.less" />
+    <link rel="stylesheet/less" href="less/tooltip.less" />
+    <script src="less/less.js"></script>
+
+    <script type="module" src="js/app.js"></script>
+  </head>
+
+  <body>
+
+    <div id="spinner" class="spinner">
+      <div class="pulse-icon"></div>
+      <div class="stop-message">Stop</div>
+    </div>
+
+    <div id="spinner-wait" class="spinner-wait">
+      <div class="pulse-icon"></div>
+    </div>
+
+    <div class="menu-h">
+      <input id="id-menu-btn" name="id-menu-btn" class="menu-btn tt-right" data-tt="Open" type="checkbox" />
+      <label for="id-menu-btn" class="menu-icon">
+        <span class="nav-icon"></span>
+      </label>
+
+      <div class="head-wrapper">
+        <button id="btn-help" class="help tt-bottom" data-tt="Istruzioni">?</button>
+
+        <button id="btn-upload" class="upload tt-bottom" data-tt="Upload file">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M20 15v2H4v-2H2v5h20v-5zM13 5V1h-2v4H7l5 5 5-5z" />
+          </svg>
+        </button>
+        <span id="active-kb-display" class="active-kb-display"></span>
+        <button id="btn-provider-settings" class="provider-settings tt-bottom" data-tt="Seleziona Provider e Modello LLM">LLM</button>
+        <span id="active-model-display" class="active-model-display"></span>
+        <button class="log active tt-bottom" data-tt="log delle richieste" id="id_log">Log</button>
+
+        <div class="btn-theme">
+          <button id="btn-dark-theme" class="btn-dark tt-left " data-tt="Tema scuro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          </button>
+          <button id="btn-light-theme" class="btn-light tt-left" data-tt="Tema chiaro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+
+      <div class="menu-box">
+        <ul>
+          <li><a href="#" id="menu-readme">README</a></li>
+          <li><a href="#" id="menu-quickstart">Quick Start</a></li>
+          <li><a href="#" id="menu-show-config">Configurazione</a></li>
+          <li><b>Knowledge Base</b></li>
+          <li><a href="#" id="menu-save-kb">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-kb">Gestisci</a></li>
+          <li class="separator"></li>
+          <li><b>Conversazione</b></li>
+          <li><a href="#" id="menu-view-convo">Visualizza</a></li>
+          <li><a href="#" id="menu-save-convo">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-convo">Gestisci</a></li>
+          <li><a href="#" id="menu-view-context">Visualizza Contesto</a></li>
+          <li class="separator"></li>
+          <li><b>Gestione Dati</b></li>
+          <li><a href="#" id="menu-elenco-docs">Elenco Documenti</a></li>
+          <li><a href="#" id="menu-elenco-dati">Elenco Dati Archiviati</a></li>
+          <li><a href="#" id="menu-delete-all" class="delete">Cancella Dati</a></li>
+          <li class="separator"></li>
+          <li><a href="#" id="menu-help-esempi">Documenti Esempio</a></li>
+          <li class="separator"></li>
+          <li><a href="#" id="menu-add-api-key">Gestisci API Key</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="container">
+      <div class="item item1">
+        <div class="output-wrapper">
+
+          <div class="text-out" id="id-text-out">
+            <div class="div-text"></div>
+          </div>
+
+          <div class="output-actions">
+            <button class="copy-output tt-leftx" data-tt="Copia Output">
+              <svg class="copy-icon" viewBox="0 0 20 24">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+              </svg>
+            </button>
+            <button id="clear-history1" class="clear-history1 tt-leftx" data-tt="Cancella Conversazione">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z" />
+              </svg>
+            </button>
+            <button id="clear-history2" class="clear-history tt-leftx" data-tt="Cancella Conversazione & Contesto">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,13H13V17H11V13H7V11H11V7H13V11H17V13Z" />
+              </svg>
+            </button>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="item item2">
+        <div class="input-wrapper">
+          <textarea class="text-input" placeholder="Scrivi qui... " rows="2"></textarea>
+          <div class="input-actions">
+            <button id="btn-action1-knowledge" class="tt-leftx" data-tt="Documenti => Knowledge">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button id="btn-action2-start-convo" class="tt-leftx" data-tt="Knowledge + Query => Contesto + Risposta">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button id="btn-action3-continue-convo" class="tt-leftx" data-tt="Conversazione + Query => Risposta">
+              <svg class="btn-icon-svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+            <button class="clear-input tt-leftx" data-tt="Cancella Input">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M3 6h18v2H3V6zm2 3h14v12H5V9zm3-7h6v2H8V2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <script src="js/services/vendor/compromise.js"></script>
+    <script src="js/services/vendor/lunr.js"></script>
+    <script src="js/services/vendor/lunr.stemmer.support.js"></script>
+    <script src="js/services/vendor/lunr.it.js"></script>
+  </body>
+
+</html>
