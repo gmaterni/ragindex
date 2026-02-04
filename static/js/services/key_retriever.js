@@ -11,21 +11,6 @@ const STORAGE_KEY = DATA_KEYS.KEY_API_KEYS;
 
 const { div, h4, h5, table, thead, tbody, tr, th, td, button, input, select, option, span, label } = van.tags;
 
-const xorDecode = (encoded) => {
-    const key = "MySecretKey123";
-    const chars = [];
-    for (let i = 0; i < encoded.length; i += 2) {
-        chars.push(String.fromCharCode(parseInt(encoded.substr(i, 2), 16)));
-    }
-    let result = '';
-    for (let i = 0; i < chars.length; i++) {
-        const keyChar = key[i % key.length];
-        result += String.fromCharCode(chars[i].charCodeAt(0) ^ keyChar.charCodeAt(0));
-    }
-    return result;
-};
-
-
 /**
  * Recupera la chiave attiva per un determinato provider.
  * @param {string} providerName - Il nome del provider (es. 'gemini', 'groq')
@@ -267,29 +252,46 @@ export async function addApiKey() {
     wnds.winfo.show(content);
 }
 
-/**
- * Carica le chiavi da un file JSON esterno.
- * Se il DB è vuoto, lo popola con i dati del file.
- */
-export async function fetchApiKeys() {
-    const URL = "./data/api_keys.json";
 
+
+const decodeApiKeysJson = (data) => {
+    if (!data?.providers) return data;
+
+    const ALPHABET_FROM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    const ALPHABET_TO = "mKpX3vQwL8ZnR4yTbJxF1YHcU9AgNsI2oODh7eMzW5jV6ifqGrPECuS0Btaldk-_";
+
+    const decodeKey = (encodedKey) =>
+        [...encodedKey].map(char => {
+            const index = ALPHABET_TO.indexOf(char);
+            return index !== -1 ? ALPHABET_FROM[index] : char;
+        }).join('');
+
+    const decodedData = JSON.parse(JSON.stringify(data));
+
+    Object.values(decodedData.providers).forEach(provider => {
+        provider.keys?.forEach(keyObj => {
+            if (keyObj.key) keyObj.key = decodeKey(keyObj.key);
+        });
+    });
+
+    return decodedData;
+};
+export async function fetchApiKeys() {
+    const URL = "./data/api_x.json";
     try {
         const existingDb = await UaDb.readJson(STORAGE_KEY);
-        // Se esiste già una struttura valida con provider, non sovrascrivere
         if (existingDb && existingDb.providers && Object.keys(existingDb.providers).length > 0) {
             console.log("*** API_KEYS db found.");
             return;
         }
-
         console.info(`*** API_KEYS loading from: ${URL}`);
         const response = await fetch(URL);
         if (!response.ok) {
             console.warn(`File chiavi non trovato o errore nel caricamento: ${URL}`);
             return;
         }
-
-        const data = await response.json();
+        const rsp = await response.json();
+        const data = decodeApiKeysJson(rsp);
         if (data && data.providers) {
             data.last_updated = new Date().toISOString();
             await UaDb.saveJson(STORAGE_KEY, data);
@@ -299,3 +301,4 @@ export async function fetchApiKeys() {
         console.error("Errore in fetchApiKeys:", error);
     }
 }
+
