@@ -11,7 +11,19 @@ const STORAGE_KEY = DATA_KEYS.KEY_API_KEYS;
 
 const { div, h4, h5, table, thead, tbody, tr, th, td, button, input, select, option, span, label } = van.tags;
 
-// const apiKey = decode(API_KEY_ENCODED);
+const xorDecode = (encoded) => {
+    const key = "MySecretKey123";
+    const chars = [];
+    for (let i = 0; i < encoded.length; i += 2) {
+        chars.push(String.fromCharCode(parseInt(encoded.substr(i, 2), 16)));
+    }
+    let result = '';
+    for (let i = 0; i < chars.length; i++) {
+        const keyChar = key[i % key.length];
+        result += String.fromCharCode(chars[i].charCodeAt(0) ^ keyChar.charCodeAt(0));
+    }
+    return result;
+};
 
 
 /**
