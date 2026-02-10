@@ -35,13 +35,16 @@ All'apertura (`window.onload`), l'app in `app.js` segue questa sequenza:
     *   `kvStore`: Frammenti (`ph0_chunks`), indici (`ph1_index`), e intere Knowledge Base archiviate (`rag_kb_*`).
     *   `settings`: Chiavi API (`api_keys`), preferenze tema (`theme`), e metadati della KB attiva (`active_kb`).
 *   **Stato Reattivo:** Utilizzo di `van.state` (es. `activeKbState`) per aggiornare automaticamente la UI al variare della Knowledge Base attiva senza ricaricare la pagina.
-*   **API Keys:** Gestite asincronamente tramite `key_retriever.js`. Il sistema supporta ora un archivio multi-chiave (multi-provider) con selezione della chiave attiva, salvato in formato JSON all'interno del record `api_keys` nella tabella `settings`.
+*   **API Keys:** Gestite asincronamente tramite `key_retriever.js`. Il sistema supporta ora un archivio multi-chiave (multi-provider) con selezione della chiave attiva, salvato in formato JSON all'interno del record `api_keys` nella tabella `settings`. Le chiavi predefinite possono essere caricate da `static/data/api_x.json` (formato codificato).
+*   **Modelli Dinamici:** La configurazione dei modelli (window size, endpoint) è caricata dinamicamente da `static/data/models.json`, permettendo l'aggiornamento dei modelli supportati senza modificare il codice core.
 *   **Cancellazione (Nuke):** `idbMgr.clearAll()` svuota tutte le tabelle Dexie e `localStorage.clear()` pulisce i residui.
 
 ## Supporto LLM
 Comunicazione diretta via HTTPS verso:
 *   **Gemini (Google):** Endpoint `generativelanguage.googleapis.com` (REST).
 *   **Groq & Mistral:** Endpoint compatibili OpenAI.
+*   **OpenRouter:** Hub multi-modello.
+*   **HuggingFace:** Accesso a modelli open-source via Inference API.
 
 ## Requisiti per Estensione Browser
 L'architettura in `static2` rispetta rigorosamente i vincoli del Manifest V3:
