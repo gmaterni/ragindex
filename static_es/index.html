@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Tester Autonomo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <style>
+        body { background-color: #0f0f0f; color: #ccc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 10px; font-size: 14px; }
+        .container { max-width: 98%; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        h1 { color: #fff; margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+        .section { background-color: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .section-title { font-weight: bold; color: #00bd97; margin-bottom: 15px; display: block; text-transform: uppercase; font-size: 0.9rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .provider-card { background-color: #111; border: 1px solid #222; padding: 15px; border-radius: 6px; }
+        .provider-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: #81c784; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .model-item { display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; border-radius: 4px; transition: background 0.2s; }
+        .model-item:hover { background-color: #222; }
+        .toolbar { display: flex; gap: 15px; margin-top: 20px; align-items: center; background: #111; padding: 15px; border-radius: 4px; border: 1px solid #222; flex-wrap: wrap; }
+        .toolbar-group { display: flex; align-items: center; gap: 8px; }
+        button { background-color: #333; color: #fff; border: 1px solid #444; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; transition: all 0.2s; }
+        button:hover { background-color: #444; border-color: #555; }
+        button#start-btn { background-color: #00bd97; color: #000; border: none; flex-grow: 1; padding: 10px 20px; font-size: 0.8rem; }
+        button#start-btn:hover { background-color: #00e6b3; }
+        button.btn-secondary { background-color: #555; }
+        select, input[type="text"] { background:#222; color:#fff; border:1px solid #444; padding:10px; border-radius: 4px; font-size: 0.9rem; }
+        #custom-query-container { display: none; margin-top: 15px; width: 100%; }
+        #custom-query { width: calc(100% - 22px); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background-color: #050505; border-radius: 4px; overflow: hidden; }
+        th, td { border: 1px solid #222; padding: 12px; text-align: left; }
+        th { background-color: #151515; color: #888; font-size: 0.8rem; text-transform: uppercase; }
+        #results td:nth-child(2), #results td:nth-child(4) { white-space: nowrap; }
+        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .status-ok { background-color: #1b4332; color: #74c69d; }
+        .status-err { background-color: #431b1b; color: #ff8a8a; }
+        .status-wait { background-color: #433a1b; color: #ffd670; }
+        #console-log { background-color: #000; color: #0f0; font-family: 'Consolas', 'Monaco', monospace; padding: 15px; border-radius: 4px; height: 180px; overflow-y: auto; font-size: 0.85rem; margin-top: 20px; border: 1px solid #333; border-left: 4px solid #00bd97; }
+        
+        /* Utility styles for key manager window */
+        .window-info { position: fixed; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .add-key-form label { color: #aaa; margin-bottom: 5px; display: block; }
+        .table-data th { background: #333; color: #eee; }
+        .btn-success { background: #00bd97 !important; color: #000 !important; }
+        .btn-danger { background: #f44336 !important; }
+        
+        /* Stile per il checkbox "Seleziona tutti" del provider */
+        .provider-select-all {
+            margin-right: 8px;
+        }
+
+        /* Stili per la finestra di analisi risultati */
+        .analysis-window {
+            background: #1a1a1a;
+            border: 1px solid #00bd97;
+            border-radius: 8px;
+            padding: 20px;
+            min-width: 350px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            color: #eee;
+        }
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+        .analysis-title {
+            color: #00bd97;
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .analysis-close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #888;
+        }
+        .analysis-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .analysis-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Consolas', monospace;
+        }
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+        .analysis-item .perf-time {
+            color: #81c784;
+        }
+        .analysis-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LLM Tester v1.0</h1>
+            <div style="display: flex; gap: 10px;">
+                <button id="import-keys-btn" class="btn-secondary">Importa Chiavi</button>
+                <button id="manage-keys-btn" class="btn-secondary">Gestisci Chiavi API</button>
+            </div>
+        </header>
+
+        <div class="section">
+            <div id="selection-grid" class="grid">
+                <!-- Caricamento modelli... -->
+            </div>
+            
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button id="btn-all">Tutti</button>
+                    <button id="btn-none">Nessuno</button>
+                    <button id="btn-select">Seleziona</button>
+                </div>
+                <div style="flex:1"></div>
+                <div class="toolbar-group">
+                    <span>Query:</span>
+                    <select id="test-query-type">
+                        <option value="ping">Ping Rapido</option>
+                        <option value="logic">Logica Semantica</option>
+                        <option value="ext">Estrazione JSON</option>
+                        <option value="custom">Personalizzata...</option>
+                    </select>
+                </div>
+                <button id="clear-output-btn" class="btn-secondary">Pulisci Output</button>
+                <button id="start-btn">Avvia Test Modelli</button>
+            </div>
+            
+            <div id="custom-query-container">
+                <span class="section-title">Query Personalizzata</span>
+                <input type="text" id="custom-query" placeholder="Inserisci qui la tua domanda per i modelli...">
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="section-title">2. Output in Tempo Reale</span>
+            <div id="console-log">SISTEMA PRONTO. In attesa di selezione modelli...</div>
+            
+            <table id="results">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Provider</th>
+                        <th style="width: 20%;">Modello</th>
+                        <th style="width: 15%;">Stato</th>
+                        <th style="width: 10%;">Tempo</th>
+                        <th style="width: 40%;">Risposta (Preview)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="5" style="text-align:center; color:#555; padding: 30px;">Seleziona i modelli e avvia il test</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>

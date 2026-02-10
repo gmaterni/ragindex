@@ -1,0 +1,185 @@
+{
+  "openrouter": {
+    "client": "openrouter",
+    "models": {
+      "arcee-ai/trinity-large-preview:free": {
+        "windowSize": 127
+      },
+      "arcee-ai/trinity-mini:free": {
+        "windowSize": 128
+      },
+      "deepseek/deepseek-r1-0528:free": {
+        "windowSize": 160
+      },
+      "google/gemma-3-12b-it:free": {
+        "windowSize": 32
+      },
+      "google/gemma-3-4b-it:free": {
+        "windowSize": 32
+      },
+      "google/gemma-3n-e2b-it:free": {
+        "windowSize": 8
+      },
+      "google/gemma-3n-e4b-it:free": {
+        "windowSize": 8
+      },
+      "liquid/lfm-2.5-1.2b-thinking:free": {
+        "windowSize": 32
+      },
+      "nvidia/nemotron-3-nano-30b-a3b:free": {
+        "windowSize": 250
+      },
+      "nvidia/nemotron-nano-12b-v2-vl:free": {
+        "windowSize": 125
+      },
+      "nvidia/nemotron-nano-9b-v2:free": {
+        "windowSize": 125
+      },
+      "openrouter/aurora-alpha": {
+        "windowSize": 125
+      },
+      "openrouter/free": {
+        "windowSize": 195
+      },
+      "tngtech/deepseek-r1t2-chimera:free": {
+        "windowSize": 160
+      }
+    }
+  },
+  "mistral": {
+    "client": "mistral",
+    "models": {
+      "codestral-latest": {
+        "windowSize": 250
+      },
+      "devstral-latest": {
+        "windowSize": 256
+      },
+      "devstral-medium-latest": {
+        "windowSize": 256
+      },
+      "devstral-small-latest": {
+        "windowSize": 256
+      },
+      "ministral-14b-latest": {
+        "windowSize": 256
+      },
+      "ministral-3b-latest": {
+        "windowSize": 128
+      },
+      "ministral-8b-latest": {
+        "windowSize": 256
+      },
+      "mistral-large-latest": {
+        "windowSize": 256
+      },
+      "mistral-medium-latest": {
+        "windowSize": 128
+      },
+      "mistral-small-latest": {
+        "windowSize": 128
+      }
+    }
+  },
+  "huggingface": {
+    "client": "huggingface",
+    "models": {
+      "meta-llama/Llama-3.1-8B-Instruct": {
+        "windowSize": 0
+      },
+      "openai/gpt-oss-20b": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen3-32B": {
+        "windowSize": 0
+      },
+      "meta-llama/Llama-3.2-1B-Instruct": {
+        "windowSize": 0
+      },
+      "openai/gpt-oss-120b": {
+        "windowSize": 0
+      },
+      "meta-llama/Llama-3.2-3B-Instruct": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen2.5-7B-Instruct": {
+        "windowSize": 0
+      },
+      "meta-llama/Llama-3.3-70B-Instruct": {
+        "windowSize": 0
+      },
+      "meta-llama/Meta-Llama-3-8B-Instruct": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen3-30B-A3B": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen2.5-Coder-32B-Instruct": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen3-235B-A22B": {
+        "windowSize": 0
+      },
+      "Qwen/Qwen3-14B": {
+        "windowSize": 0
+      }
+    }
+  },
+  "groq": {
+    "client": "groq",
+    "models": {
+      "llama-3.1-8b-instant": {
+        "windowSize": 128
+      }
+    }
+  },
+  "gemini": {
+    "client": "gemini",
+    "models": {
+      "gemini-2.5-flash": {
+        "windowSize": 1024
+      },
+      "gemini-2.5-flash-lite": {
+        "windowSize": 1024
+      },
+      "gemma-3-1b-it": {
+        "windowSize": 32
+      },
+      "gemma-3-27b-it": {
+        "windowSize": 128
+      },
+      "gemma-3-4b-it": {
+        "windowSize": 32
+      },
+      "gemma-3n-e2b-it": {
+        "windowSize": 8
+      },
+      "gemma-3n-e4b-it": {
+        "windowSize": 8
+      },
+      "gemini-3-flash-preview": {
+        "windowSize": 1024
+      }
+    }
+  },
+  "cerebras": {
+    "client": "cerebras",
+    "models": {
+      "gpt-oss-120b": {
+        "windowSize": 8
+      },
+      "llama-3.3-70b": {
+        "windowSize": 128
+      },
+      "llama3.1-8b": {
+        "windowSize": 8
+      },
+      "qwen-3-32b": {
+        "windowSize": 8
+      },
+      "zai-glm-4.7": {
+        "windowSize": 8
+      }
+    }
+  }
+}
