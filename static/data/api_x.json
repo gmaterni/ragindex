@@ -1,9 +1,9 @@
 {
-    "last_updated": "2026-02-04T21:01:43.279962",
+    "last_updated": "2026-02-10T14:17:39.476301",
     "providers": {
         "gemini": {
             "api_key_env": "GEMINI_API_KEY",
-            "exported_key": "ragquery",
+            "exported_key": "ipotesi",
             "keys": [
                 {
                     "name": "ragquery",
@@ -13,6 +13,11 @@
                 {
                     "name": "ragtext",
                     "key": "mLEAxPmlYry9bsBWYDj-XldkNaq3ZedzHx7_4Qo",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ipotesi2000",
+                    "key": "mLEAxPmbm9Yd4hWuwscCySF3mbdYfNPFc-TwojC",
                     "notes": "giuseppe.materni"
                 },
                 {
@@ -34,6 +39,33 @@
                     "name": "giu",
                     "key": "mLEAxPXcOxVKfsyjCDa0qoeRe_aAHNAdhFaIIrR",
                     "notes": "giumaterni"
+                },
+                {
+                    "name": "ipotesi",
+                    "key": "mLEAxPpx77REpFF6IHuA04GVVmwl2wZ--ouZqZL",
+                    "notes": "ipotesi2000"
+                }
+            ]
+        },
+        "cerebras": {
+            "api_key_env": "CEREBRAS_API_KEY",
+            "exported_key": "crb1",
+            "keys": [
+                {
+                    "name": "crb1",
+                    "key": "N67-kBdBti0iqGMOzzOsNzqPaizPq7ztk5dO7S2VGVNPMzSzOVik",
+                    "notes": "giuseppe.materni"
+                }
+            ]
+        },
+        "openrouter": {
+            "api_key_env": "OPENROUTER_API_KEY",
+            "exported_key": "opr1",
+            "keys": [
+                {
+                    "name": "opr1",
+                    "key": "67-WV-qu-SsuSsCABaBtIICI0IBIIC2sk00IAd0ggNCStugSddSIBkkt22sdsdasSadC2C00I",
+                    "notes": "giuseppe.materni"
                 }
             ]
         },
@@ -65,7 +97,7 @@
         },
         "huggingface": {
             "api_key_env": "HF_TOKEN",
-            "exported_key": "hf1",
+            "exported_key": "hf12",
             "keys": [
                 {
                     "name": "hf1",

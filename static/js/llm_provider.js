@@ -6,52 +6,19 @@ import { getApiKey, fetchApiKeys } from "./services/key_retriever.js";
 import { GeminiClient } from './llmclient/gemini_client.js';
 import { GroqClient } from './llmclient/groq_client.js';
 import { MistralClient } from './llmclient/mistral_client.js';
-import { wnds } from "./app_ui.js";
+import { HuggingFaceClient } from './llmclient/huggingface_client.js';
+import { OpenRouterClient } from './llmclient/openrouter_client.js';
 import { UaWindowAdm } from "./services/uawindow.js";
 import { DATA_KEYS } from "./services/data_keys.js";
 import { UaDb } from "./services/uadb.js";
 
-const CLIENTS = {
-  "gemini": null,
-  "groq": null,
-  "mistral": null,
-};
-export const PROVIDER_CONFIG = {
-  mistral: {
-    client: "mistral",
-    models: {
-      "mistral-large-latest": { windowSize: 260 },
-      "mistral-medium-latest": { windowSize: 130 },
-      "mistral-small-latest": { windowSize: 130 },
-      "devstral-latest": { windowSize: 230 },
-      "devstral-medium-latest": { windowSize: 130 },
-      "devstral-small-latest": { windowSize: 130 },
-      "ministral-14b-2512": { windowSize: 260 },
-    },
-  },
-  gemini: {
-    client: "gemini",
-    models: {
-      "gemini-2.5-flash": { windowSize: 600 },
-      "gemini-2.5-flash-lite": { windowSize: 600 },
-      "gemini-3-flash-preview": { windowSize: 600 },
-    },
-  },
-  groq: {
-    client: "groq",
-    models: {
-      "llama-3.1-8b-instant": { windowSize: 8 },
-      "llama-3.3-70b-versatile": { windowSize: 8 },
-      "groq/compound": { windowSize: 8 },
-      "qwen/qwen3-32b": { windowSize: 8 },
-    },
-  }
-};
+export let PROVIDER_CONFIG = {};
+export let CLIENTS = {};
 
 const DEFAULT_PROVIDER_CONFIG = {
   provider: "gemini",
   model: "gemini-2.5-flash-lite",
-  windowSize: 600,
+  windowSize: 1024,
   client: "gemini",
 };
 
@@ -64,23 +31,69 @@ export const LlmProvider = {
     client: "",
   },
   container_id: "provvider_id",
+
+  async loadModels() {
+    if (Object.keys(PROVIDER_CONFIG).length > 0) return;
+    try {
+      const response = await fetch("./data/models.json");
+      if (response.ok) {
+        PROVIDER_CONFIG = await response.json();
+        // Inizializza CLIENTS in base ai provider disponibili in PROVIDER_CONFIG
+        for (const providerName in PROVIDER_CONFIG) {
+          const provider = PROVIDER_CONFIG[providerName];
+          if (provider && provider.client) {
+            CLIENTS[provider.client] = null;
+          }
+        }
+      } else {
+        console.error("Errore: Impossibile caricare ./data/models.json");
+      }
+    } catch (error) {
+      console.error("Eccezione durante il caricamento di models.json:", error);
+    }
+  },
+
   async init() {
+    await this.loadModels();
     await fetchApiKeys();
-    let apikey = await getApiKey("gemini")
-    CLIENTS.gemini = new GeminiClient(apikey)
-    apikey = await getApiKey("groq")
-    CLIENTS.groq = new GroqClient(apikey)
-    apikey = await getApiKey("mistral")
-    CLIENTS.mistral = new MistralClient(apikey)
+    
+    // Popola dinamicamente i client in base alla configurazione
+    for (const providerName in PROVIDER_CONFIG) {
+      const provider = PROVIDER_CONFIG[providerName];
+      const clientName = provider.client;
+      const apiKey = await getApiKey(clientName);
+      
+      switch(clientName) {
+        case "gemini":
+          CLIENTS[clientName] = new GeminiClient(apiKey);
+          break;
+        case "groq":
+          CLIENTS[clientName] = new GroqClient(apiKey);
+          break;
+        case "mistral":
+          CLIENTS[clientName] = new MistralClient(apiKey);
+          break;
+        case "huggingface":
+          CLIENTS[clientName] = new HuggingFaceClient(apiKey);
+          break;
+        case "openrouter":
+          CLIENTS[clientName] = new OpenRouterClient(apiKey);
+          break;
+        default:
+          CLIENTS[clientName] = null;
+          console.warn(`Client non supportato: ${clientName}`);
+          break;
+      }
+    }
   },
   // AAA Dexie - initConfig ora è asincrono
   async initConfig() {
+    await this.loadModels(); // Assicura che i modelli siano caricati
     const savedConfig = await UaDb.readJson(DATA_KEYS.KEY_PROVIDER);
     if (this._isValidConfig(savedConfig)) {
       this.config = savedConfig;
     } else {
-      if (savedConfig && savedConfig.provider)
-        alert("Errore nella configurazione provider/model");
+      // Se savedConfig non è valido, non allertiamo ma resettiamo al default
       this.config = { ...DEFAULT_PROVIDER_CONFIG };
       await UaDb.saveJson(DATA_KEYS.KEY_PROVIDER, this.config);
     }
@@ -92,7 +105,7 @@ export const LlmProvider = {
     const { provider, model, client } = config;
     if (!provider || !PROVIDER_CONFIG[provider]) return false;
     if (!model || !PROVIDER_CONFIG[provider].models[model]) return false;
-    if (typeof client !== "string" || !CLIENTS[client]) return false;
+    // Non controlliamo CLIENTS[client] qui perché potrebbe non essere ancora inizializzato
     return true;
   },
 
@@ -217,7 +230,7 @@ export const LlmProvider = {
     }
   },
 
-  showConfig() {
+  async showConfig() {
     const llmConfig = LlmProvider.getConfig();
 
     // AAA VanJS - Inizio refactoring
@@ -233,7 +246,8 @@ export const LlmProvider = {
     );
 
     // Passiamo l'elemento DOM direttamente a wnds.winfo.show
-    // Nota: wnds.winfo deve supportare sia stringhe che elementi DOM
+    // Nota: importiamo wnds dinamicamente per evitare dipendenza circolare a top-level
+    const { wnds } = await import("./app_ui.js");
     wnds.winfo.show(configTable);
     // AAA VanJS - Fine refactoring
   },
