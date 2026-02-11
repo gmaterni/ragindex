@@ -3,17 +3,32 @@
     "providers": {
         "gemini": {
             "api_key_env": "GEMINI_API_KEY",
-            "exported_key": "ragindex",
+            "exported_key": "ipotesi",
             "keys": [
+                {
+                    "name": "ragquery",
+                    "key": "mLEAxPKgMeQsFqYcNp6ZJCqAAk0ypySqZDrlzLL",
+                    "notes": "giuseppe.materni"
+                },
                 {
                     "name": "ragtext",
                     "key": "mLEAxPmlYry9bsBWYDj-XldkNaq3ZedzHx7_4Qo",
                     "notes": "giuseppe.materni"
                 },
                 {
+                    "name": "ipotesi2000",
+                    "key": "mLEAxPmbm9Yd4hWuwscCySF3mbdYfNPFc-TwojC",
+                    "notes": "giuseppe.materni"
+                },
+                {
                     "name": "ragindex",
                     "key": "mLEAxPmP4kiTbJpVqu6W7V_PU19bJif-knhK8jm",
                     "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "gab",
+                    "key": "mLEAxPmoXRPFjtpMhpuQQdSrB0h6ocXleTxBbkL",
+                    "notes": "gabriele.tenebra"
                 },
                 {
                     "name": "gm",
@@ -24,6 +39,11 @@
                     "name": "giu",
                     "key": "mLEAxPXcOxVKfsyjCDa0qoeRe_aAHNAdhFaIIrR",
                     "notes": "giumaterni"
+                },
+                {
+                    "name": "ipotesi",
+                    "key": "mLEAxPpx77REpFF6IHuA04GVVmwl2wZ--ouZqZL",
+                    "notes": "ipotesi2000"
                 }
             ]
         },
@@ -67,12 +87,17 @@
                     "name": "ua250203a",
                     "key": "Lc8yTErafLJLDMAhcKFU0EQL3VWiV0sy",
                     "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "vibe1",
+                    "key": "BZpmCun38mWunms9ZaU9urMGzDKnfwF1",
+                    "notes": "giuseppe.materni"
                 }
             ]
         },
         "huggingface": {
             "api_key_env": "HF_TOKEN",
-            "exported_key": "hf1",
+            "exported_key": "hf12",
             "keys": [
                 {
                     "name": "hf1",
