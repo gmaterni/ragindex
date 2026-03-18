@@ -1,0 +1,48 @@
+{
+    "last_updated": "2026-02-10T14:17:39.476301",
+    "providers": {
+        "gemini": {
+            "api_key_env": "GEMINI_API_KEY",
+            "exported_key": "ragindex",
+            "keys": [
+                {
+                    "name": "ragindex",
+                    "key": "mLEAxPmP4kiTbJpVqu6W7V_PU19bJif-knhK8jm",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "gm",
+                    "key": "mLEAxPXTtsPxMN_aFNztNwMwBJwPBqiMejOS_JB",
+                    "notes": "gmaterni"
+                },
+                {
+                    "name": "giu",
+                    "key": "mLEAxPXcOxVKfsyjCDa0qoeRe_aAHNAdhFaIIrR",
+                    "notes": "giumaterni"
+                }
+            ]
+        },
+        "openrouter": {
+            "api_key_env": "OPENROUTER_API_KEY",
+            "exported_key": "opr1",
+            "keys": [
+                {
+                    "name": "opr1",
+                    "key": "67-WV-qu-SsuSsCABaBtIICI0IBIIC2sk00IAd0ggNCStugSddSIBkkt22sdsdasSadC2C00I",
+                    "notes": "giuseppe.materni"
+                }
+            ]
+        },
+        "mistral": {
+            "api_key_env": "MISTRAL_API_KEY",
+            "exported_key": "mst1",
+            "keys": [
+                {
+                    "name": "ua260203",
+                    "key": "H8VTkiSG9zV7qaZ8UFrYC3L4nIuKPFsc",
+                    "notes": "giuseppe.materni"
+                }
+            ]
+        }
+    }
+}
