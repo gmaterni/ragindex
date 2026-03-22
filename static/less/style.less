@@ -342,9 +342,11 @@ div.container {
 //  5. COMPONENTI UI
 // ===================================================================
 
-// -------------------
-// Menu Orizzontale Superiore
-// -------------------
+// ===================================================================
+//  5. COMPONENTI UI
+// ===================================================================
+
+// --- 5.1 Menu Orizzontale Superiore ---
 .menu-h {
   position: fixed;
   top: 0;
@@ -352,23 +354,10 @@ div.container {
   width: 100vw;
   height: 4.5vh;
   z-index: 100;
-
-  // .release {
-  //   font-size: @fsize-msg;
-  //   position: fixed;
-  //   top: 0.2vh;
-  //   right: 0.5vw;
-  //   height: 2vh;
-  //   margin-top: 0.8vh;
-  // }
-
   .menu-btn {
     appearance: none;
-    &:checked + .menu-icon .nav-icon::before {
-      content: "X";
-    }
+    &:checked + .menu-icon .nav-icon::before { content: "X"; }
   }
-
   .menu-icon {
     box-sizing: border-box;
     display: block;
@@ -389,49 +378,31 @@ div.container {
       transition-duration: 0.25s;
     }
   }
-
   .head-wrapper {
     position: absolute;
     top: 0;
     left: 5vw;
     height: 4vh;
-
-    .active-doctype-display,
-    .active-model-display,
-    .help,
-    .upload,
-    .doctype-settings,
-    .provider-settings,
-    .log {
+    .active-doctype-display, .active-model-display, .help, .upload, .doctype-settings, .provider-settings, .log {
       position: absolute;
       top: 0;
-      margin: 2px 0 2px 0;
-      padding: 2px 5px 2px 5px;
+      margin: 2px 0;
+      padding: 2px 5px;
       border: none;
       cursor: pointer;
       border-radius: 10%;
       min-height: 4vh;
       max-height: 4vh;
     }
-    .help {
-      left: 1vw;
-      font-size: @fsize-log;
-      font-weight: normal;
-    }
+    .help { left: 1vw; font-size: @fsize-log; }
     .upload {
       left: 5vw;
-      .icon {
-        width: 24px;
-        height: 24px;
-        stroke-width: 2px;
-        fill: none;
-      }
+      .icon { width: 24px; height: 24px; stroke-width: 2px; fill: none; }
     }
-
     .active-kb-display {
       position: absolute;
       top: 0;
-      left: 10vw; // Position it after upload button
+      left: 10vw;
       margin: 2px 0;
       padding: 2px 5px;
       min-height: 4vh;
@@ -448,63 +419,38 @@ div.container {
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    .doctype-settings {
-      left: 25vw;
-      font-weight: normal;
-    }
+    .doctype-settings { left: 25vw; }
     .active-doctype-display {
       left: 28.5vw;
       font-size: @fsize-out;
-      font-weight: normal;
-      // text-decoration: underline;
       font-style: italic;
       max-width: 20vw;
-      // min-width: 20vw;
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      // border-width: 1px;
-      // border-style: solid;
     }
-
-    .provider-settings {
-      left: 40vw;
-      font-weight: normal;
-    }
+    .provider-settings { left: 40vw; }
     .active-model-display {
       left: 45.5vw;
       font-size: @fsize-out;
-      font-weight: normal;
-      // text-decoration: underline;
       font-style: italic;
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      // min-width: 40vw;
       max-width: 40vw;
-      // border-width: 1px;
-      // border-style: solid;
     }
-
-    .log {
-      font-size: @fsize-log;
-      font-weight: normal;
-      left: 83vw;
-    }
+    .log { font-size: @fsize-log; left: 83vw; }
   }
 }
 
-// -------------------
-// Menu Laterale a Scorrimento
-// -------------------
+// --- 5.2 Menu Laterale ---
 .menu-box {
   box-sizing: border-box;
   position: fixed;
   top: 5vh;
-  left: -2000px; // Nascosto di default
+  left: -2000px;
   height: 95vh;
   width: @menu-width;
   transition: left 0.3s ease-out;
@@ -513,13 +459,9 @@ div.container {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-
   ul {
     list-style: none;
-    li {
-      padding: 0;
-      margin: 4px 0 0 0;
-    }
+    li { padding: 0; margin: 4px 0 0 0; }
     li a {
       font-family: @fsans;
       text-decoration: none;
@@ -528,9 +470,7 @@ div.container {
       white-space: nowrap;
       text-overflow: ellipsis;
       max-width: 20vw;
-      &:hover {
-        text-decoration: underline;
-      }
+      &:hover { text-decoration: underline; }
       &.delete {
         text-align: center;
         font-weight: bold;
@@ -545,11 +485,8 @@ div.container {
         text-align: center;
         border-radius: 5px;
         padding: 2px 5px;
-        display: block; /* Assicura che prenda larghezza se necessario */
-        &:hover {
-          background-color: darken(#ffeb3b, 10%) !important;
-          text-decoration: none;
-        }
+        display: block;
+        &:hover { background-color: darken(#ffeb3b, 10%) !important; text-decoration: none; }
       }
     }
     li b {
@@ -566,35 +503,16 @@ div.container {
     }
   }
 }
-
-// --- Logica apertura/chiusura menu ---
 .menu-open {
-  .container {
-    margin-left: @menu-width;
-  }
-  .menu-box {
-    left: 0 !important;
-  }
+  .container { margin-left: @menu-width; }
+  .menu-box { left: 0 !important; }
 }
 
-// -------------------text-
-// Pulsanti Azioni (Input/Output)
-// -------------------
-.output-actions,
-.input-actions {
-  display: flex;
-  flex-direction: column;
-  margin: 0 0.5vw;
-}
-
+// --- 5.3 Pulsanti Azione ---
+.output-actions, .input-actions { display: flex; flex-direction: column; margin: 0 0.5vw; }
 .output-actions {
   align-items: flex-end;
-  .copy-output,
-  .wnd-output,
-  .clear-output,
-  .clear-history,
-  .clear-history1,
-  .delete-kb-btn {
+  .copy-output, .wnd-output, .clear-output, .clear-history, .clear-history1, .delete-kb-btn {
     box-sizing: border-box;
     border: none;
     padding: 10px;
@@ -605,20 +523,11 @@ div.container {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
-    transition:
-      background-color 0.3s,
-      transform 0.3s;
-    .icon,
-    .copy-icon {
-      width: 24px;
-      height: 24px;
-    }
+    transition: background-color 0.3s, transform 0.3s;
+    .icon, .copy-icon { width: 24px; height: 24px; }
   }
-  .copy-output.copied {
-    transform: scale(1.2);
-  }
+  .copy-output.copied { transform: scale(1.2); }
 }
-
 .input-actions {
   .clear-input {
     box-sizing: border-box;
@@ -631,10 +540,7 @@ div.container {
     margin-bottom: 5px;
     transition: background-color 0.3s;
   }
-
-  #btn-action1-knowledge,
-  #btn-action2-start-convo,
-  #btn-action3-continue-convo {
+  #btn-action1-knowledge, #btn-action2-start-convo, #btn-action3-continue-convo {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -647,27 +553,14 @@ div.container {
     font-weight: bold;
     transition: background-color 0.3s;
     width: 100%;
-    color: #ffffff; // Testo bianco per la maggior parte dei pulsanti
+    color: #ffffff;
   }
-
   #btn-action3-continue-convo {
     background-color: #81c784;
-    &:hover {
-      background-color: lighten(#81c784, 10%);
-    }
-  } // Verde
-}
-
-.clear-input {
-  &:hover {
-    font-weight: bolder;
-    text-decoration: underline;
+    &:hover { background-color: lighten(#81c784, 10%); }
   }
 }
-
-// -------------------
-// Pulsanti Tema (Sole/Luna)
-// -------------------
+.clear-input { &:hover { font-weight: bolder; text-decoration: underline; } }
 .btn-theme {
   position: fixed;
   top: 0.2vh;
@@ -675,186 +568,54 @@ div.container {
   height: 4vh;
   background: inherit;
   z-index: 110;
-
   button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding: 5px;
-    display: none;
-    svg {
-      width: 24px;
-      height: 24px;
-    }
+    border: none; background: none; cursor: pointer; padding: 5px; display: none;
+    svg { width: 24px; height: 24px; }
   }
 }
 
-// -------------------
-// Spinner di Caricamento
-// -------------------
-
-.spinner-bg {
-  visibility: hidden;
-}
-
-.spinner,
-#spinner-wait {
-  z-index: 10002;
-  position: absolute;
-  top: auto;
-  bottom: 41.5vh;
-  left: 30vw;
-  transform: translate(-50%, 0);
-  cursor: pointer;
-  display: none;
-  align-items: center;
-
-  .pulse-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-  }
-
-  .stop-message {
-    margin-left: 15px;
-    padding: 9px 15px;
-    border-radius: 10px;
-    font-size: 22px;
-    font-weight: bold;
-    opacity: 1;
-    transition:
-      opacity 0.3s,
-      color 0.3s,
-      background-color 0.3s;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-#spinner-wait {
-  z-index: 10001;
-}
-
-.show-spinner,
-.show-spinner-wait {
-  display: flex !important;
-}
-
-@keyframes pulse-dark {
-  0% {
-    transform: scale(0.6);
-    box-shadow: 0 0 0 0 fade(@dark-color1, 70%);
-  }
-  70% {
-    transform: scale(1.4);
-    box-shadow: 0 0 0 20px fade(@dark-color1, 0%);
-  }
-  100% {
-    transform: scale(0.6);
-    box-shadow: 0 0 0 0 fade(@dark-color1, 0%);
-  }
-}
-
-@keyframes pulse-light {
-  0% {
-    transform: scale(0.6);
-    box-shadow: 0 0 0 0 fade(@light-color1, 70%);
-  }
-  70% {
-    transform: scale(1.4);
-    box-shadow: 0 0 0 20px fade(@light-color1, 0%);
-  }
-  100% {
-    transform: scale(0.6);
-    box-shadow: 0 0 0 0 fade(@light-color1, 0%);
-  }
-}
-
-.show-spinner {
-  display: flex;
-}
-
-// -------------------
-// Finestre Modali e Finestre di Info
-// -------------------
-.window-text,
-.window-info {
+// --- 5.4 Finestre e Modali ---
+.window-text, .window-info {
   position: relative;
   border: none;
   border-radius: 5px;
   outline: none;
   overflow: auto;
 }
-
 .window-text {
   box-sizing: border-box;
   padding: 0 2px 2px 2px;
   width: 78vw;
   height: 94vh;
-
-  pre.pre-text,
-  div.div-text {
+  pre.pre-text, div.div-text {
     word-wrap: break-word;
     font-family: @fserif;
     font-size: @fsize-help;
     padding: 2px;
     margin: 0;
   }
-  pre.pre-text {
-    white-space: pre-wrap;
-    line-height: 1.6;
-    overflow-wrap: anywhere;
-    word-wrap: break-word;
-  }
+  pre.pre-text { white-space: pre-wrap; line-height: 1.6; overflow-wrap: anywhere; }
   div.text {
-    font-size: @fsize-help;
-    padding: 0 10px;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-wrap: break-word;
-    p {
-      text-align: justify;
-      padding-bottom: 9px;
-      padding-left: 5px;
-    }
-    .center {
-      font-weight: bold;
-      font-style: italic;
-      text-align: center;
-      text-decoration: underline;
-    }
-    pre {
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      word-wrap: break-word;
-      hyphens: auto;
-    }
+    font-size: @fsize-help; padding: 0 10px; white-space: normal; overflow-wrap: anywhere;
+    p { text-align: justify; padding-bottom: 9px; padding-left: 5px; }
+    .center { font-weight: bold; font-style: italic; text-align: center; text-decoration: underline; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; hyphens: auto; }
   }
 }
-
 .window-info {
   box-sizing: border-box;
   padding: 5px;
-  // padding-top: 5px;
   width: auto;
-  // min-width: 50vw;
   max-width: 79vw;
-  .div-info {
-    max-height: 90vh;
-    overflow-y: auto;
-  }
+  .div-info { max-height: 90vh; overflow-y: auto; }
 }
-
 .btn-wrapper {
   width: 100%;
   height: 2vw;
   position: sticky;
   top: 0;
   padding: 0;
-
-  .btn-copy,
-  .btn-close {
+  .btn-copy, .btn-close {
     position: absolute;
     top: 1px;
     border: none;
@@ -864,17 +625,93 @@ div.container {
     right: 5vw;
     width: 30px;
     padding: 0;
-    .copy-icon {
-      width: 20px;
-      height: 20px;
-    }
+    .copy-icon { width: 20px; height: 20px; }
   }
-  .btn-close {
-    right: 2vw;
-    font-size: @fsize-btn-close;
-    font-weight: bold;
+  .btn-close { right: 2vw; font-size: @fsize-btn-close; font-weight: bold; }
+}
+
+// --- 5.5 Altri Componenti ---
+
+// Spinner di Caricamento
+.spinner-bg { visibility: hidden; }
+.spinner, #spinner-wait {
+  z-index: 10002; position: absolute; top: auto; bottom: 41.5vh; left: 30vw;
+  transform: translate(-50%, 0); cursor: pointer; display: none; align-items: center;
+  .pulse-icon { width: 30px; height: 30px; border-radius: 50%; }
+  .stop-message {
+    margin-left: 15px; padding: 9px 15px; border-radius: 10px; font-size: 22px;
+    font-weight: bold; opacity: 1; transition: opacity 0.3s, color 0.3s, background-color 0.3s;
+    &:hover { text-decoration: underline; }
   }
 }
+#spinner-wait { z-index: 10001; }
+.show-spinner, .show-spinner-wait { display: flex !important; }
+@keyframes pulse-dark {
+  0% { transform: scale(0.6); box-shadow: 0 0 0 0 fade(@dark-color1, 70%); }
+  70% { transform: scale(1.4); box-shadow: 0 0 0 20px fade(@dark-color1, 0%); }
+  100% { transform: scale(0.6); box-shadow: 0 0 0 0 fade(@dark-color1, 0%); }
+}
+@keyframes pulse-light {
+  0% { transform: scale(0.6); box-shadow: 0 0 0 0 fade(@light-color1, 70%); }
+  70% { transform: scale(1.4); box-shadow: 0 0 0 20px fade(@light-color1, 0%); }
+  100% { transform: scale(0.6); box-shadow: 0 0 0 0 fade(@light-color1, 0%); }
+}
+
+// Upload
+.upload-dialog-content {
+  padding: 1px 5px; text-align: center;
+  h4 { padding: 0; margin: 0; }
+  .upload-description { margin-bottom: 15px; font-size: @fsize-upload; }
+  .upload-mode-selector {
+    display: flex; justify-content: center; margin-bottom: 20px;
+    label { margin: 0 15px; cursor: pointer; font-size: @fsize-menu;
+      input[type="radio"] { margin-right: 8px; transform: scale(1.2); }
+      span { font-weight: bold; }
+    }
+  }
+  .drop-zone { border: 3px dashed; border-radius: 10px; padding: 20px; cursor: pointer; margin-bottom: 1em;
+    p { font-size: @fsize-upload; margin: 0; }
+  }
+  #progress-container { margin-top: 20px;
+    div { width: 100%; border-radius: 5px; overflow: hidden; height: 25px; }
+    #progress-bar { width: 0%; height: 100%; text-align: center; font-weight: bold; }
+    #progress-text { margin-top: 10px; font-size: @fsize-menu; font-weight: bold; }
+  }
+  #file-list-container { margin-top: 1em; max-height: 200px; overflow-y: auto; border: 1px solid; padding: 10px; border-radius: 5px; text-align: left; }
+  .file-list-item { padding: 8px 5px; border-bottom: 1px solid; animation: fadeIn 0.5s ease-in-out; display: flex; align-items: center;
+    &:last-child { border-bottom: none; }
+  }
+  #upload-summary { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: left;
+    strong { font-size: @fsize-upload; display: block; margin-bottom: 10px; text-align: center; }
+  }
+}
+.docs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5em; }
+.select-all-label { display: flex; align-items: center; cursor: pointer; font-size: @fsize-menu; font-weight: bold; }
+#select-all-docs-checkbox { margin-right: 8px; transform: scale(1.2); }
+.docs-footer { margin-top: 1em; text-align: center; }
+#delete-selected-docs-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+// Tabelle e Liste Dati
+.table-data {
+  box-sizing: border-box; width: 100%; table-layout: auto; border-collapse: separate;
+  border-spacing: 0; margin: 1.5em auto; border-radius: 8px; overflow: hidden;
+  th, td { border: none; border-bottom: 1px solid; padding: 4px 8px; text-align: left; white-space: nowrap; }
+  th { font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px; }
+  tr:last-child td { border-bottom: none; }
+}
+.list-data {
+  width: 100%; margin: 1em auto; border-radius: 5px; overflow: hidden; list-style: none; padding: 0;
+  li { border: 1px solid; padding: 8px; text-align: left; border-top: none; &:first-child { border-top: 1px solid; } }
+}
+
+// Selettori Provider e DocType
+.provider-tree-container, .doctype-tree-container {
+  display: none; position: absolute; border-radius: 6px; padding: 10px; z-index: 1001; min-width: 250px; max-height: 70vh; overflow-y: auto;
+}
+.provider-tree-header, .doctype-tree-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; }
+.provider-tree-close-btn, .doctype-tree-close-btn { background: none; border: none; font-size: 20px; cursor: pointer; }
+.provider-tree ul, .doctype-tree ul { list-style: none; padding-left: 0; }
+
 
 // -------------------
 // Componente Upload
