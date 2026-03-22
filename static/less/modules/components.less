@@ -1,0 +1,66 @@
+// ===================================================================
+//  COMPONENTI UI: MENU LATERALE
+// ===================================================================
+
+.menu-box {
+  box-sizing: border-box;
+  position: fixed;
+  top: 5vh;
+  left: -2000px;
+  height: 95vh;
+  width: @menu-width;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 2vh 1vw;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: @dark-menu-bg; // Usiamo le variabili base dal file variables
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  border-right: 1px solid rgba(0,0,0,0.05);
+
+  ul {
+    list-style: none;
+    li {
+      margin: 8px 0;
+      a {
+        font-family: @fsans;
+        text-decoration: none;
+        display: block;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: @dark-text;
+        &:hover {
+          background: rgba(255,255,255,0.05);
+          text-decoration: none;
+          transform: translateX(5px);
+        }
+        &.delete {
+          text-align: center;
+          font-weight: bold;
+          font-style: italic;
+          background: @dark-color1;
+          color: #ffffff !important;
+          &:hover { background: darken(@dark-color1, 10%); }
+        }
+        &.highlight-yellow {
+          background-color: @dark-color3 !important;
+          color: #000 !important;
+          font-weight: bold;
+          padding: 8px 12px;
+          border-radius: 8px;
+          &:hover { background-color: darken(@dark-color3, 10%) !important; }
+        }
+      }
+    }
+  }
+}
+
+.menu-open {
+  .container { margin-left: @menu-width; }
+  .menu-box { left: 0 !important; }
+}
