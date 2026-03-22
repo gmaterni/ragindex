@@ -1,0 +1,149 @@
+/** @format */
+
+// -------------------
+// Fonts
+// -------------------
+@fserif: Georgia, "Times New Roman", serif; 
+@fsans: "Inter", "Segoe UI", Roboto, Arial, sans-serif; 
+
+// -------------------
+// Font Sizes
+// -------------------
+@fsize-out: 20px;
+@fsize-inp: 20px;
+@fsize-help: 18px;
+@fsize-btn-close: 22px;
+@fsize-msg: 15px;
+@fsize-upload: 20px;
+@fsize-log: 14px;
+@fsize-menu: 14px;
+
+// -------------------
+// Variabili Comuni
+// -------------------
+@menu-width: 20vw;
+
+// -------------------------------------------------------------------
+// TEMA: Dark
+// -------------------------------------------------------------------
+@dark-bg: #252525;
+@dark-text: #ffffff;
+@dark-color1: #e82323; 
+@dark-color2: #00bd97; 
+@dark-color3: #f6e602; 
+
+@dark-container-bg: lighten(@dark-bg, 10%);
+@dark-border-shadow: lighten(@dark-container-bg, 20%);
+@dark-btn-bg: lighten(@dark-container-bg, 10%);
+@dark-btn-hover: lighten(@dark-btn-bg, 15%);
+@dark-btn-color: darken(@dark-text, 10%);
+@dark-btn-hover-fg: lighten(@dark-color2, 10%);
+@dark-btn-copied: darken(@dark-color2, 20%);
+@dark-output-bg: darken(@dark-container-bg, 15%);
+@dark-input-bg: darken(@dark-container-bg, 15%);
+@dark-text-copied-bg: lighten(@dark-output-bg, 5%);
+@dark-text-copied: lighten(@dark-color2, 20%);
+@dark-btn-send0-bg: @dark-color1;
+@dark-btn-send0-hover-bg: lighten(@dark-color1, 10%);
+@dark-btn-send1-bg: @dark-color3;
+@dark-btn-send1-hover-bg: lighten(@dark-color3, 10%);
+@dark-btn-send2-bg: @dark-color2;
+@dark-btn-send2-hover-bg: lighten(@dark-color2, 10%);
+@dark-wnd-bg: lighten(@dark-bg, 5%);
+@dark-wnd-border-shadow: darken(@dark-color3, 10%);
+@dark-wnd-pre-color: lighten(@dark-color3, 30%);
+@dark-menu-bg: darken(@dark-container-bg, 35%);
+@dark-menu-border: lighten(@dark-menu-bg, 20%);
+@dark-menu-fg: @dark-text;
+@dark-menu-icon-fg: #aea7a7;
+@dark-menu-icon-hover: @dark-color1;
+@dark-label-btn-bg: darken(@dark-color2, 10%);
+@dark-delete-btn-bg: darken(@dark-color1, 10%);
+@dark-delete-btn-hover-bg: darken(@dark-color1, 20%);
+@dark-delete-btn-fg: #ffffff;
+@dark-delete-btn-hover-fg: #ffffff;
+@dark-btn-success-bg: darken(@dark-color2, 20%);
+@dark-btn-success-hover-bg: darken(@dark-color2, 15%);
+@dark-btn-danger-bg: @dark-color1;
+@dark-btn-danger-hover-bg: lighten(@dark-color1, 10%);
+@dark-dialog-bg: lighten(@dark-bg, 5%);
+@dark-dialog-text: @dark-text;
+@dark-kb-display-fg: #f6e602; 
+@dark-file-list-item-success-bg: lighten(@dark-color2, 20%);
+@dark-file-list-item-success-fg: darken(@dark-color2, 30%);
+@dark-file-list-item-duplicate-bg: lighten(@dark-color3, 10%);
+@dark-file-list-item-duplicate-fg: darken(@dark-color3, 20%);
+@dark-file-list-item-error-bg: lighten(@dark-color1, 10%);
+@dark-file-list-item-error-fg: darken(@dark-color1, 20%);
+@dark-summary-bg: lighten(@dark-bg, 8%);
+@dark-summary-border: lighten(@dark-bg, 15%);
+@dark-summary-success-fg: @dark-color2;
+@dark-summary-duplicate-fg: @dark-color3;
+@dark-summary-error-fg: @dark-color1;
+@dark-progress-bg: #444;
+@dark-progress-bar-bg: @dark-color2;
+
+// -------------------------------------------------------------------
+// TEMA: Light
+// -------------------------------------------------------------------
+@light-bg: #f5f5f5;
+@light-text: #333333;
+@light-color1: #d32f2f; 
+@light-color2: #00796b; 
+@light-color3: #ff9e03; 
+
+@light-container-bg: darken(@light-bg, 2%);
+@light-border-shadow: darken(@light-bg, 10%);
+@light-btn-bg: darken(@light-bg, 5%);
+@light-btn-hover: darken(@light-btn-bg, 20%);
+@light-btn-color: @light-text;
+@light-btn-hover-fg: @light-color1;
+@light-btn-copied: lighten(@light-color2, 50%);
+@light-output-bg: @light-bg;
+@light-input-bg: @light-bg;
+@light-text-copied-bg: lighten(@light-color2, 60%);
+@light-text-copied: darken(@light-color2, 20%);
+@light-btn-send0-bg: @light-color3;
+@light-btn-send0-hover-bg: lighten(@light-color3, 10%);
+@light-btn-send1-bg: @light-color1;
+@light-btn-send1-hover-bg: lighten(@light-color1, 10%);
+@light-btn-send2-bg: @light-color2;
+@light-btn-send2-hover-bg: lighten(@light-color2, 10%);
+@light-wnd-bg: darken(@light-bg, 1%);
+@light-wnd-border-shadow: @light-color3;
+@light-wnd-pre-color: darken(@light-text, 10%);
+@light-menu-bg: @light-btn-bg;
+@light-menu-border: darken(@light-menu-bg, 20%);
+@light-menu-fg: @light-text;
+@light-menu-icon-fg: #757575;
+@light-menu-icon-hover: @light-color1;
+@light-menu-box-bg: darken(@light-bg, 3%);
+@light-menu-box-border: lighten(@light-menu-bg, 20%);
+@light-menu-box-fg: darken(@light-text, 5%);
+@light-menu-icon-box-hover: darken(@light-color1, 20%);
+@light-border-box-shadow: darken(@light-bg, 15%);
+@light-label-btn-bg: darken(@light-color2, 0%);
+@light-delete-btn-bg: @light-color1;
+@light-delete-btn-hover-bg: lighten(@light-color1, 10%);
+@light-delete-btn-fg: #000000;
+@light-delete-btn-hover-fg: #000000;
+@light-btn-success-bg: @light-color2;
+@light-btn-success-hover-bg: lighten(@light-color2, 5%);
+@light-btn-danger-bg: @light-color1;
+@light-btn-danger-hover-bg: lighten(@light-color1, 10%);
+@light-dialog-bg: darken(@light-bg, 1%);
+@light-dialog-text: @light-text;
+@light-kb-display-fg: #e65100; 
+@light-file-list-item-success-bg: lighten(@light-color2, 50%);
+@light-file-list-item-success-fg: darken(@light-color2, 20%);
+@light-file-list-item-duplicate-bg: lighten(@light-color3, 40%);
+@light-file-list-item-duplicate-fg: darken(@light-color3, 20%);
+@light-file-list-item-error-bg: lighten(@light-color1, 30%);
+@light-file-list-item-error-fg: darken(@light-color1, 20%);
+@light-summary-bg: lighten(@light-bg, -2%);
+@light-summary-border: lighten(@light-bg, -8%);
+@light-summary-success-fg: @light-color2;
+@light-summary-duplicate-fg: @light-color3;
+@light-summary-error-fg: @light-color1;
+@light-progress-bg: #e0e0e0;
+@light-progress-bar-bg: @light-color2;
