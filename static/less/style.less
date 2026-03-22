@@ -30,7 +30,7 @@
     display: block;
     position: absolute;
     margin-left: 2vw;
-    top: -15px; // Rialzato ulteriormente
+    top: 0;
     left: 0;
     width: 35px;
     height: 100%;
@@ -39,11 +39,24 @@
     z-index: 1;
     .nav-icon::before {
       content: "☰";
+      font-family: @fsans;
+      font-size: 24px;
+      line-height: 4.5vh;
       position: absolute;
-      left: 0;
-      font-size: 35px;
+      top: 0;
+      left: 5px;
       transition-duration: 0.25s;
     }
+  }
+
+  .menu-btn:checked + .menu-icon .nav-icon::before {
+    content: "✕";
+    font-family: @fsans;
+    font-size: 24px;
+    line-height: 4.5vh;
+    position: absolute;
+    top: 0;
+    left: 5px;
   }
   .head-wrapper {
     position: absolute;
