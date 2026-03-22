@@ -2,6 +2,43 @@
 //  COMPONENTI UI: MENU LATERALE
 // ===================================================================
 
+.menu-icon {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  margin-left: 2vw;
+  top: 0;
+  left: 0;
+  width: 35px;
+  height: 100%;
+  cursor: pointer;
+  padding: 2px;
+  z-index: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  
+  .nav-icon::before {
+    content: "☰";
+    font-family: @fsans;
+    font-size: 24px;
+    line-height: 4.5vh;
+    position: absolute;
+    top: 0;
+    left: 5px;
+    transition-duration: 0.25s;
+  }
+}
+
+.menu-btn:checked + .menu-icon .nav-icon::before {
+  content: "✕";
+  font-family: @fsans;
+  font-size: 24px;
+  line-height: 4.5vh;
+  position: absolute;
+  top: 0;
+  left: 5px;
+}
+
 .menu-box {
   box-sizing: border-box;
   position: fixed;
@@ -10,25 +47,25 @@
   height: 95vh;
   width: @menu-width;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 2vh 1vw;
+  padding: 1vh 0.5vw;
   z-index: 101;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  background: @dark-menu-bg; // Usiamo le variabili base dal file variables
+  background: @dark-menu-bg;
   box-shadow: 4px 0 15px rgba(0,0,0,0.1);
   border-right: 1px solid rgba(0,0,0,0.05);
 
   ul {
     list-style: none;
     li {
-      margin: 8px 0;
+      margin: 2px 0;
       a {
         font-family: @fsans;
         text-decoration: none;
         display: block;
-        padding: 8px 12px;
-        border-radius: 8px;
+        padding: 4px 10px;
+        border-radius: 6px;
         transition: all 0.2s ease;
         overflow: hidden;
         white-space: nowrap;
@@ -51,8 +88,8 @@
           background-color: @dark-color3 !important;
           color: #000 !important;
           font-weight: bold;
-          padding: 8px 12px;
-          border-radius: 8px;
+          padding: 4px 10px;
+          border-radius: 6px;
           &:hover { background-color: darken(@dark-color3, 10%) !important; }
         }
       }
