@@ -1,0 +1,4 @@
+arcee-ai/trinity-large-preview:free|130048|8|28.79
+nvidia/nemotron-nano-12b-v2-vl:free|128000|9|25.69
+nvidia/nemotron-nano-9b-v2:free|128000|7|14.37
+qwen/qwen3-vl-30b-a3b-thinking|131072|7|39.17

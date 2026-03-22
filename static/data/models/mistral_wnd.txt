@@ -1,0 +1,4 @@
+ministral-14b-latest|262144|9|9.39
+mistral-large-latest|131072|9|31.40
+mistral-medium-latest|131072|9|31.40
+mistral-small-latest|131072|7|4.77
