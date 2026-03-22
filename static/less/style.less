@@ -1432,35 +1432,35 @@ div.container {
     }
   }
 
-  .btn-success,
-  .btn-danger {
-    cursor: pointer;
-    border-radius: 5px;
-    padding: 1px 2px;
-    font-weight: normal;
-    &:hover {
-      text-decoration: underline;
-    }
+// Raffinamento Pulsanti Azione
+.btn-success, .btn-danger {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   }
+  &:active {
+    transform: translateY(0);
+  }
+}
 
-  .btn-success {
-    border-color: @btn-success-bg;
-    background-color: @btn-success-bg;
-    color: #ffffff;
-    &:hover {
-      background-color: @btn-success-hover-bg;
-      color: #ffffff;
-    }
-  }
+.btn-success {
+  background-color: @light-color2;
+  color: #ffffff;
+  &:hover { background-color: lighten(@light-color2, 10%); }
+}
 
-  .btn-danger {
-    border-color: @btn-danger-bg;
-    background-color: @btn-danger-bg;
-    color: #ffffff;
-    &:hover {
-      background-color: @btn-danger-hover-bg;
-    }
-  }
+.btn-danger {
+  background-color: @light-color1;
+  color: #ffffff;
+  &:hover { background-color: lighten(@light-color1, 10%); }
+}
+
 
   .table-data {
     tr:nth-child(even) {
