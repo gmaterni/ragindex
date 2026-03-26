@@ -5,6 +5,8 @@
 @import "modules/layout.less";
 @import "modules/components.less";
 
+@menu-icon-fg: #aea7a7; // Definizione globale per evitare NameError
+
 html, body {
   caret-color: transparent;
 }
@@ -64,7 +66,7 @@ input, textarea, [contenteditable="true"] {
     content: "✕";
     font-family: @fsans;
     font-size: 42px;
-    color: #fff !important;
+    color: @menu-icon-fg !important;
     line-height: 4.5vh;
     position: absolute;
     top: 0;
