@@ -6,14 +6,14 @@
   box-sizing: border-box;
   display: block;
   position: absolute;
-  margin-left: 2vw;
+  margin-left: 0.5vw;
   top: 0;
   left: 0;
-  width: 35px;
+  width: 50px;
   height: 100%;
   cursor: pointer;
   padding: 2px;
-  z-index: 1;
+  z-index: 110;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -23,7 +23,8 @@
   .nav-icon::before {
     content: "☰";
     font-family: @fsans;
-    font-size: 24px;
+    font-size: 42px;
+    font-weight: 900;
     line-height: 4.5vh;
     position: absolute;
     top: 0;
@@ -36,7 +37,8 @@
 .menu-btn:checked + .menu-icon .nav-icon::before {
   content: "✕";
   font-family: @fsans;
-  font-size: 24px;
+  font-size: 42px;
+  color: #fff !important;
   line-height: 4.5vh;
   position: absolute;
   top: 0;
@@ -51,7 +53,7 @@
   height: 95vh;
   width: 25vw; // Aumentato da 20vw a 25vw
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 1vh 0.5vw;
+  padding: 0.2vh 0.5vw;
   z-index: 101;
   display: flex;
   flex-direction: column;
@@ -72,7 +74,7 @@
         font-family: @fsans;
         text-decoration: none;
         display: block;
-        padding: 4px 8px;
+        padding: 1px 8px;
         border-radius: 6px;
         transition: all 0.2s ease;
         overflow: hidden;

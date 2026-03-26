@@ -5,6 +5,14 @@
 @import "modules/layout.less";
 @import "modules/components.less";
 
+html, body {
+  caret-color: transparent;
+}
+
+input, textarea, [contenteditable="true"] {
+  caret-color: auto;
+}
+
 
 
 // ===================================================================
@@ -31,18 +39,19 @@
     box-sizing: border-box;
     display: block;
     position: absolute;
-    margin-left: 2vw;
+    margin-left: 0.5vw;
     top: 0;
     left: 0;
-    width: 35px;
+    width: 50px;
     height: 100%;
     cursor: pointer;
     padding: 2px;
-    z-index: 1;
+    z-index: 110;
     .nav-icon::before {
       content: "☰";
       font-family: @fsans;
-      font-size: 24px;
+      font-size: 42px;
+      font-weight: 900;
       line-height: 4.5vh;
       position: absolute;
       top: 0;
@@ -54,7 +63,8 @@
   .menu-btn:checked + .menu-icon .nav-icon::before {
     content: "✕";
     font-family: @fsans;
-    font-size: 24px;
+    font-size: 42px;
+    color: #fff !important;
     line-height: 4.5vh;
     position: absolute;
     top: 0;
@@ -136,18 +146,19 @@
   height: 95vh;
   width: @menu-width;
   transition: left 0.3s ease-out;
-  padding: 1vh 0.5vw;
+  padding: 0.2vh 0.5vw;
   z-index: 101;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   ul {
     list-style: none;
-    li { padding: 0; margin: 4px 0 0 0; }
+    li { padding: 0; margin: 1px 0 0 0; }
     li a {
       font-family: @fsans;
       text-decoration: none;
-      display: inline-block;
+      display: block;
+      padding: 1px 8px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;

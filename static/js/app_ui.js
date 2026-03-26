@@ -1036,7 +1036,9 @@ export const bindEventListener = () => {
     document.querySelector("#clear-history2").onclick = () => TextOutput.clearHistoryContext();
 
     const btn = document.querySelector("#id-menu-btn");
+    const label = document.querySelector("#id-menu-icon-label");
     btn.onchange = () => {
         document.body.classList.toggle("menu-open", btn.checked);
+        label.setAttribute("data-tt", btn.checked ? "Close" : "Open");
     };
 };

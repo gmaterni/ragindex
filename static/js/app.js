@@ -25,7 +25,7 @@ import "./services/uadialog.js";
  * Versione dell'applicazione.
  * @type {string}
  */
-const VERSIONE = "0.3.3";
+const VERSIONE = "0.3.4";
 
 /**
  * URL del worker per l'invio eventi.
