@@ -1,0 +1,179 @@
+// ===================================================================
+//  PULSANTI AZIONE, FINESTRE, WRAPPER
+// ===================================================================
+
+.output-actions,
+.input-actions {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.5vw;
+}
+.output-actions {
+  align-items: flex-end;
+  .copy-output,
+  .wnd-output,
+  .clear-output,
+  .clear-history,
+  .clear-history1,
+  .delete-kb-btn {
+    box-sizing: border-box;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    transition:
+      background-color 0.3s,
+      transform 0.3s;
+    .icon,
+    .copy-icon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  .copy-output.copied {
+    transform: scale(1.2);
+  }
+}
+
+.input-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  margin: 0 0.5vw;
+  padding-bottom: 8px;
+
+  .clear-input {
+    box-sizing: border-box;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-top: 12px;
+    transition: background-color 0.3s;
+  }
+  #btn-action1-knowledge,
+  #btn-action2-start-convo,
+  #btn-action3-continue-convo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 50px;
+    height: 50px;
+    color: #ffffff;
+    pointer-events: auto;
+    position: relative;
+    z-index: @z-btn-icon;
+
+    .btn-icon-svg {
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+.clear-input {
+  &:hover {
+    font-weight: bolder;
+    text-decoration: underline;
+  }
+}
+.window-text,
+.window-info {
+  position: relative;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  overflow: auto;
+}
+.window-text {
+  box-sizing: border-box;
+  padding: 0 2px 2px 2px;
+  width: 78vw;
+  height: 94vh;
+  pre.pre-text,
+  div.div-text {
+    word-wrap: break-word;
+    font-family: @fserif;
+    font-size: @fsize-help;
+    padding: 2px;
+    margin: 0;
+  }
+  pre.pre-text {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+  div.text {
+    font-size: @fsize-help;
+    padding: 0 10px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    p {
+      text-align: justify;
+      padding-bottom: 9px;
+      padding-left: 5px;
+    }
+    .center {
+      font-weight: bold;
+      font-style: italic;
+      text-align: center;
+      text-decoration: underline;
+    }
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+  }
+}
+.window-info {
+  box-sizing: border-box;
+  padding: 5px;
+  width: auto;
+  max-width: 79vw;
+  .div-info {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+.btn-wrapper {
+  width: 100%;
+  height: 2vw;
+  position: sticky;
+  top: 0;
+  padding: 0;
+  .btn-copy,
+  .btn-close {
+    position: absolute;
+    top: 1px;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-copy {
+    right: 5vw;
+    width: 30px;
+    padding: 0;
+    .copy-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  .btn-close {
+    right: 2vw;
+    font-size: @fsize-btn-close;
+    font-weight: bold;
+  }
+}
