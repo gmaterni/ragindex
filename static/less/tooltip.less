@@ -1,3 +1,5 @@
+@import "modules/variables.less";
+
 /**
  * Regolare i valori di calc() per distanze diverse
  * Aggiungere white-space: normal per tooltip multi-riga
@@ -40,7 +42,7 @@
     position: absolute;
     opacity: 0;
     pointer-events: none;
-    z-index: 30000;
+    z-index: @z-tooltip;
     transition: @tt-transition;
   }
 

@@ -13,7 +13,7 @@
   height: 100%;
   cursor: pointer;
   padding: 2px;
-  z-index: 110;
+  z-index: @z-menu-h-controls;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -51,26 +51,23 @@
   top: 5vh;
   left: -2000px;
   height: 95vh;
-  width: 25vw; // Aumentato da 20vw a 25vw
+  width: @menu-width;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0.2vh 0.5vw;
-  z-index: 101;
+  z-index: @z-menu-box;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  background: @dark-menu-bg;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-  border-right: 1px solid rgba(0,0,0,0.05);
 
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
+
     li {
       margin: 0;
+
       a {
-        text-align: left;
-        padding-left: 8px;
         font-family: @fsans;
         text-decoration: none;
         display: block;
@@ -80,10 +77,10 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        color: @dark-text;
-        font-size: 0.9em;
+        max-width: 20vw;
+
         &:hover {
-          background: rgba(255,255,255,0.05);
+          background: rgba(255, 255, 255, 0.05);
           text-decoration: none;
         }
 
@@ -91,15 +88,16 @@
           text-align: center;
           font-weight: bold;
           font-style: italic;
-          background: @dark-color1;
+          border-radius: 5px;
           color: #ffffff !important;
-          &:hover { background: darken(@dark-color1, 10%); }
         }
+
         &#menu-delete-all {
           background-color: @dark-color3 !important;
           color: #000 !important;
           &:hover { background-color: darken(@dark-color3, 10%) !important; }
         }
+
         &.highlight-yellow {
           background-color: @dark-color3 !important;
           color: #000 !important;
@@ -109,11 +107,19 @@
           &:hover { background-color: darken(@dark-color3, 10%) !important; }
         }
       }
+
+      b {
+        font-family: @fsans;
+        text-align: left !important;
+        font-weight: bold;
+        font-style: italic;
+        color: #ffffff !important;
+        max-width: 20vw;
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
     }
   }
-}
-
-.menu-open {
-  .container { margin-left: @menu-width; }
-  .menu-box { left: 0 !important; }
 }

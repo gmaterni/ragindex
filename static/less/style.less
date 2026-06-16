@@ -29,48 +29,16 @@ textarea,
   left: 0;
   width: 100vw;
   height: 4.5vh;
-  z-index: 10010; // Alzato sopra lo spinner (10000)
+  z-index: @z-menu-h;
   .menu-btn {
     appearance: none;
-    &:checked + .menu-icon .nav-icon::before {
-      content: "X";
-    }
-  }
-  .menu-icon {
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    margin-left: 0.5vw;
-    top: 0;
-    left: 0;
-    width: 50px;
-    height: 100%;
-    cursor: pointer;
-    padding: 2px;
-    z-index: 110;
-    .nav-icon::before {
-      content: "☰";
-      font-family: @fsans;
-      font-size: 42px;
-      font-weight: 900;
-      line-height: 4.5vh;
-      position: absolute;
-      top: 0;
-      left: 5px;
-      transition-duration: 0.25s;
-    }
   }
 
-  .menu-btn:checked + .menu-icon .nav-icon::before {
-    content: "✕";
-    font-family: @fsans;
-    font-size: 42px;
-    color: @menu-icon-fg !important;
-    line-height: 4.5vh;
+  // Mantenuto per specificità: batte .tt-right { position: relative }
+  .menu-icon {
     position: absolute;
-    top: 0;
-    left: 5px;
   }
+
   .head-wrapper {
     position: absolute;
     top: 0;
@@ -97,7 +65,7 @@ textarea,
       left: 1vw;
       font-size: @fsize-out;
       font-weight: 900;
-      z-index: 200;
+      z-index: @z-help;
     }
     .upload {
       left: 5vw;
@@ -162,7 +130,7 @@ textarea,
     .log {
       font-size: @fsize-log;
       left: 83vw;
-      z-index: 10010; // Sopra lo spinner (10000)
+      z-index: @z-menu-h;
     }
   }
   .btn-theme-toggle {
@@ -171,7 +139,7 @@ textarea,
     right: 1vw;
     height: 4vh;
     background: inherit;
-    z-index: 110;
+    z-index: @z-menu-h-controls;
     border: none;
     background: none;
     cursor: pointer;
@@ -187,72 +155,7 @@ textarea,
 }
 
 // --- 5.2 Menu Laterale ---
-.menu-box {
-  box-sizing: border-box;
-  position: fixed;
-  top: 5vh;
-  left: -2000px;
-  height: 95vh;
-  width: @menu-width;
-  transition: left 0.3s ease-out;
-  padding: 0.2vh 0.5vw;
-  z-index: 101;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  ul {
-    list-style: none;
-    li {
-      padding: 0;
-      margin: 1px 0 0 0;
-    }
-    li a {
-      font-family: @fsans;
-      text-decoration: none;
-      display: block;
-      padding: 1px 8px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      max-width: 20vw;
-      &:hover {
-        text-decoration: underline;
-      }
-      &.delete {
-        text-align: center;
-        font-weight: bold;
-        font-style: italic;
-        border-radius: 5px;
-        color: #ffffff !important;
-      }
-      &.highlight-yellow {
-        background-color: #ffeb3b !important;
-        color: #000 !important;
-        font-weight: bold;
-        text-align: center;
-        border-radius: 5px;
-        padding: 2px 5px;
-        display: block;
-        &:hover {
-          background-color: darken(#ffeb3b, 10%) !important;
-          text-decoration: none;
-        }
-      }
-    }
-    li b {
-      font-family: @fsans;
-      text-align: left !important;
-      font-weight: bold;
-      font-style: italic;
-      color: #ffffff !important;
-      max-width: 20vw;
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-}
+// .menu-box definito in modules/components.less
 .menu-open {
   .container {
     margin-left: @menu-width;
@@ -337,7 +240,7 @@ textarea,
     color: #ffffff;
     pointer-events: auto;
     position: relative;
-    z-index: 15;
+    z-index: @z-btn-icon;
 
     .btn-icon-svg {
       width: 28px;
@@ -443,7 +346,7 @@ textarea,
 
 // Finestra Log sopra tutto
 #ualog_id {
-  z-index: 10011 !important; // Sopra pulsante log e spinner
+  z-index: @z-log-panel !important;
 }
 
 // Spinner di Caricamento (Modal Overlay)
@@ -460,15 +363,15 @@ textarea,
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 10000;
-  background: rgba(0, 0, 0, 0.1); // Sfondo ancora più trasparente
+  z-index: @z-spinner;
+  background: rgba(0, 0, 0, 0.1);
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: default;
   backdrop-filter: blur(0.5px);
-  pointer-events: auto; // Blocca i click su tutto ciò che sta sotto (tranne ciò che ha z-index > 10000)
+  pointer-events: auto;
 
   .spinner-content {
     display: flex;
@@ -516,8 +419,19 @@ textarea,
 }
 
 .spinner-wait .pulse-icon {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
+}
+.spinner-wait .spinner-content {
+  padding: 12px 16px;
+  border-radius: 14px;
+  border-width: 3px;
+  cursor: default;
+  &:hover {
+    transform: none;
+    border-color: currentColor !important;
+    background: rgba(0, 0, 0, 0.8);
+  }
 }
 
 .item.item2 {
@@ -525,7 +439,7 @@ textarea,
   flex-direction: row;
   align-items: flex-end; // Allinea tutto al fondo (fondamentale per i pulsanti che salgono)
   position: relative;
-  z-index: 10;
+  z-index: @z-item2;
 }
 
 .input-context-actions {
@@ -555,7 +469,7 @@ textarea,
   }
 }
 #spinner-wait {
-  z-index: 10001;
+  z-index: @z-spinner-wait;
 }
 .show-spinner,
 .show-spinner-wait {
@@ -906,7 +820,7 @@ textarea,
   position: absolute;
   border-radius: 6px;
   padding: 10px;
-  z-index: 1001;
+  z-index: @z-tree-container;
   min-width: 250px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   max-height: 70vh;
@@ -1155,7 +1069,7 @@ textarea,
               display: flex;
               align-items: center;
               justify-content: center;
-              z-index: 5;
+               z-index: @z-tree-btn;
               &:hover {
                 color: @color1;
                 background: @container-bg;

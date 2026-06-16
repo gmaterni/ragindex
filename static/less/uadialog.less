@@ -1,3 +1,5 @@
+@import "modules/variables.less";
+
 /**
  * ========= VARIABILI =========
  *
@@ -28,7 +30,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   // border: 2px solid red;
   border: 2px solid #2196f3;
-  z-index: 20011;
+  z-index: @z-dialog;
   min-width: 320px;
   max-width: 90%;
   transition: all @transition-speed cubic-bezier(0.4, 0, 0.2, 1);
@@ -116,7 +118,7 @@
   background: @overlay-bg;
   opacity: 0;
   visibility: hidden;
-  z-index: 20010;
+  z-index: @z-dialog-overlay;
   transition: opacity @transition-speed ease;
 
   &.show {
