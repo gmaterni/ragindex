@@ -1,0 +1,1002 @@
+// ===================================================================
+//  6. TEMPLATE DEGLI STILI
+// ===================================================================
+
+.apply-theme() {
+  background: @container-bg;
+  color: @text;
+
+  .spinner,
+  .spinner-wait {
+    .pulse-icon {
+      background-color: @color1;
+      animation: @pulse-animation 1.5s ease-in-out infinite;
+    }
+    .spinner-content {
+      border-color: @color1;
+      &:hover {
+        transform: scale(1.02);
+        border-color: lighten(@color1, 15%);
+        background: rgba(0, 0, 0, 0.8);
+      }
+    }
+    .stop-message {
+      color: #fff;
+    }
+  }
+
+  // --- Layout ---
+  div.container {
+    background: @container-bg;
+    .item1 .output-wrapper {
+      .text-out {
+        background: @output-bg;
+        color: @text;
+        border: none; // Rimuove il bordo fisico per usare lo shadow come input
+        box-shadow: 0 0 0 2px @border-shadow; // IDENTICO A INPUT
+        transition: all 0.3s ease;
+        outline: none;
+        &:hover {
+          box-shadow: 0 0 0 2px @color2; // IDENTICO A INPUT
+        }
+        &:focus-within,
+        &:focus {
+          box-shadow: 0 0 0 2px @color1; // IDENTICO A INPUT
+        }
+        .div-text {
+          .user,
+          .assistant,
+          .system {
+            position: relative; // INDISPENSABILE per la matita
+            padding: 8px 12px; // Ridotto
+            margin-bottom: 8px; // Ridotto
+            border-radius: 4px;
+
+            // Stile Markdown interpretato
+            b {
+              font-weight: bold;
+              color: inherit; // Sovrascrive lo stile del titolo se necessario
+              border-bottom: none !important;
+              display: inline !important;
+              margin-bottom: 0 !important;
+              padding-bottom: 0 !important;
+            }
+
+            i {
+              font-style: italic;
+            }
+
+            code {
+              font-family: monospace;
+              background: rgba(0, 0, 0, 0.1);
+              padding: 2px 4px;
+              border-radius: 4px;
+              font-size: 0.9em;
+            }
+
+            // Stile Titoli Markdown
+            h1, h2, h3 {
+              margin: 4px 0 0 0 !important; // Ridotto da 12px a 4px
+              padding: 0 !important;
+              color: @title-color;
+              font-weight: bold;
+              line-height: 1.0 !important;
+              &:first-child { margin-top: 0 !important; }
+            }
+            h1 { font-size: 1.3em; border-bottom: 1px solid fade(@text, 20%); }
+            h2 { font-size: 1.2em; }
+            h3 { font-size: 1.1em; }
+
+            // Contenuto del messaggio (generato da marked)
+            .msg-content {
+              margin: 0 !important;
+              padding: 0 !important;
+              line-height: 1.1 !important; // Ridotto da 1.3 a 1.1
+
+              // Azzeramento totale di default per tutti i figli
+              & > * {
+                margin-bottom: 0 !important;
+                margin-top: 0 !important;
+              }
+
+              // Paragrafi: spazio ridotto al minimo indispensabile
+              p {
+                margin: 0 !important;
+                padding: 0 !important;
+                & + p { margin-top: 2px !important; } // Ridotto da 4px a 2px
+              }
+
+              // Liste: azzerato lo spazio sopra per incollarle al testo
+              ul, ol {
+                margin-top: 0 !important; // Azzerato
+                margin-bottom: 0 !important;
+                padding: 0 0 0 25px !important;
+                
+                li {
+                  display: list-item;
+                  margin-top: 0 !important; // Azzerato
+                  margin-bottom: 0 !important;
+                  padding: 0 !important;
+                  
+                  // Incolla il testo al numero
+                  p {
+                    display: inline !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                  }
+                }
+              }
+              ul { list-style-type: disc !important; }
+              ol { list-style-type: decimal !important; }
+
+              // Se un elemento di blocco segue un titolo, lo incolliamo (spazio sotto titolo = 0)
+              h1 + *, h2 + *, h3 + * {
+                margin-top: 0 !important;
+              }
+            }
+
+            // Intestazione messaggio (User:, Assistant:, etc.)
+            & > b:first-child {
+              border-bottom: 1px solid fade(@text, 10%) !important;
+              font-size: 0.9em;
+              text-transform: uppercase;
+              letter-spacing: 1.2px;
+              opacity: 0.9;
+              display: block;
+              margin: 0 !important; // Azzerato totale
+              padding: 0 !important;
+            }
+          }
+          .user {
+            background: fade(@color2, 5%);
+            border: 1px solid fade(@color2, 20%) !important;
+            border-left: 6px solid @color2 !important;
+            & > b:first-child {
+              color: @color3;
+            } // Usiamo il colore base (scuro in light, giallo in dark)
+            .btn-edit-last {
+              box-sizing: border-box;
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: fade(@container-bg, 80%);
+              border: 1px solid fade(@text, 10%);
+              cursor: pointer;
+              color: @color2;
+              width: 32px;
+              height: 32px;
+              border-radius: 50%;
+              transition: all 0.2s ease;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+               z-index: @z-tree-btn;
+              &:hover {
+                color: @color1;
+                background: @container-bg;
+                transform: scale(1.1);
+              }
+              svg {
+                width: 18px;
+                height: 18px;
+              }
+            }
+          }
+          .assistant {
+            background: fade(@color1, 5%);
+            border: 1px solid fade(@color1, 20%) !important;
+            border-left: 6px solid @color1 !important;
+            & > b:first-child {
+              color: @color3;
+            } // Usiamo il colore base
+          }
+          .system {
+            background: fade(@color3, 5%);
+            border: 1px dashed fade(@color3, 30%) !important;
+            & > b:first-child {
+              color: @color3;
+            } // Usiamo il colore base
+          }
+        }
+      }
+    }
+    .item2 .input-wrapper .text-input {
+      background: @input-bg;
+      color: @text;
+      box-shadow: 0 0 0 2px @border-shadow;
+      &:hover {
+        box-shadow: 0 0 0 2px @color2;
+      }
+      &:focus {
+        box-shadow: 0 0 0 2px @color1;
+      }
+    }
+  }
+
+  // --- Menu ---
+  .menu-h {
+    background-color: @menu-h-bg;
+    box-shadow: 0 0 0 2px @border-shadow;
+    .release {
+      color: @text;
+    }
+    .menu-icon {
+      &:hover .nav-icon::before {
+        color: @menu-icon-hover;
+      }
+      .nav-icon::before {
+        color: @menu-icon-fg;
+      }
+    }
+    .head-wrapper {
+      .log,
+      .help,
+      .provider-settings,
+      .doctype-settings,
+      .upload {
+        color: @text;
+        background: @btn-bg;
+        &:hover {
+          background: @btn-hover;
+        }
+      }
+      .upload .icon {
+        stroke: @text;
+      }
+      .log {
+        background: @log-bg !important;
+        color: @log-fg !important;
+        &:hover {
+          background: @log-hover-bg !important;
+        }
+        &.active {
+          background: @log-active-bg !important;
+          &:hover {
+            background: @log-active-hover-bg !important;
+          }
+        }
+      }
+    }
+  }
+  .menu-box {
+    background: @menu-box-bg;
+    box-shadow: 0 0 0 2px @border-box-shadow;
+    ul {
+      border-top: 1px solid @menu-box-border;
+      li {
+        border: 1px solid @menu-box-border;
+        border-top: none;
+        b {
+          background: @label-btn-bg;
+          color: @delete-btn-fg;
+        }
+        a {
+          color: @menu-box-fg;
+          font-size: @fsize-menu;
+        }
+        &:hover {
+          background-color: lighten(@menu-bg, 25%);
+        }
+        a.delete,
+        a.help {
+          background: @delete-btn-bg;
+          color: @delete-btn-fg;
+          &:hover {
+            background: @delete-btn-hover-bg;
+            color: @delete-btn-hover-fg;
+          }
+        }
+      }
+    }
+  }
+
+  // --- Pulsanti ---
+  .input-actions .clear-history .icon {
+    fill: @text;
+  }
+  .clear-input {
+    color: @btn-color;
+    background: transparent;
+    &:hover {
+      color: @btn-hover-fg;
+    }
+  }
+  .output-actions {
+    .copy-output,
+    .wnd-output,
+    .clear-history,
+    .clear-output {
+      background-color: @btn-bg;
+      .icon,
+      .copy-icon {
+        fill: @text;
+      }
+      &:hover {
+        background-color: @btn-hover;
+        .icon,
+        .copy-icon {
+          fill: @btn-hover-fg;
+        }
+      }
+    }
+    .delete-kb-btn {
+      background: @delete-btn-bg;
+      .icon {
+        fill: #ffffff;
+      }
+      &:hover {
+        background: @delete-btn-hover-bg;
+      }
+    }
+    .clear-history {
+      background: @btn-send0-bg; // Rosso (@dark-color1)
+      &:hover {
+        background: @btn-send0-hover-bg;
+      }
+    }
+    .clear-history1 {
+      background: @btn-send1-bg; // Giallo (@dark-color3)
+      &:hover {
+        background: @btn-send1-hover-bg;
+      }
+    }
+    .copy-output.copied {
+      background: @btn-copied;
+    }
+  }
+
+  .input-context-actions,
+  .input-actions {
+    button {
+      background-color: @btn-bg;
+      .icon,
+      .btn-icon-svg {
+        fill: @text;
+      }
+      border: none;
+      box-shadow: none;
+      &:hover {
+        background-color: @btn-hover;
+        .icon,
+        .btn-icon-svg {
+          fill: @btn-hover-fg;
+        }
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .input-actions {
+    #btn-action1-knowledge {
+      background: @dark-color1; // Rosso
+      &:hover {
+        background: lighten(@dark-color1, 10%);
+      }
+    }
+    #btn-action2-start-convo {
+      background: @dark-color3; // Giallo
+      &:hover {
+        background: lighten(@dark-color3, 10%);
+      }
+    }
+    #btn-action3-continue-convo {
+      background: @dark-color2; // Verde
+      &:hover {
+        background: lighten(@dark-color2, 10%);
+      }
+    }
+  }
+
+  .input-context-actions {
+    #btn-edit-last-fixed,
+    .clear-input {
+      background-color: @btn-bg;
+      .icon {
+        fill: @text;
+      }
+      &:hover {
+        background-color: @btn-hover;
+        .icon {
+          fill: @btn-hover-fg;
+        }
+      }
+    }
+  }
+
+  // --- Finestre ---
+  .window-text,
+  .window-info {
+    background: @wnd-bg;
+    color: @text;
+    box-shadow: 0 0 0 2px @wnd-border-shadow;
+  }
+  .window-text {
+    pre.pre-text,
+    div.div-text {
+      color: @wnd-pre-color;
+    }
+    div.text .center {
+      color: @color3;
+    }
+  }
+  .btn-wrapper {
+    background: @wnd-btn-wrapper-bg;
+    .btn-copy {
+      background: inherit;
+      .copy-icon {
+        fill: @btn-color;
+        &:hover {
+          fill: @btn-hover-fg;
+          background: @wnd-btn-hover-bg;
+        }
+      }
+    }
+    .btn-close {
+      background-color: transparent;
+      color: @btn-color;
+      &:hover {
+        color: @btn-hover-fg;
+        background: @wnd-btn-hover-bg;
+      }
+    }
+  }
+  .window-info .div-info li {
+    border-bottom: 1px solid darken(@wnd-bg, 10%);
+  }
+
+  // --- Tabelle ---
+  .table-data {
+    th,
+    td {
+      border-color: @menu-border;
+      b {
+        background-color: @btn-success-bg;
+        color: #ffffff;
+      }
+    }
+    th {
+      background-color: @menu-h-bg;
+    }
+    .link-show-data,
+    .link-show-doc {
+      color: @table-link-fg;
+      &:hover {
+        color: @table-link-hover-fg;
+      }
+    }
+    .delete-doc-btn {
+      cursor: pointer;
+      border-radius: 5px;
+      padding: 1px 2px;
+      font-weight: normal;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Raffinamento Pulsanti Azione
+  .btn-success,
+  .btn-danger {
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .btn-success {
+    background-color: @light-color2;
+    color: #ffffff;
+    &:hover {
+      background-color: lighten(@light-color2, 10%);
+    }
+  }
+
+  .btn-danger {
+    background-color: @light-color1;
+    color: #ffffff;
+    &:hover {
+      background-color: lighten(@light-color1, 10%);
+    }
+  }
+
+  .table-data {
+    tr:nth-child(even) {
+      background-color: @table-tr-even-bg;
+    }
+    tr:hover {
+      background-color: @table-tr-hover-bg;
+    }
+  }
+
+  // --- Liste Dati (simili a tabelle) ---
+  .list-data {
+    li {
+      border-color: @menu-border;
+    }
+    li:first-child {
+      background-color: @menu-h-bg; // Apply header background color
+      font-weight: bold; // Make it bold like table headers
+    }
+    li:nth-child(even) {
+      background-color: @table-tr-even-bg;
+    }
+    li:hover {
+      background-color: @table-tr-hover-bg;
+    }
+  }
+
+  // --- Upload ---
+  .upload-dialog-content {
+    .upload-description {
+      color: @text;
+    }
+    .drop-zone {
+      border-color: @drop-zone-border;
+      p {
+        color: @drop-zone-fg;
+      }
+      &.drag-over {
+        background-color: @drop-zone-drag-over-bg;
+        border-color: @color2;
+      }
+    }
+    #progress-container {
+      div {
+        background-color: @progress-bg;
+      }
+      #progress-bar {
+        background-color: @progress-bar-bg;
+      }
+      #progress-text {
+        color: @text;
+      }
+    }
+    #file-list-container {
+      border-color: @file-list-border;
+    }
+    .file-list-item {
+      border-bottom-color: @file-list-item-border;
+      color: @text;
+      &.success {
+        background-color: @file-list-item-success-bg;
+        color: @file-list-item-success-fg;
+      }
+      &.duplicate {
+        background-color: @file-list-item-duplicate-bg;
+        color: @file-list-item-duplicate-fg;
+      }
+      &.error {
+        background-color: @file-list-item-error-bg;
+        color: @file-list-item-error-fg;
+      }
+    }
+    #upload-summary {
+      background-color: @summary-bg;
+      border: 1px solid @summary-border;
+      strong {
+        color: @text;
+      }
+      #summary-content {
+        .success {
+          color: @summary-success-fg;
+        }
+        .duplicate {
+          color: @summary-duplicate-fg;
+        }
+        .error {
+          color: @summary-error-fg;
+        }
+        details {
+          summary {
+            color: @text;
+          }
+          ul li {
+            color: @text;
+          }
+        }
+      }
+    }
+  }
+
+  // --- Dialogo Cancellazione Dati ---
+  .delete-dialog {
+    background-color: @dialog-bg;
+    color: @dialog-text;
+    padding: 10px; // Ridotto da 1em (16px)
+    h4 {
+      color: @text;
+      margin: 0 0 10px 0; // Margine ridotto
+    }
+    .list-data {
+      margin-bottom: 8px; // Ridotto
+      li {
+        padding: 6px 10px; // Ridotto padding righe
+        label {
+          color: @text;
+          font-size: 0.9em; // Leggermente più piccolo
+        }
+      }
+    }
+    .table-data {
+      margin: 10px auto; // Ridotto margine tabella
+      td,
+      th {
+        padding: 6px 10px; // Ridotto padding celle
+        font-size: 0.9em;
+      }
+    }
+    .delete-actions {
+      display: flex;
+      flex-direction: row; // Cambiato da column per compattezza orizzontale
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+
+      button {
+        padding: 8px 15px; // Più bilanciato
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.85em; // Unificato
+        font-weight: bold;
+        width: auto; // Non più 80%
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      .btn-delete-selected {
+        background-color: darken(@color2, 15%);
+        color: #ffffff;
+        &:hover {
+          background-color: darken(@color2, 5%);
+          text-decoration: underline;
+        }
+      }
+      .btn-delete-all {
+        background-color: @delete-btn-bg;
+        color: #ffffff;
+        &:hover {
+          background-color: @delete-btn-hover-bg;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  // --- Selettori Provider/DocType ---
+  .provider-tree-container,
+  .doctype-tree-container {
+    background-color: @tree-bg;
+    border: 2px solid @tree-border;
+  }
+  .provider-tree-header,
+  .doctype-tree-header {
+    color: @tree-header-fg;
+  }
+  .provider-tree-close-btn,
+  .doctype-tree-close-btn {
+    color: @tree-close-btn-fg;
+  }
+  .provider-tree .provider-node > span {
+    color: @tree-node-fg;
+    &.active {
+      color: @tree-node-active-fg;
+    }
+  }
+  .provider-tree .model-node {
+    color: @tree-model-node-fg;
+    &:hover {
+      background-color: @tree-model-node-hover-bg;
+    }
+    &.active {
+      background-color: @tree-model-node-active-bg;
+      color: @tree-model-node-active-fg;
+    }
+  }
+  .doctype-tree .doctype-node > span {
+    color: @tree-doctype-node-fg;
+    &.active {
+      background-color: @tree-doctype-node-active-bg;
+      color: @tree-doctype-node-active-fg;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+  .doctype-tree .subdoctype-node {
+    color: @tree-subdoctype-node-fg;
+    &:hover {
+      background-color: @tree-subdoctype-node-hover-bg;
+      color: @tree-subdoctype-node-hover-fg;
+    }
+  }
+  .active-doctype-display {
+    // background: @active-doctype-bg;
+    // border-color:@active-doctype-border;
+    color: @active-doctype-fg;
+  }
+  .active-model-display {
+    // background: @active-model-bg;
+    // border-color:@active-model-border;
+    color: @active-model-fg;
+  }
+  .active-kb-display {
+    color: @kb-display-fg;
+  }
+}
+
+// ===================================================================
+//  7. APPLICAZIONE DEI TEMI
+// ===================================================================
+
+// -------------------
+// Tema DARK
+// -------------------
+.theme-dark {
+  // --- Mappatura Variabili Generiche ---
+
+  @pulse-animation: pulse-dark;
+  @bg: @dark-bg;
+  @log-bg: darken(@dark-color1, 20%);
+  @log-fg: @dark-text;
+  @log-hover-bg: darken(@dark-color1, 10%);
+  @log-active-bg: darken(@dark-color2, 20%);
+  @log-active-hover-bg: darken(@dark-color2, 10%);
+  @container-bg: @dark-container-bg;
+  @text: @dark-text;
+  @color1: @dark-color1;
+  @color2: @dark-color2;
+  @color3: @dark-color3;
+  @border-shadow: @dark-border-shadow;
+  @btn-bg: @dark-btn-bg;
+  @btn-hover: @dark-btn-hover;
+  @btn-color: @dark-btn-color;
+  @btn-hover-fg: @dark-btn-hover-fg;
+  @btn-copied: @dark-btn-copied;
+  @output-bg: @dark-output-bg;
+  @input-bg: @dark-input-bg;
+  @wnd-bg: @dark-wnd-bg;
+  @wnd-border-shadow: @dark-wnd-border-shadow;
+  @wnd-pre-color: @dark-wnd-pre-color;
+  @menu-h-bg: lighten(@dark-menu-bg, 10%);
+  @menu-bg: @dark-menu-bg;
+  @menu-border: @dark-menu-border;
+  @menu-fg: @dark-menu-fg;
+  @menu-icon-fg: @dark-menu-icon-fg;
+  @menu-icon-hover: @dark-menu-icon-hover;
+  @menu-box-bg: lighten(@dark-menu-bg, 5%);
+  @menu-box-border: @dark-menu-border;
+  @menu-box-fg: @dark-menu-fg;
+  @menu-icon-box-hover: @dark-menu-icon-hover;
+  @border-box-shadow: @dark-border-shadow;
+  @btn-send0-bg: @dark-btn-send0-bg;
+  @btn-send0-hover-bg: @dark-btn-send0-hover-bg;
+  @btn-send1-bg: @dark-btn-send1-bg;
+  @btn-send1-hover-bg: @dark-btn-send1-hover-bg;
+  @btn-edit-fixed-bg: @dark-btn-edit-fixed-bg;
+  @btn-edit-fixed-hover-bg: @dark-btn-edit-fixed-hover-bg;
+  @btn-send2-bg: @dark-btn-send2-bg;
+  @btn-send2-hover-bg: @dark-btn-send2-hover-bg;
+  @label-btn-bg: @dark-label-btn-bg;
+  @delete-btn-bg: @dark-delete-btn-bg;
+  @delete-btn-hover-bg: @dark-delete-btn-hover-bg;
+  @delete-btn-fg: @dark-delete-btn-fg;
+  @delete-btn-hover-fg: @dark-delete-btn-hover-fg;
+  @btn-success-bg: @dark-btn-success-bg;
+  @btn-success-hover-bg: @dark-btn-success-hover-bg;
+  @btn-danger-bg: @dark-btn-danger-bg;
+  @btn-danger-hover-bg: @dark-btn-danger-hover-bg;
+  @wnd-btn-wrapper-bg: lighten(@dark-wnd-bg, 5%);
+  @wnd-btn-hover-bg: lighten(@dark-wnd-bg, 15%);
+  @table-tr-even-bg: lighten(@dark-wnd-bg, 5%);
+  @table-tr-hover-bg: lighten(@dark-wnd-bg, 15%);
+  @spinner-stop-msg-fg: #e8f406;
+  @spinner-stop-msg-bg: #3e3e3e;
+  @spinner-stop-msg-border: #05cc80;
+  @spinner-stop-msg-hover-border: #fc0909;
+  @table-link-fg: #efac37;
+  @table-link-hover-fg: @dark-color1;
+  @table-delete-btn-fg: #ffffff;
+  @table-delete-btn-bg: #f30404fc;
+  @table-delete-btn-border: #8e0303fc;
+  @table-delete-btn-hover-bg: #e44c00;
+  @drop-zone-border: #888;
+  @drop-zone-fg: #888;
+  @drop-zone-drag-over-bg: lighten(@dark-container-bg, 10%);
+  @file-list-border: #444;
+  @file-list-item-border: #555;
+  @tree-bg: #2d2d2d;
+  @tree-border: #4caf50;
+  @file-list-item-success-bg: @dark-file-list-item-success-bg;
+  @file-list-item-success-fg: @dark-file-list-item-success-fg;
+  @file-list-item-duplicate-bg: @dark-file-list-item-duplicate-bg;
+  @file-list-item-duplicate-fg: @dark-file-list-item-duplicate-fg;
+  @file-list-item-error-bg: @dark-file-list-item-error-bg;
+  @file-list-item-error-fg: @dark-file-list-item-error-fg;
+  @summary-bg: @dark-summary-bg;
+  @summary-border: @dark-summary-border;
+  @summary-success-fg: @dark-summary-success-fg;
+  @summary-duplicate-fg: @dark-summary-duplicate-fg;
+  @summary-error-fg: @dark-summary-error-fg;
+  @progress-bg: @dark-progress-bg;
+  @progress-bar-bg: @dark-progress-bar-bg;
+  @tree-header-fg: #eee;
+  @tree-close-btn-fg: #ccc;
+  @tree-node-fg: #87ceeb;
+  @tree-node-active-fg: #4caf50;
+  @tree-model-node-fg: #ddd;
+  @tree-model-node-hover-bg: #444;
+  @tree-model-node-active-bg: #4caf50;
+  @tree-model-node-active-fg: white;
+  @tree-doctype-node-fg: #4caf50;
+  @tree-doctype-node-active-bg: #4caf50;
+  @tree-doctype-node-active-fg: white;
+  @tree-subdoctype-node-fg: #bbb;
+  @tree-subdoctype-node-hover-bg: #333;
+  @tree-subdoctype-node-hover-fg: #ddd;
+  // @active-doctype-bg: @dark-color2;
+  // @active-doctype-border: @dark-color2;
+  @active-doctype-fg: lighten(@dark-color2, 5%);
+  // @active-model-bg: @dark-color2;
+  // @active-model-border: @dark-color2;
+  @active-model-fg: lighten(@dark-color2, 5%);
+  @kb-display-fg: @dark-kb-display-fg;
+  @dialog-bg: lighten(@dark-bg, 10%);
+  @dialog-text: @dark-text;
+  @title-color: lighten(@dark-color3, 15%); // Titoli chiari su fondo scuro
+
+  // --- Applica Stili e Override ---
+  .apply-theme();
+
+  .btn-theme-toggle svg {
+    fill: none;
+    stroke: @dark-menu-fg;
+  }
+}
+
+// -------------------
+// Tema LIGHT
+// -------------------
+.theme-light {
+  // --- Mappatura Variabili Generiche ---
+  @pulse-animation: pulse-light;
+  @bg: @light-bg;
+  @log-bg: @light-color1;
+  @log-fg: @light-bg;
+  @log-hover-bg: lighten(@light-color1, 10%);
+  @log-active-bg: @light-color2;
+  @log-active-hover-bg: lighten(@light-color2, 10%);
+  @container-bg: @light-container-bg;
+  @text: @light-text;
+  @color1: @light-color1;
+  @color2: @light-color2;
+  @color3: @light-color3;
+
+  .provider-settings:hover {
+    background-color: fade(@light-color2, 40%) !important;
+    box-shadow: 0 0 8px fade(@light-color2, 50%);
+  }
+
+  @border-shadow: @light-border-shadow;
+  @btn-bg: @light-btn-bg;
+  @btn-hover: @light-btn-hover;
+  @btn-color: @light-btn-color;
+  @btn-hover-fg: @light-btn-hover-fg;
+  @btn-copied: @light-btn-copied;
+  @output-bg: @light-output-bg;
+  @input-bg: @light-input-bg;
+  @wnd-bg: @light-wnd-bg;
+  @wnd-border-shadow: @light-wnd-border-shadow;
+  @wnd-pre-color: @light-wnd-pre-color;
+  @menu-h-bg: @light-menu-bg;
+  @menu-bg: @light-menu-bg;
+  @menu-border: @light-menu-border;
+  @menu-fg: @light-menu-fg;
+  @menu-icon-fg: @light-menu-icon-fg;
+  @menu-icon-hover: @light-menu-icon-hover;
+  @menu-box-bg: @light-menu-box-bg;
+  @menu-box-border: @light-menu-box-border;
+  @menu-box-fg: @light-menu-box-fg;
+  @menu-icon-box-hover: @light-menu-icon-box-hover;
+  @border-box-shadow: @light-border-box-shadow;
+  // Modifica per usare gli stessi colori del tema scuro per i pulsanti di invio
+  // @btn-send0-bg: @light-btn-send0-bg;
+  // @btn-send0-hover-bg: @light-btn-send0-hover-bg;
+  // @btn-send1-bg: @light-btn-send1-bg;
+  // @btn-send1-hover-bg: @light-btn-send1-hover-bg;
+  // @btn-send2-bg: @light-btn-send2-bg;
+  // @btn-send2-hover-bg: @light-btn-send2-hover-bg;
+  @btn-send0-bg: @dark-btn-send0-bg;
+  @btn-send0-hover-bg: @dark-btn-send0-hover-bg;
+  @btn-send1-bg: @dark-btn-send1-bg;
+  @btn-send1-hover-bg: @dark-btn-send1-hover-bg;
+  @btn-edit-fixed-bg: @dark-btn-edit-fixed-bg;
+  @btn-edit-fixed-hover-bg: @dark-btn-edit-fixed-hover-bg;
+  @btn-send2-bg: @dark-btn-send2-bg;
+  @btn-send2-hover-bg: @dark-btn-send2-hover-bg;
+  @label-btn-bg: @light-label-btn-bg;
+  @delete-btn-bg: @light-delete-btn-bg;
+  @delete-btn-hover-bg: @light-delete-btn-hover-bg;
+  @delete-btn-fg: @light-delete-btn-fg;
+  @delete-btn-hover-fg: @light-delete-btn-hover-fg;
+  @btn-success-bg: @light-btn-success-bg;
+  @btn-success-hover-bg: @light-btn-success-hover-bg;
+  @btn-danger-bg: @light-btn-danger-bg;
+  @btn-danger-hover-bg: @light-btn-danger-hover-bg;
+  @wnd-btn-wrapper-bg: darken(@light-wnd-bg, 2%);
+  @wnd-btn-hover-bg: darken(@light-wnd-bg, 5%);
+  @table-tr-even-bg: darken(@light-wnd-bg, 3%);
+  @table-tr-hover-bg: darken(@light-wnd-bg, 8%);
+  @spinner-stop-msg-fg: @light-text;
+  @spinner-stop-msg-bg: lighten(@light-color3, 20%);
+  @spinner-stop-msg-border: @light-color2;
+  @spinner-stop-msg-hover-border: @light-color1;
+  @table-link-fg: #0303d3;
+  @table-link-hover-fg: @light-color1;
+  @table-delete-btn-fg: #ffffff;
+  @table-delete-btn-bg: #d32f2f;
+  @table-delete-btn-border: #b71c1c;
+  @table-delete-btn-hover-bg: #e53935;
+  @drop-zone-border: #aaa;
+  @drop-zone-fg: #aaa;
+  @drop-zone-drag-over-bg: darken(@light-container-bg, 5%);
+  @file-list-border: #ccc;
+  @file-list-item-border: #ddd;
+  @tree-bg: #fafafa;
+  @tree-border: @light-color2;
+  @file-list-item-success-bg: @light-file-list-item-success-bg;
+  @file-list-item-success-fg: @light-file-list-item-success-fg;
+  @file-list-item-duplicate-bg: @light-file-list-item-duplicate-bg;
+  @file-list-item-duplicate-fg: @light-file-list-item-duplicate-fg;
+  @file-list-item-error-bg: @light-file-list-item-error-bg;
+  @file-list-item-error-fg: @light-file-list-item-error-fg;
+  @summary-bg: @light-summary-bg;
+  @summary-border: @light-summary-border;
+  @summary-success-fg: @light-summary-success-fg;
+  @summary-duplicate-fg: @light-summary-duplicate-fg;
+  @summary-error-fg: @light-summary-error-fg;
+  @progress-bg: @light-progress-bg;
+  @progress-bar-bg: @light-progress-bar-bg;
+  @tree-header-fg: @light-text;
+  @tree-close-btn-fg: #555;
+  @tree-node-fg: #007acc;
+  @tree-node-active-fg: @light-color2;
+  @tree-model-node-fg: #333;
+  @tree-model-node-hover-bg: #ddd;
+  @tree-model-node-active-bg: @light-color2;
+  @tree-model-node-active-fg: white;
+  @tree-doctype-node-fg: @light-color2;
+  @tree-doctype-node-active-bg: @light-color2;
+  @tree-doctype-node-active-fg: white;
+  @tree-subdoctype-node-fg: #666;
+  @tree-subdoctype-node-hover-bg: #eee;
+  @tree-subdoctype-node-hover-fg: #333;
+  // @active-doctype-bg:@light-color2;
+  // @active-doctype-border: @light-color2;
+  @active-doctype-fg: darken(@light-color2, 10%);
+  // @active-model-bg:@light-color2;
+  // @active-model-border: @light-color2;
+  @active-model-fg: darken(@light-color2, 10%);
+  @kb-display-fg: @light-kb-display-fg;
+  @dialog-bg: @light-bg;
+  @dialog-text: @light-text;
+  @title-color: @light-color3; // Titolo scuro (arancione bruciato) su fondo chiaro
+
+  // --- Applica Stili e Override ---
+  .apply-theme();
+
+  .btn-theme-toggle svg {
+    stroke: @light-text;
+    fill: none;
+  }
+}
