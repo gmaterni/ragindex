@@ -64,7 +64,7 @@
 
       </div>
 
-      <button id="btn-theme-toggle" class="btn-theme-toggle tt-left" data-tt="Cambia Tema">
+      <button id="btn-theme-toggle" class="btn-theme-toggle tt-left" data-tt="Tema Chiaro">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5" />
           <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
@@ -97,11 +97,11 @@
           <li><b>Gestione Dati</b></li>
           <li><a href="#" id="menu-elenco-docs">Elenco Documenti</a></li>
           <li><a href="#" id="menu-elenco-dati">Elenco Dati Archiviati</a></li>
-          <li><a href="#" id="menu-delete-all" class="delete">Cancella Dati</a></li>
           <li class="separator"></li>
           <li><a href="#" id="menu-default-api-keys">API Keys Default</a></li>
           <li><a href="#" id="menu-add-api-key">Gestisci API Key</a></li>
           <li class="separator"></li>
+          <li><a href="#" id="menu-delete-all" class="delete">Reset</a></li>
           <li class="separator"></li>
           <li><a href="#" id="menu-logout" class="delete">Logout</a></li>
         </ul>
@@ -116,15 +116,6 @@
           <div class="text-out" id="id-text-out" tabindex="0">
             <div class="div-text"></div>
           </div>
-
-          <div class="output-actions">
-            <button id="btn-copy-output" class="copy-output tt-leftx" data-tt="Copia Output">
-              <svg class="icon" viewBox="0 0 20 24">
-                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
-              </svg>
-            </button>
-
-          </div>
         </div>
       </div>
 
@@ -133,25 +124,25 @@
           <textarea class="text-input" placeholder="Scrivi qui... " rows="2"></textarea>
         </div>
         <div class="input-context-actions">
-          <button id="btn-edit-last-fixed" class="tt-leftx" data-tt="Ripristina e Modifica Ultima Domanda">
-            <svg class="icon" viewBox="0 0 24 24">
-              <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
-            </svg>
-          </button>
           <button class="clear-input tt-leftx" data-tt="Cancella Input">
             <svg class="icon" viewBox="0 0 24 24">
               <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
             </svg>
           </button>
+          <button id="btn-copy-output" class="tt-leftx" data-tt="Copia Output">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+            </svg>
+          </button>
         </div>
 
         <div class="input-actions">
-          <button id="btn-action3-continue-convo" class="tt-leftx" data-tt="(3) Continua Dialogo">
+          <button id="btn-action3-continue-convo" class="tt-leftx" data-tt="Continua Dialogo">
             <svg class="btn-icon-svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8 5v14l11-7z" />
             </svg>
           </button>
-          <button id="btn-action2-start-convo" class="tt-leftx" data-tt="(2) Avvia Conversazione">
+          <button id="btn-action2-start-convo" class="tt-leftx" data-tt="Avvia Conversazione">
             <svg class="btn-icon-svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8 5v14l11-7z" />
             </svg>

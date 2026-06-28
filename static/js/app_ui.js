@@ -168,11 +168,11 @@ const _UaWindowFactory = function(id, contentClass, copyMethodName, showCopy = t
 
         const copyBtnHtml = showCopy ? `
                     <button class="btn-copy wcp tt-left" data-tt="Copia" onclick="wnds.${copyMethodName}.copy()">
-                        <svg class="icon" viewBox="0 0 24 24">
+                        <svg class="icon copy-icon" viewBox="0 0 24 24">
                             <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
                         </svg>
                     </button>
-                    <button class="btn-close wcl" onclick="wnds.${copyMethodName}.close()">X</button>
+                    <button class="btn-close wcl tt-left" data-tt="Chiudi" onclick="wnds.${copyMethodName}.close()">X</button>
                     ` : `
                     <button class="btn-copy wcl" onclick="wnds.${copyMethodName}.close()">
                         <svg class="icon" viewBox="0 0 24 24" style="fill: #f6e602;">
@@ -223,7 +223,7 @@ const _UaWindowInfoFactory = function(id) {
         const html = `
             <div class="window-info">
                 <div class="btn-wrapper">
-                    <button class="btn-close" onclick="wnds.winfo.close()">X</button>
+                    <button class="btn-close tt-left" data-tt="Chiudi" onclick="wnds.winfo.close()">X</button>
                 </div>
                 <div class="div-info">${innerContent}</div>
             </div>
@@ -670,8 +670,8 @@ export const TextOutput = {
         if (rawText.length < 2) return;
         try {
             await navigator.clipboard.writeText(textFormatter(rawText));
-            outputEl.classList.add("copied");
-            setTimeout(() => outputEl.classList.remove("copied"), 2000);
+            const btn = document.getElementById("btn-copy-output");
+            if (btn) { btn.classList.add("copied"); setTimeout(() => btn.classList.remove("copied"), 2000); }
         } catch (err) { console.error("TextOutput.copyAsync:", err); }
     },
     clearHistoryAsync: async function() {
@@ -774,7 +774,6 @@ export const bindEventListener = function() {
         "menu-delete-kb": _actionDeleteKnowledgeBaseAsync,
         "btn-action2-start-convo": TextInput.startConversationAsync,
         "btn-action3-continue-convo": TextInput.continueConversationAsync,
-        "btn-edit-last-fixed": () => wnds.editLastQuestion(),
         "btn-copy-output": TextOutput.copyAsync
     };
 
@@ -898,7 +897,7 @@ export const bindEventListener = function() {
             jfh.append('<button class="btn-warning btn-small" onclick="wnds.delDocs()">Elimina</button></div>');
             if (arr.length > 0) {
                 jfh.append('<table class="table-data"><tbody>');
-                arr.forEach((name, i) => jfh.append(`<tr><td><input type="checkbox" class="doc-checkbox" data-doc-name="${name}"></td><td>${name}</td><td><button onclick="wnds.viewDoc(${i})">Vedi</button></td></tr>`));
+                arr.forEach((name, i) => jfh.append(`<tr><td><input type="checkbox" class="doc-checkbox" data-doc-name="${name}"></td><td>${name}</td><td><button class="btn-success" onclick="wnds.viewDoc(${i})">Visualizza</button></td></tr>`));
                 jfh.append('</tbody></table>');
             } else jfh.append('<p>Nessun documento.</p>');
             jfh.append('</div>');
@@ -949,13 +948,14 @@ export const bindEventListener = function() {
     // --- INIZIALIZZAZIONE POPUP INFORMATIVI ---
     HelpPopup.bind("btn-upload", "<strong>Caricamento Documenti</strong><br>Carica file PDF, TXT o DOCX dal tuo computer per la Knowledge Base.");
     HelpPopup.bind("btn-provider-settings", "<strong>Configurazione LLM</strong><br>Seleziona il provider AI e il modello specifico.");
-    HelpPopup.bind("btn-action2-start-convo", "<strong>(2) Avvia Conversazione</strong><br>Cerca il contesto nei documenti e interroga l'AI per la prima risposta.");
-    HelpPopup.bind("btn-action3-continue-convo", "<strong>(3) Continua Dialogo</strong><br>Invia la nuova domanda mantenendo la memoria della chat e del contesto.");
-    HelpPopup.bind("btn-theme-toggle", "<strong>Cambia Tema</strong><br>Alterna tra tema chiaro e tema scuro per un miglior comfort visivo.");
+    HelpPopup.bind("btn-action2-start-convo", "<strong>Avvia Conversazione</strong><br>Cerca il contesto nei documenti e interroga l'AI per la prima risposta.");
+    HelpPopup.bind("btn-action3-continue-convo", "<strong>Continua Dialogo</strong><br>Invia la nuova domanda mantenendo la memoria della chat e del contesto.");
+
     HelpPopup.bind("menu-view-context", "<strong>Visualizza Contesto</strong><br>Mostra il contenuto estratto usato dall'AI per rispondere.");
     HelpPopup.bind("menu-view-convo", "<strong>Visualizza Conversazione</strong><br>Mostra l'intero storico della chat in formato testo.");
     HelpPopup.bind("menu-clear-context", "<strong>Cancella Contesto</strong><br>Azzeramento totale: cancella il contesto, la prima domanda e l'intera conversazione. La chat torna come appena avviata.");
     HelpPopup.bind("menu-clear-conversazione", "<strong>Cancella Conversazione</strong><br>Elimina solo i messaggi successivi alla prima domanda, mantenendo intatti il contesto e la domanda iniziale.");
-    HelpPopup.bind("menu-default-api-keys", "<strong>API Keys Default</strong><br>Ripristina le chiavi API predefinite dal file locale <code>api_x.json</code>.");
+    HelpPopup.bind("menu-delete-all", "<strong>Reset</strong><br>Elimina ogni dato: Knowledge Base, contesto, conversazioni, documenti e chiavi salvate. L'app torna allo stato iniziale.");
+    HelpPopup.bind("menu-default-api-keys", "<strong>API Keys Default</strong><br>Ripristina le chiavi API predefinite dal file locale <code>api_x.json</code>, sovrascrivendo quelle attuali.");
     HelpPopup.bind("menu-add-api-key", "<strong>Gestione API Key</strong><br>Aggiungi, attiva o elimina le tue chiavi API personali.");
 };

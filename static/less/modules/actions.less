@@ -2,40 +2,6 @@
 //  PULSANTI AZIONE, FINESTRE, WRAPPER
 // ===================================================================
 
-.output-actions,
-.input-actions {
-  display: flex;
-  flex-direction: column;
-  margin: 0 0.5vw;
-}
-.output-actions {
-  align-items: flex-end;
-  .copy-output {
-    box-sizing: border-box;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    transition:
-      background-color 0.3s,
-      transform 0.3s;
-    .icon,
-    .copy-icon {
-      width: 28px;
-      height: 28px;
-    }
-  }
-  .copy-output.copied {
-    transform: scale(1.2);
-  }
-}
-
 .input-actions {
   display: flex;
   flex-direction: column-reverse;

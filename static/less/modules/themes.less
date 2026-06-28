@@ -182,26 +182,6 @@
       color: @btn-hover-fg;
     }
   }
-  .output-actions {
-    .copy-output {
-      background-color: @btn-bg;
-      .icon,
-      .copy-icon {
-        fill: @text;
-      }
-      &:hover {
-        background-color: @btn-hover;
-        .icon,
-        .copy-icon {
-          fill: @btn-hover-fg;
-        }
-      }
-    }
-    .copy-output.copied {
-      background: @btn-copied;
-    }
-  }
-
   .input-context-actions,
   .input-actions {
     button {
@@ -239,8 +219,8 @@
   }
 
   .input-context-actions {
-    #btn-edit-last-fixed,
-    .clear-input {
+    .clear-input,
+    #btn-copy-output {
       background-color: @btn-bg;
       .icon {
         fill: @text;
@@ -251,6 +231,9 @@
           fill: @btn-hover-fg;
         }
       }
+    }
+    #btn-copy-output.copied {
+      background: @btn-copied;
     }
   }
 
