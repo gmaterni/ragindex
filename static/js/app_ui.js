@@ -163,8 +163,8 @@ const _UaWindowFactory = function(id, contentClass, copyMethodName, showCopy = t
         _win.drag().setZ(12);
 
         const isMenuOpen = document.body.classList.contains(CSS_MENU_OPEN);
-        const xPos = isMenuOpen ? 21 : 1;
-        _win.vw_vh().setXY(xPos, 5, 1);
+        const xPos = isMenuOpen ? 22 : 2;
+        _win.vw_vh().setXY(xPos, 6, 1);
 
         const copyBtnHtml = showCopy ? `
                     <button class="btn-copy wcp tt-left" data-tt="Copia" onclick="wnds.${copyMethodName}.copy()">
@@ -215,8 +215,8 @@ const _UaWindowInfoFactory = function(id) {
         _win.drag().setZ(11);
 
         const isMenuOpen = document.body.classList.contains(CSS_MENU_OPEN);
-        const xPos = isMenuOpen ? 21 : 1;
-        _win.vw_vh().setXY(xPos, 5, -1);
+        const xPos = isMenuOpen ? 22 : 2;
+        _win.vw_vh().setXY(xPos, 6, -1);
 
         const innerContent = typeof content === "string" ? `<div>${content}</div>` : (content.innerHTML || content);
 
@@ -254,43 +254,46 @@ const _UaWindowInfoFactory = function(id) {
 
 const HelpPopup = (function() {
     let _popupEl = null;
+    let _hideTimer = null;
 
     const _createPopup = function() {
         if (_popupEl) return;
         _popupEl = document.createElement("div");
         _popupEl.className = "help-popup-window";
-        _popupEl.style.position = "fixed";
-        _popupEl.style.backgroundColor = "#2d2d2d";
-        _popupEl.style.color = "#ffffff";
-        _popupEl.style.padding = "8px 12px";
-        _popupEl.style.borderRadius = "8px";
-        _popupEl.style.border = "1px solid #ffffff";
-        _popupEl.style.fontSize = "13px";
-        _popupEl.style.zIndex = "30000";
-        _popupEl.style.pointerEvents = "none";
         _popupEl.style.display = "none";
-        _popupEl.style.maxWidth = "280px";
-        _popupEl.style.boxShadow = "0 4px 12px rgba(0,0,0,0.5)";
-        _popupEl.style.lineHeight = "1.4";
         document.body.appendChild(_popupEl);
     };
 
     const show = function(event, text) {
         _createPopup();
+        if (_hideTimer) {
+            clearTimeout(_hideTimer);
+            _hideTimer = null;
+        }
         _popupEl.innerHTML = text;
+        _popupEl.classList.remove("visible");
         _popupEl.style.display = "block";
-        _popupEl.style.visibility = "hidden";
 
         const el = event.currentTarget;
         const rect = el.getBoundingClientRect();
         const pWidth = _popupEl.offsetWidth;
         const pHeight = _popupEl.offsetHeight;
         
-        let top = rect.top - pHeight - 12;
-        let left = rect.left + (rect.width / 2) - (pWidth / 2);
-        
-        if (top < 10 || el.closest(".head-wrapper")) {
-            top = rect.bottom + 12;
+        let top, left;
+        const isMenu = el.closest(".menu-box");
+
+        if (isMenu) {
+            const menuBox = document.querySelector(".menu-box");
+            const menuRect = menuBox.getBoundingClientRect();
+            left = menuRect.right + 8;
+            top = rect.top + (rect.height / 2) - (pHeight / 2);
+        } else {
+            top = rect.top - pHeight - 12;
+            left = rect.left + (rect.width / 2) - (pWidth / 2);
+
+            if (top < 10 || el.closest(".head-wrapper")) {
+                top = rect.bottom + 12;
+            }
         }
         
         if (left < 10) left = 10;
@@ -301,17 +304,26 @@ const HelpPopup = (function() {
         if (top + pHeight > window.innerHeight - 10) {
             top = rect.top - pHeight - 12;
         }
+        if (top < 10) top = 10;
 
         _popupEl.style.top = `${top}px`;
         _popupEl.style.left = `${left}px`;
-        _popupEl.style.visibility = "visible";
+
+        void _popupEl.offsetWidth;
+        _popupEl.classList.add("visible");
     };
 
     const hide = function() {
-        if (_popupEl) {
-            _popupEl.style.display = "none";
-            _popupEl.style.visibility = "hidden";
-        }
+        if (_hideTimer) return;
+        _hideTimer = setTimeout(function() {
+            if (_popupEl) {
+                _popupEl.classList.remove("visible");
+                setTimeout(function() {
+                    _popupEl.style.display = "none";
+                }, 200);
+            }
+            _hideTimer = null;
+        }, 300);
     };
 
     const bind = function(id, text) {
@@ -321,9 +333,10 @@ const HelpPopup = (function() {
         el.removeAttribute("title");
         const classesToRemove = Array.from(el.classList).filter(c => c.startsWith("tt-"));
         classesToRemove.forEach(c => el.classList.remove(c));
-        el.addEventListener("mouseenter", (e) => show(e, text));
-        el.addEventListener("mouseleave", hide);
-        el.addEventListener("click", hide);
+        const trigger = el.closest("li") || el;
+        trigger.addEventListener("mouseenter", (e) => show(e, text));
+        trigger.addEventListener("mouseleave", hide);
+        trigger.addEventListener("click", hide);
     };
 
     const api = { bind };

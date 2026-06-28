@@ -107,3 +107,47 @@
     transform: translateY(50%); // Spostato in alto del 50% della sua altezza
   }
 }
+
+/* ========= HELP POPUP (Dark Material Style) ========= */
+@help-popup-bg: #323232;
+@help-popup-text: #e0e0e0;
+@help-popup-accent: #00bd97;
+@help-popup-radius: 8px;
+@help-popup-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+@help-popup-font: 13px/1.5 "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+@help-popup-max-width: 280px;
+@help-popup-padding: 10px 14px;
+
+.help-popup-window {
+  position: fixed;
+  background: @help-popup-bg;
+  color: @help-popup-text;
+  font: @help-popup-font;
+  padding: @help-popup-padding;
+  border-radius: @help-popup-radius;
+  border: 1px solid rgba(255,255,255,0.08);
+  z-index: @z-tooltip;
+  pointer-events: none;
+  max-width: @help-popup-max-width;
+  box-shadow: @help-popup-shadow;
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+
+  strong {
+    color: lighten(@help-popup-accent, 10%);
+  }
+
+  code {
+    background: rgba(255,255,255,0.1);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+}
+
+.help-popup-window.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
