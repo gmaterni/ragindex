@@ -6,9 +6,49 @@
             "exported_key": "gab",
             "keys": [
                 {
+                    "name": "ua260305",
+                    "key": "mLEAxPXkA9rPiLJcwYB_lHn7dqiyacdpQqsI1DW",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ragquery",
+                    "key": "mLEAxPKgMeQsFqYcNp6ZJCqAAk0ypySqZDrlzLL",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ragtext",
+                    "key": "mLEAxPmlYry9bsBWYDj-XldkNaq3ZedzHx7_4Qo",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ipotesi2000",
+                    "key": "mLEAxPmbm9Yd4hWuwscCySF3mbdYfNPFc-TwojC",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ragindex",
+                    "key": "mLEAxPmP4kiTbJpVqu6W7V_PU19bJif-knhK8jm",
+                    "notes": "giuseppe.materni"
+                },
+                {
                     "name": "gab",
                     "key": "mLEAxPmoXRPFjtpMhpuQQdSrB0h6ocXleTxBbkL",
                     "notes": "gabriele.tenebra"
+                },
+                {
+                    "name": "gm",
+                    "key": "mLEAxPXTtsPxMN_aFNztNwMwBJwPBqiMejOS_JB",
+                    "notes": "gmaterni"
+                },
+                {
+                    "name": "giu",
+                    "key": "mLEAxPXcOxVKfsyjCDa0qoeRe_aAHNAdhFaIIrR",
+                    "notes": "giumaterni"
+                },
+                {
+                    "name": "ipotesi",
+                    "key": "mLEAxPpx77REpFF6IHuA04GVVmwl2wZ--ouZqZL",
+                    "notes": "ipotesi2000"
                 }
             ]
         },
@@ -16,6 +56,11 @@
             "api_key_env": "CEREBRAS_API_KEY",
             "exported_key": "ua260310",
             "keys": [
+                {
+                    "name": "crb1",
+                    "key": "N67-kBdBti0iqGMOzzOsNzqPaizPq7ztk5dO7S2VGVNPMzSzOVik",
+                    "notes": "giuseppe.materni"
+                },
                 {
                     "name": "ua260310",
                     "key": "N67-sa5s0VOr7zNMshiqGVSG7MSkaMkM2MrGzOP5MVN0q2iGqsMk",
@@ -28,9 +73,19 @@
             "exported_key": "260605",
             "keys": [
                 {
+                    "name": "260520",
+                    "key": "67-DE9Z7cD0E4G73bMNsJ4KvzZw4hcTmoCr3HElZxoCvPsidZcLSejkCOY4IdHWxol7",
+                    "notes": "giuseppe.materni"
+                },
+                {
                     "name": "260605",
                     "key": "67-y5LEDGyAGZeDfoiDBm588I3Gjiol34wpfbz2nKuV2UQz5F3MhRDmwMCXY31i4ctR",
                     "notes": "gabriele.tenebra"
+                },
+                {
+                    "name": "260606",
+                    "key": "67-V85pVBltImCNPWyRgeybwtAIGor0vRd4VxxeWofoI8Kw1f5kpbmyhC381HXzWlrX",
+                    "notes": "ipotesi2000"
                 }
             ]
         },
@@ -61,9 +116,24 @@
             "exported_key": "260416",
             "keys": [
                 {
+                    "name": "260414",
+                    "key": "qyqMNcyMydvxWeEA6PCo8QkLe5boT7dA",
+                    "notes": "giuseppe.materni"
+                },
+                {
                     "name": "260416",
                     "key": "VRd2FGMaeqvzGXHfsnQneD4bqPQi5qzi",
                     "notes": "ipotesi1000"
+                },
+                {
+                    "name": "vibegm261011",
+                    "key": "0dpg19W3yJeXgapABxXoMqBHqMxMByZR",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "gt261011",
+                    "key": "7SxLy2vax3WpEm8TKmkO6z2FMFgrqPDB",
+                    "notes": "gabriele.tenebra"
                 }
             ]
         },
@@ -75,6 +145,11 @@
                     "name": "hf1",
                     "key": "O2_hfgPYPPEVUUxjWKzGIRQn341w8qFfDKhDI",
                     "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "hf12",
+                    "key": "O2_hNDLVebH8EDgO7cPciTcVGZngmxI2Qf7Kz",
+                    "notes": "giuseppe.materni"
                 }
             ]
         },
@@ -82,6 +157,11 @@
             "api_key_env": "GROQ_API_KEY",
             "exported_key": "gmt2",
             "keys": [
+                {
+                    "name": "gmt1",
+                    "key": "o67_D6UzMLbtevBLhSuhBlSxHQsPg0vU1kIBru1CvpeIalzrAuLFivIy",
+                    "notes": "giuseppe.materni"
+                },
                 {
                     "name": "gmt2",
                     "key": "o67_deaFoPWuNsV9xSs82bmNHQsPg0vU9HpaKqgqYBbpDwdWvJMKIMR0",
@@ -94,8 +174,18 @@
             "exported_key": "ua260320",
             "keys": [
                 {
+                    "name": "ua260310",
+                    "key": "67-aCkgBNB2NlAuBNtAku00duNBsklgAg2l",
+                    "notes": "giuseppe.materni"
+                },
+                {
                     "name": "ua260320",
                     "key": "67-0ACk2NsgtANkBsABk0CatkuBgkdBCI2A",
+                    "notes": "giuseppe.materni"
+                },
+                {
+                    "name": "ua260321",
+                    "key": "67-SlC0IuSaCuCABgNgkSgNdldlkCsgdAIt",
                     "notes": "giuseppe.materni"
                 }
             ]
@@ -126,6 +216,11 @@
             "api_key_env": "SILICONFLOW_API_KEY",
             "exported_key": "260628",
             "keys": [
+                {
+                    "name": "260620",
+                    "key": "67-rWgVNisiDDN7zV2ie2gEMrWG6MrjWN6hqj6sA5A5GififfhI",
+                    "notes": "giuseppe.materni"
+                },
                 {
                     "name": "260628",
                     "key": "67-M55sfsfIWrhEA2j26DAiDfPhNorj7ghjDVIgi7PfsNjGhqqV",

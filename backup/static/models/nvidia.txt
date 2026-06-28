@@ -1,0 +1,2 @@
+deepseek-ai/deepseek-v4-flash|8192|8|10.61
+meta/llama-3.1-70b-instruct|131072|9|15.94

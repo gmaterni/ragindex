@@ -1,3 +1,5 @@
+/** @format */
+
 // ===================================================================
 //  SPINNER E MODAL OVERLAY
 // ===================================================================
@@ -9,43 +11,51 @@
   pointer-events: none;
 }
 
-// Spinner principale e variante wait
-.spinner,
-.spinner-wait {
+// Spinner principale (con pulsante STOP)
+.spinner {
+  box-sizing: border-box;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 60vh;
+  left: calc(@menu-width + 6px);
+  width: auto;
+  height: auto;
   z-index: @z-spinner;
-  background: rgba(0, 0, 0, 0.1);
+  background: transparent;
+  border: none;
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: default;
-  backdrop-filter: blur(0.5px);
   pointer-events: auto;
+  backdrop-filter: none;
+  padding: 4px;
+
+  .pulse-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: none;
+  }
 
   .spinner-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 60px;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(10px);
-    border: 6px solid currentColor;
-    border-radius: 35px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-    transition: all 0.3s ease;
+    padding: 6px 8px;
+    background: transparent;
+    border: 2px solid currentColor;
+    border-radius: 7px;
     cursor: pointer;
     pointer-events: auto;
+    backdrop-filter: none;
+    box-shadow: none;
 
     &:hover {
-      transform: scale(1.05);
-      border-color: #ffeb3b !important;
-      background: rgba(0, 0, 0, 0.9);
+      transform: none;
+      border-color: #ffeb3b;
+      background: transparent;
 
       .stop-message {
         color: #ffeb3b;
@@ -54,43 +64,64 @@
     }
   }
 
-  .pulse-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-  }
-
   .stop-message {
-    margin-top: 20px;
-    font-size: 32px;
+    margin-top: 4px;
+    font-size: 10px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
 
-// Variante piccola per spinner wait (senza box STOP)
-.spinner-wait .pulse-icon {
-  width: 28px;
-  height: 28px;
-}
-.spinner-wait .spinner-content {
-  padding: 12px 16px;
-  border-radius: 14px;
-  border-width: 3px;
-  cursor: default;
-  &:hover {
-    transform: none;
-    border-color: currentColor !important;
-    background: rgba(0, 0, 0, 0.8);
-  }
-}
-
-#spinner-wait {
+// Spinner wait (senza STOP)
+.spinner-wait {
+  box-sizing: border-box;
+  position: fixed;
+  top: 60vh;
+  left: calc(@menu-width + 6px);
+  width: auto;
+  height: auto;
   z-index: @z-spinner-wait;
+  background: transparent;
+  border: none;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  pointer-events: auto;
+  backdrop-filter: none;
+  padding: 4px;
+
+  .pulse-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: none;
+  }
+
+  .spinner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    background: transparent;
+    border: 2px solid currentColor;
+    border-radius: 7px;
+    cursor: default;
+    pointer-events: auto;
+    backdrop-filter: none;
+    box-shadow: none;
+
+    &:hover {
+      transform: none;
+      border-color: currentColor;
+      background: transparent;
+    }
+  }
 }
 
 // Attivazione display
