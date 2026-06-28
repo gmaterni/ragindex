@@ -7,58 +7,91 @@
  */
 export const help0_html = `
 <div class="text">
-    <p class="center" style="font-size: 1.2em; font-weight: bold;">Architettura e Logica RagIndex</p>
-    
-    <div>
-        <strong>Privacy e Logica 100% Client-Side</strong>
-        <p>RagIndex opera interamente nel tuo browser. L'ingestione dei documenti, il chunking, l'indicizzazione e la ricerca del contesto avvengono localmente. I tuoi file non vengono mai inviati a un server; solo il prompt finale (domanda + contesto estratto) viene inviato al provider AI scelto.</p>
-    </div>
+    <p class="center" style="font-size: 1.2em; font-weight: bold;">Elenco Comandi RagIndex</p>
+
+    <p class="center" style="font-style: italic; margin-bottom: 12px;">
+        Passa il mouse su ogni comando per un aiuto contestuale.
+    </p>
 
     <div>
-        <strong>Generazione del Contesto (La Chiave del RAG)</strong>
-        <p>Il cuore del sistema è la <strong>generazione del contesto</strong>: quando premi <strong>Avvia Conversazione</strong>, il sistema cerca nella Knowledge Base i frammenti di testo pi&ugrave; rilevanti. Questi frammenti vengono "iniettati" nella memoria dell'AI, permettendole di rispondere basandosi sui <em>tuoi</em> documenti invece che solo sulle sue conoscenze generali.</p>
-    </div>
-
-    <hr>
-
-    <p class="center">Interfaccia e Feedback</p>
-    <div>
-        <strong>HelpPopup</strong>
-        <p>Passando il mouse sui pulsanti d'azione o sulle voci del menu laterale appare una finestra descrittiva con dettagli specifici sul comando.</p>
-    </div>
-    <div>
-        <strong>Indicatori di Stato</strong>
-        <p>In alto a sinistra sono sempre visibili la <strong>KB attiva</strong> e il <strong>modello LLM</strong> in uso. Se la KB mostra "BASE CORRENTE", significa che stai usando i documenti appena indicizzati ma non ancora archiviati con un nome specifico.</p>
+        <strong style="font-size: 1.1em;">Barra Superiore (Header)</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Icona Menu</strong> <span>Apre il menu laterale con tutte le sezioni (KB, Chat, Dati, API Key, Logout).</span>
+            <strong>? (Help)</strong> <span>Apre questa finestra con l'elenco completo dei comandi.</span>
+            <strong>Upload</strong> <span>Carica file PDF, DOCX o TXT nella Knowledge Base.</span>
+            <strong>LLM</strong> <span>Sceglie il provider AI (Gemini, Mistral, OpenRouter, ecc.) e il modello.</span>
+            <strong>Log</strong> <span>Mostra la console tecnica con i messaggi di chunking, ricerca ed errori.</span>
+            <strong>Tema</strong> <span>Alterna tra tema scuro e tema chiaro.</span>
+        </div>
     </div>
 
     <hr>
 
-    <p class="center">Barra Superiore (Header)</p>
-    <div style="display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin-bottom: 10px;">
-        <strong>Icona Menu</strong> <span>Apre il pannello laterale per la gestione di KB, Conversazioni, API Key e dati.</span>
-        <strong>? (Help)</strong> <span>Mostra questa documentazione.</span>
-        <strong>Upload</strong> <span>Carica file PDF, DOCX o TXT per la Knowledge Base.</span>
-        <strong>LLM</strong> <span>Configura il provider AI (Gemini, Mistral, OpenRouter, ecc.) e scegli il modello.</span>
-        <strong>Log</strong> <span>Apre la console tecnica per monitorare chunking e ricerca.</span>
-        <strong>Tema</strong> <span>Alterna tra tema scuro e tema chiaro.</span>
+    <div>
+        <strong style="font-size: 1.1em;">Pulsanti di Controllo</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Cancella Input</strong> <span>Elimina il testo nella casella di input.</span>
+            <strong>Copia Output</strong> <span>Copia la risposta dell'AI negli appunti.</span>
+            <strong>Avvia (Giallo)</strong> <span>Cerca il contesto nei documenti e invia la prima domanda all'AI.</span>
+            <strong>Continua (Verde)</strong> <span>Invia una nuova domanda mantenendo chat e contesto.</span>
+        </div>
     </div>
 
     <hr>
 
-    <p class="center">Pulsanti di Controllo</p>
     <div>
-        <strong>Cancella Input</strong> <span>Elimina il testo scritto nella casella di input.</span>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Informazioni</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Quick Start</strong> <span>Guida operativa rapida su pipeline, memoria e comandi del menu.</span>
+        </div>
     </div>
+
     <div>
-        <strong>Copia Output</strong> <span>Copia il contenuto della finestra di risposta negli appunti.</span>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Knowledge Base</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Crea</strong> <span>Genera l'indice di ricerca Lunr BM25 dai documenti caricati.</span>
+            <strong>Cancella</strong> <span>Elimina la Knowledge Base attiva e i suoi indici.</span>
+            <strong>Archivia</strong> <span>Salva la KB corrente con un nome personalizzato per usi futuri.</span>
+            <strong>Gestisci</strong> <span>Elenca, attiva, esporta o elimina le KB archiviate.</span>
+            <strong>Ripristina</strong> <span>Carica una KB da un file di backup JSON.</span>
+        </div>
     </div>
+
     <div>
-        <strong>Avvia Conversazione (Giallo)</strong>
-        <p>Cerca il contesto nei documenti della KB e invia la prima domanda all'AI. Crea una nuova "memoria di lavoro".</p>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Conversazione</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Visualizza Contesto</strong> <span>Mostra il contenuto estratto usato dall'AI per rispondere.</span>
+            <strong>Visualizza Conversazione</strong> <span>Mostra l'intero storico della chat in formato testo.</span>
+            <strong>Cancella Contesto</strong> <span>Azzera contesto, prima domanda e tutta la conversazione.</span>
+            <strong>Cancella Conversazione</strong> <span>Elimina solo i messaggi successivi alla prima domanda.</span>
+            <strong>Archivia</strong> <span>Salva la cronologia della chat corrente con un nome personalizzato.</span>
+            <strong>Gestisci</strong> <span>Elenca, attiva, esporta o elimina le conversazioni archiviate.</span>
+            <strong>Ripristina</strong> <span>Carica una conversazione da un file di backup JSON.</span>
+        </div>
     </div>
+
     <div>
-        <strong>Continua Dialogo (Verde)</strong>
-        <p>Invia la nuova domanda mantenendo la cronologia della chat e il contesto gi&agrave; estratto.</p>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Gestione Dati</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>Elenco Documenti</strong> <span>Mostra i file caricati con opzioni di visualizzazione ed eliminazione.</span>
+            <strong>Dati Archiviati</strong> <span>Mostra tutti i dati in IndexedDB: chunk, indici, contesto e thread.</span>
+            <strong>Reset</strong> <span>Cancella ogni dato: KB, contesto, conversazioni, documenti e chiavi.</span>
+        </div>
+    </div>
+
+    <div>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; API Key</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+            <strong>API Keys Default</strong> <span>Ripristina le chiavi API predefinite dal file api_x.json.</span>
+            <strong>Gestisci API Key</strong> <span>Aggiungi, attiva o elimina le tue chiavi API personali.</span>
+        </div>
+    </div>
+
+    <div>
+        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Sistema</strong>
+        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 0 0; font-size: 0.95em;">
+            <strong>Logout</strong> <span>Esci dall'applicazione e torna alla schermata di login.</span>
+        </div>
     </div>
 </div>
 `;
