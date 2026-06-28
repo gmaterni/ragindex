@@ -419,18 +419,21 @@ const _actionDeleteKnowledgeBaseAsync = async function() {
 const _actionClearContextAsync = async function() {
     const hasContext = await idbMgr.exists(DATA_KEYS.PHASE2_CONTEXT);
     if (!hasContext) { await alert("Nessun contesto da cancellare."); return; }
-    if (!await confirm("Cancellare il contesto estratto?")) return;
+    if (!await confirm("Cancellare contesto e l'intera conversazione (prima domanda inclusa)?")) return;
     await idbMgr.delete(DATA_KEYS.PHASE2_CONTEXT);
-    UaLog.log(">>> Contesto cancellato. <<<");
+    await idbMgr.delete(DATA_KEYS.KEY_THREAD);
+    _setResponseHtml("");
+    UaLog.log(">>> Contesto e conversazione cancellati. <<<");
 };
 
 const _actionClearConversazioneAsync = async function() {
-    const hasThread = await idbMgr.exists(DATA_KEYS.KEY_THREAD);
-    if (!hasThread) { await alert("Nessuna conversazione da cancellare."); return; }
-    if (!await confirm("Cancellare la conversazione attiva?")) return;
-    await idbMgr.delete(DATA_KEYS.KEY_THREAD);
-    _setResponseHtml("");
-    UaLog.log(">>> Conversazione cancellata. <<<");
+    const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
+    if (!thread || thread.length < 2) { await alert("Nessuna conversazione successiva da cancellare."); return; }
+    if (!await confirm("Cancellare solo i messaggi successivi alla prima domanda? (contesto e prima domanda restano)")) return;
+    const firstMessage = thread[0];
+    await idbMgr.create(DATA_KEYS.KEY_THREAD, [firstMessage]);
+    await showHtmlThread();
+    UaLog.log(">>> Messaggi successivi alla prima domanda cancellati. <<<");
 };
 
 const _actionSaveConversationAsync = async function() {
@@ -949,6 +952,10 @@ export const bindEventListener = function() {
     HelpPopup.bind("btn-action2-start-convo", "<strong>(2) Avvia Conversazione</strong><br>Cerca il contesto nei documenti e interroga l'AI per la prima risposta.");
     HelpPopup.bind("btn-action3-continue-convo", "<strong>(3) Continua Dialogo</strong><br>Invia la nuova domanda mantenendo la memoria della chat e del contesto.");
     HelpPopup.bind("btn-theme-toggle", "<strong>Cambia Tema</strong><br>Alterna tra tema chiaro e tema scuro per un miglior comfort visivo.");
+    HelpPopup.bind("menu-view-context", "<strong>Visualizza Contesto</strong><br>Mostra il contenuto estratto usato dall'AI per rispondere.");
+    HelpPopup.bind("menu-view-convo", "<strong>Visualizza Conversazione</strong><br>Mostra l'intero storico della chat in formato testo.");
+    HelpPopup.bind("menu-clear-context", "<strong>Cancella Contesto</strong><br>Azzeramento totale: cancella il contesto, la prima domanda e l'intera conversazione. La chat torna come appena avviata.");
+    HelpPopup.bind("menu-clear-conversazione", "<strong>Cancella Conversazione</strong><br>Elimina solo i messaggi successivi alla prima domanda, mantenendo intatti il contesto e la domanda iniziale.");
     HelpPopup.bind("menu-default-api-keys", "<strong>API Keys Default</strong><br>Ripristina le chiavi API predefinite dal file locale <code>api_x.json</code>.");
     HelpPopup.bind("menu-add-api-key", "<strong>Gestione API Key</strong><br>Aggiungi, attiva o elimina le tue chiavi API personali.");
 };
