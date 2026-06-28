@@ -28,78 +28,76 @@
   // --- Layout ---
   div.container {
     background: @container-bg;
-    .item1 .output-wrapper {
-      .text-out {
-        background: @output-bg;
-        color: @text;
-        border: none; // Rimuove il bordo fisico per usare lo shadow come input
-        box-shadow: 0 0 0 2px @border-shadow; // IDENTICO A INPUT
-        transition: all 0.3s ease;
-        outline: none;
+  }
+  div.container .item1 .output-wrapper .text-out {
+    background: @output-bg;
+    color: @text;
+    border: none;
+    box-shadow: 0 0 0 2px @border-shadow;
+    transition: all 0.3s ease;
+    outline: none;
+    &:hover {
+      box-shadow: 0 0 0 2px @color2;
+    }
+    &:focus-within,
+    &:focus {
+      box-shadow: 0 0 0 2px @color1;
+    }
+    .div-text .user,
+    .div-text .assistant,
+    .div-text .system {
+      h1, h2, h3 {
+        color: @title-color;
+      }
+      h1 {
+        border-bottom: 1px solid fade(@text, 20%);
+      }
+      & > b:first-child {
+        border-bottom: 1px solid fade(@text, 10%) !important;
+      }
+    }
+    .div-text .user {
+      background: fade(@color2, 5%);
+      border: 1px solid fade(@color2, 20%) !important;
+      border-left: 6px solid @color2 !important;
+      & > b:first-child {
+        color: @color3;
+      }
+      .btn-edit-last {
+        background: fade(@container-bg, 80%);
+        border: 1px solid fade(@text, 10%);
+        color: @color2;
         &:hover {
-          box-shadow: 0 0 0 2px @color2; // IDENTICO A INPUT
-        }
-        &:focus-within,
-        &:focus {
-          box-shadow: 0 0 0 2px @color1; // IDENTICO A INPUT
-        }
-        .div-text {
-          .user, .assistant, .system {
-            h1, h2, h3 {
-              color: @title-color;
-            }
-            h1 {
-              border-bottom: 1px solid fade(@text, 20%);
-            }
-            & > b:first-child {
-              border-bottom: 1px solid fade(@text, 10%) !important;
-            }
-          }
-          .user {
-            background: fade(@color2, 5%);
-            border: 1px solid fade(@color2, 20%) !important;
-            border-left: 6px solid @color2 !important;
-            & > b:first-child {
-              color: @color3;
-            }
-            .btn-edit-last {
-              background: fade(@container-bg, 80%);
-              border: 1px solid fade(@text, 10%);
-              color: @color2;
-              &:hover {
-                color: @color1;
-                background: @container-bg;
-              }
-            }
-          }
-          .assistant {
-            background: fade(@color1, 5%);
-            border: 1px solid fade(@color1, 20%) !important;
-            border-left: 6px solid @color1 !important;
-            & > b:first-child {
-              color: @color3;
-            }
-          }
-          .system {
-            background: fade(@color3, 5%);
-            border: 1px dashed fade(@color3, 30%) !important;
-            & > b:first-child {
-              color: @color3;
-            }
-          }
+          color: @color1;
+          background: @container-bg;
         }
       }
     }
-    .item2 .input-wrapper .text-input {
-      background: @input-bg;
-      color: @text;
-      box-shadow: 0 0 0 2px @border-shadow;
-      &:hover {
-        box-shadow: 0 0 0 2px @color2;
+    .div-text .assistant {
+      background: fade(@color1, 5%);
+      border: 1px solid fade(@color1, 20%) !important;
+      border-left: 6px solid @color1 !important;
+      & > b:first-child {
+        color: @color3;
       }
-      &:focus {
-        box-shadow: 0 0 0 2px @color1;
+    }
+    .div-text .system {
+      background: fade(@color3, 5%);
+      border: 1px dashed fade(@color3, 30%) !important;
+      & > b:first-child {
+        color: @color3;
       }
+    }
+  }
+  div.container .item2 .input-wrapper .text-input {
+    background: @input-bg;
+    color: @text;
+    box-shadow: 0 0 0 2px @border-shadow;
+    &:hover {
+      box-shadow: 0 0 0 2px @color2;
+    }
+    &:focus {
+      box-shadow: 0 0 0 2px @color1;
     }
   }
 
@@ -600,7 +598,6 @@
   .apply-theme();
 
   .btn-theme-toggle svg {
-    fill: none;
     stroke: @dark-menu-fg;
   }
 }
@@ -721,6 +718,5 @@
 
   .btn-theme-toggle svg {
     stroke: @light-text;
-    fill: none;
   }
 }
