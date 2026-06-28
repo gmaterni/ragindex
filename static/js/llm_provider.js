@@ -366,6 +366,7 @@ export const LlmProvider = {
             const provider = _PROVIDER_CONFIG[providerName];
             const clientName = provider.client;
             const apiKey = await getApiKey(clientName);
+            if (!apiKey) continue;
             _createClientInstance(clientName, apiKey);
         }
     },
