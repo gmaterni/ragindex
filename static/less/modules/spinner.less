@@ -4,6 +4,21 @@
 //  SPINNER E MODAL OVERLAY
 // ===================================================================
 
+@spinner-bg: #323232;
+@spinner-border: 1px solid lighten(#00bd97, 10%);
+@spinner-radius: 8px;
+@spinner-shadow:
+  0 8px 24px rgba(0, 0, 0, 0.45),
+  0 2px 8px rgba(0, 0, 0, 0.3);
+@spinner-text: #e0e0e0;
+@spinner-font:
+  13px/1.5 "Inter",
+  "Segoe UI",
+  Roboto,
+  Arial,
+  sans-serif;
+@spinner-accent: #e82323;
+
 // Sfondo sfocato attivo durante lo spinner
 .spinner-bg {
   filter: blur(1px);
@@ -16,7 +31,7 @@
   box-sizing: border-box;
   position: fixed;
   top: 60vh;
-  left: calc(@menu-width + 6px);
+  left: calc(@menu-width + 20vw);
   width: auto;
   height: auto;
   z-index: @z-spinner;
@@ -35,7 +50,9 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    box-shadow: none;
+    background: @spinner-accent;
+    box-shadow: 0 0 0 0 fade(@spinner-accent, 70%);
+    animation: pulse-spinner-icon 1.5s infinite;
   }
 
   .spinner-content {
@@ -44,19 +61,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 8px;
-    background: transparent;
-    border: 2px solid currentColor;
-    border-radius: 7px;
+    padding: 10px 14px;
+    background: @spinner-bg;
+    border: @spinner-border;
+    border-radius: @spinner-radius;
     cursor: pointer;
     pointer-events: auto;
-    backdrop-filter: none;
-    box-shadow: none;
+    box-shadow: @spinner-shadow;
 
     &:hover {
-      transform: none;
       border-color: #ffeb3b;
-      background: transparent;
+      background: @spinner-bg;
 
       .stop-message {
         color: #ffeb3b;
@@ -67,12 +82,12 @@
 
   .stop-message {
     margin-top: 4px;
+    font: @spinner-font;
     font-size: 10px;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    color: @spinner-text;
   }
 }
 
@@ -81,7 +96,7 @@
   box-sizing: border-box;
   position: fixed;
   top: 60vh;
-  left: calc(@menu-width + 6px);
+  left: calc(@menu-width + 20vw);
   width: auto;
   height: auto;
   z-index: @z-spinner-wait;
@@ -100,7 +115,9 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    box-shadow: none;
+    background: @spinner-accent;
+    box-shadow: 0 0 0 0 fade(@spinner-accent, 70%);
+    animation: pulse-spinner-icon 1.5s infinite;
   }
 
   .spinner-content {
@@ -109,19 +126,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 8px;
-    background: transparent;
-    border: 2px solid currentColor;
-    border-radius: 7px;
+    padding: 10px 14px;
+    background: @spinner-bg;
+    border: @spinner-border;
+    border-radius: @spinner-radius;
     cursor: default;
     pointer-events: auto;
-    backdrop-filter: none;
-    box-shadow: none;
+    box-shadow: @spinner-shadow;
 
     &:hover {
-      transform: none;
-      border-color: currentColor;
-      background: transparent;
+      border-color: @spinner-border;
+      background: @spinner-bg;
     }
   }
 }
@@ -169,5 +184,20 @@
   100% {
     transform: scale(0.6);
     box-shadow: 0 0 0 0 fade(@light-color1, 0%);
+  }
+}
+
+@keyframes pulse-spinner-icon {
+  0% {
+    transform: scale(0.6);
+    box-shadow: 0 0 0 0 fade(@spinner-accent, 70%);
+  }
+  70% {
+    transform: scale(1.4);
+    box-shadow: 0 0 0 20px fade(@spinner-accent, 0%);
+  }
+  100% {
+    transform: scale(0.6);
+    box-shadow: 0 0 0 0 fade(@spinner-accent, 0%);
   }
 }

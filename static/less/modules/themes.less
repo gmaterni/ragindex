@@ -10,18 +10,21 @@
   .spinner-wait {
     .pulse-icon {
       background-color: @color1;
-      animation: @pulse-animation 1.5s ease-in-out infinite;
+      box-shadow: 0 0 0 0 fade(@color1, 70%);
+      animation: pulse-spinner-icon 1.5s infinite;
     }
     .spinner-content {
-      border-color: @color1;
+      background: @spinner-bg;
+      border: @spinner-border;
+      border-radius: @spinner-radius;
+      box-shadow: @spinner-shadow;
       &:hover {
-        transform: scale(1.02);
-        border-color: lighten(@color1, 15%);
-        background: rgba(0, 0, 0, 0.8);
+        border-color: #ffeb3b;
+        background: @spinner-bg;
       }
     }
     .stop-message {
-      color: #fff;
+      color: @spinner-text;
     }
   }
 
@@ -74,7 +77,7 @@
       }
     }
     .div-text .assistant {
-      background: fade(@color1, 5%);
+      background: fade(@color2, 5%);
       border: 1px solid fade(@color1, 20%) !important;
       border-left: 6px solid @color1 !important;
       & > b:first-child {
