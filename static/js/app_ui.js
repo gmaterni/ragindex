@@ -620,9 +620,13 @@ export const Commands = {
         const msg = "Attenzione: verranno cancellati Knowledge Base, contesto, conversazioni e documenti.\n\nLe chiavi API e l'account restano preservati. Confermi?";
         if (await confirm(msg)) {
             const apiKeys = await UaDb.readJson(DATA_KEYS.KEY_API_KEYS);
+            const providerConfig = await UaDb.readJson(DATA_KEYS.KEY_PROVIDER);
             await idbMgr.clearAll();
             if (apiKeys && Object.keys(apiKeys).length > 0) {
                 await UaDb.saveJson(DATA_KEYS.KEY_API_KEYS, apiKeys);
+            }
+            if (providerConfig && Object.keys(providerConfig).length > 0) {
+                await UaDb.saveJson(DATA_KEYS.KEY_PROVIDER, providerConfig);
             }
             location.reload();
         }
