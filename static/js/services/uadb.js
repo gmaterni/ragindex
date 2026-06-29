@@ -1,21 +1,24 @@
-/** @format */
 "use strict";
 
-import { idbMgr } from "./idb_mgr.js";
+import { dbInstance as _db } from "./db_instance.js";
+
+const _logErr = function(op, err) { 
+    console.error(`UaDb.${op}:`, err); 
+    return false; 
+};
 
 export const UaDb = {
   async read(id) {
     let result = "";
 
     try {
-      const db = idbMgr.db();
-      const record = await db.settings.get(id);
+      const record = await _db.settings.get(id);
 
       if (record) {
         result = record.value;
       }
     } catch (error) {
-      console.error(`Dexie UaDb: Errore lettura ${id}:`, error);
+      _logErr(`read ${id}`, error);
       result = "";
     }
 
@@ -24,19 +27,17 @@ export const UaDb = {
 
   async delete(id) {
     try {
-      const db = idbMgr.db();
-      await db.settings.delete(id);
+      await _db.settings.delete(id);
     } catch (error) {
-      console.error(`Dexie UaDb: Errore eliminazione ${id}:`, error);
+      _logErr(`delete ${id}`, error);
     }
   },
 
   async save(id, data) {
     try {
-      const db = idbMgr.db();
-      await db.settings.put({ id: id, value: data });
+      await _db.settings.put({ id: id, value: data });
     } catch (error) {
-      console.error(`Dexie UaDb: Errore salvataggio ${id}:`, error);
+      _logErr(`save ${id}`, error);
     }
   },
 
@@ -44,10 +45,9 @@ export const UaDb = {
     let result = [];
 
     try {
-      const db = idbMgr.db();
-      result = await db.settings.toCollection().primaryKeys();
+      result = await _db.settings.toCollection().primaryKeys();
     } catch (error) {
-      console.error("UaDb.getAllIds:", error);
+      _logErr("getAllIds", error);
       result = [];
     }
 
@@ -71,7 +71,7 @@ export const UaDb = {
     try {
       result = JSON.parse(str);
     } catch (e) {
-      console.error("UaDb.readArray:", e);
+      _logErr("readArray", e);
       result = [];
     }
 
@@ -95,7 +95,7 @@ export const UaDb = {
     try {
       result = JSON.parse(str);
     } catch (e) {
-      console.error("UaDb.readJson:", e);
+      _logErr("readJson", e);
       result = {};
     }
 
@@ -103,7 +103,10 @@ export const UaDb = {
   },
 
   async clear() {
-    const db = idbMgr.db();
-    await db.settings.clear();
+    try {
+      await _db.settings.clear();
+    } catch (e) {
+      _logErr("clear", e);
+    }
   }
 };

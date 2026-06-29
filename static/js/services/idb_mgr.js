@@ -6,24 +6,8 @@
  */
 "use strict";
 
-import Dexie from "./vendor/dexie.js";
+import { dbInstance as _db } from "./db_instance.js";
 import { WebId } from "./webuser_id.js";
-
-// ============================================================================
-// CONFIGURAZIONE DATABASE
-// ============================================================================
-
-/** 
- * Il nome del database include l'ID utente per garantire l'isolamento dei dati
- * tra account diversi sullo stesso browser.
- */
-const userId = WebId.get();
-const _db = new Dexie(`RagIndexDB_${userId}`);
-
-_db.version(2).stores({
-    kvStore: "id",
-    settings: "id"
-});
 
 // ============================================================================
 // FUNZIONI DI SUPPORTO (Private)
@@ -174,113 +158,5 @@ export const idbMgr = {
             success = _logErr("clearAll", e); 
         } 
         return success;
-    }
-};
-
-// ============================================================================
-// API PUBBLICA - UaDb (Tabella settings)
-// ============================================================================
-
-export const UaDb = {
-    read: async function(id) {
-        let result = "";
-
-        try {
-            const r = await _db.settings.get(id);
-
-            if (r) {
-                result = r.value;
-            }
-        } catch (e) {
-            _logErr(`UaDb.read:${id}`, e);
-            result = "";
-        }
-
-        return result;
-    },
-
-    delete: async function(id) {
-        try {
-            await _db.settings.delete(id);
-        } catch (e) {
-            _logErr(`UaDb.delete:${id}`, e);
-        }
-    },
-
-    save: async function(id, data) {
-        try {
-            await _db.settings.put({ id, value: data });
-        } catch (e) {
-            _logErr(`UaDb.save:${id}`, e);
-        }
-    },
-
-    getAllIds: async function() {
-        let result = [];
-
-        try {
-            result = await _db.settings.toCollection().primaryKeys();
-        } catch (e) {
-            _logErr("UaDb.getAllIds", e);
-            result = [];
-        }
-
-        return result;
-    },
-
-    saveArray: async function(id, arr) {
-        const str = JSON.stringify(arr);
-        await UaDb.save(id, str);
-    },
-
-    readArray: async function(id) {
-        const str = await UaDb.read(id);
-
-        if (!str) {
-            return [];
-        }
-
-        let result = [];
-
-        try {
-            result = JSON.parse(str);
-        } catch (e) {
-            _logErr("UaDb.readArray", e);
-            result = [];
-        }
-
-        return result;
-    },
-
-    saveJson: async function(id, js) {
-        const str = JSON.stringify(js);
-        await UaDb.save(id, str);
-    },
-
-    readJson: async function(id) {
-        const str = await UaDb.read(id);
-
-        if (!str) {
-            return {};
-        }
-
-        let result = {};
-
-        try {
-            result = JSON.parse(str);
-        } catch (e) {
-            _logErr("UaDb.readJson", e);
-            result = {};
-        }
-
-        return result;
-    },
-
-    clear: async function() {
-        try {
-            await _db.settings.clear();
-        } catch (e) {
-            _logErr("UaDb.clear", e);
-        }
     }
 };
