@@ -58,8 +58,21 @@ const _initWorker = function () {
     return;
   }
 
-  const workerUrl = new URL(WORKER_PATH, import.meta.url).href;
-  _worker = new Worker(workerUrl);
+  try {
+    const workerUrl = new URL(WORKER_PATH, import.meta.url).href;
+    _worker = new Worker(workerUrl);
+  } catch (e) {
+    console.error("_initWorker: impossibile creare il Web Worker:", e);
+    UaLog.log("ERRORE: Web Worker non disponibile, pipeline interrotta.");
+    const workerErr = new Error("Web Worker non disponibile");
+    Object.values(_requestPromises).forEach(function (p) {
+      p.reject(workerErr);
+    });
+    for (const key in _requestPromises) {
+      delete _requestPromises[key];
+    }
+    return;
+  }
 
   /**
    * Handler per i messaggi dal worker.
@@ -113,6 +126,12 @@ const _initWorker = function () {
  */
 const _postCommandToWorker = function (command, data) {
   _initWorker();
+
+  if (!_worker) {
+    const err = new Error("Web Worker non disponibile");
+    UaLog.log(`ERRORE: ${err.message} — comando "${command}" annullato.`);
+    return Promise.reject(err);
+  }
 
   const promise = new Promise(function (resolve, reject) {
     _requestPromises[command] = { resolve, reject };
