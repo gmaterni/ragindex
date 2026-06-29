@@ -26,7 +26,7 @@ import { ragEngine } from "./rag_engine.js";
 import { DATA_KEYS, getDescriptionForKey, REGEX_NAME_CLEANER } from "./services/data_keys.js";
 import { idbMgr } from "./services/idb_mgr.js";
 import { BackupMgr } from "./services/backup_mgr.js";
-import { addApiKey, restoreDefaultApiKeys } from "./services/key_retriever.js";
+import { addApiKey, restoreDefaultApiKeys, getApiKey } from "./services/key_retriever.js";
 import { UaSender } from "./services/sender.js";
 import { WebId } from "./services/webuser_id.js";
 
@@ -760,6 +760,20 @@ export const TextInput = {
             }, 50);
         }
     },
+    _checkProviderReady: async function() {
+        const config = LlmProvider.getConfig();
+        if (!config || !config.provider) {
+            await alert("Nessun provider configurato. Selezionare un provider LLM.");
+            return false;
+        }
+        const provider = config.provider;
+        const apiKey = await getApiKey(provider);
+        if (!apiKey) {
+            await alert(`API key mancante per il provider "${provider}".\nAggiungere una chiave valida in Gestisci API Key.`);
+            return false;
+        }
+        return true;
+    },
     startConversationAsync: async function() {
         if (!TextInput._inputEl) return;
         const query = TextInput._inputEl.value.trim();
@@ -781,6 +795,7 @@ export const TextInput = {
                 const kbData = { index, chunks };
                 const thread = [{ role: "user", content: query }];
                 await AppMgr.initConfig();
+                if (!await TextInput._checkProviderReady()) { _Spinner.hide(); return; }
                 const context = await ragEngine.getOptimizedContext(query, kbData, thread);
                 await idbMgr.create(DATA_KEYS.PHASE2_CONTEXT, context);
                 const answer = await ragEngine.generateResponse(context, thread);
@@ -807,7 +822,8 @@ export const TextInput = {
 
                 thread.push({ role: "user", content: query });
                 await AppMgr.initConfig();
-                
+                if (!await TextInput._checkProviderReady()) { _Spinner.hide(); return; }
+
                 const answer = await ragEngine.generateResponse(context, thread);
                 thread.push({ role: "assistant", content: answer });
                 await idbMgr.create(DATA_KEYS.KEY_THREAD, thread);
