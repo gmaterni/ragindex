@@ -133,6 +133,21 @@ const _isValidConfig = function(config) {
     return true;
 };
 
+const _setDefaultConfig = function() {
+    const defaultProvider = "gemini";
+    if (_providerModels[defaultProvider]) {
+        const models = Object.keys(_providerModels[defaultProvider].models);
+        if (models.length > 0) {
+            const ok = LlmProvider.setActive(defaultProvider, models[0]);
+            if (ok) {
+                console.debug("Configurazione non trovata: impostato default su Gemini.");
+            } else {
+                console.error("_setDefaultConfig: impossibile impostare default Gemini.");
+            }
+        }
+    }
+};
+
 // ============================================================================
 // API PUBBLICA — providerModels
 // ============================================================================
@@ -174,11 +189,8 @@ export const LlmProvider = {
      * @returns {Promise<void>}
      */
     loadModels: async (force = false) => {
-        if (force) {
+        if (force || Object.keys(_providerModels).length > 0) {
             _providerModels = {};
-        }
-        if (Object.keys(_providerModels).length > 0) {
-            return;
         }
 
         for (const p of SUPPORTED_PROVIDERS) {
@@ -198,7 +210,7 @@ export const LlmProvider = {
                     lines.forEach(function(line) {
                         const [name, windowSizeTokens] = line.split("|");
                         if (name && windowSizeTokens) {
-                            const tokens = Math.round(parseInt(windowSizeTokens) / 1024);
+                            const tokens = Math.round(parseInt(windowSizeTokens, 10) / 1024);
                             _providerModels[p].models[name] = {
                                 windowSize: tokens
                             };
@@ -232,8 +244,7 @@ export const LlmProvider = {
         const config = {
             provider: _activeProvider,
             model: _activeModel,
-            windowSize: _windowSize,
-            client: _activeProvider
+            windowSize: _windowSize
         };
         return config;
     },
@@ -303,10 +314,6 @@ export const LlmProvider = {
             return null;
         }
 
-        if (_activeClient && _activeClientProvider === _activeProvider) {
-            return _activeClient;
-        }
-
         const apiKey = await getApiKey(_activeProvider);
         if (!apiKey) {
             console.error(`LlmProvider.getClient: chiave API mancante per ${_activeProvider}`);
@@ -344,9 +351,8 @@ export const LlmProvider = {
      * @returns {Promise<void>}
      */
     loadConfig: async function() {
-        // Assicuriamoci che i modelli siano caricati prima di validare la config
         await LlmProvider.loadModels();
-        
+
         const savedConfig = await UaDb.readJson(DATA_KEYS.KEY_PROVIDER);
 
         if (_isValidConfig(savedConfig)) {
@@ -354,16 +360,7 @@ export const LlmProvider = {
             _activeModel = savedConfig.model;
             _windowSize = savedConfig.windowSize;
         } else {
-            // Scenario primo avvio o configurazione corrotta: Default a Gemini
-            const defaultProvider = "gemini";
-            if (_providerModels[defaultProvider]) {
-                const models = Object.keys(_providerModels[defaultProvider].models);
-                if (models.length > 0) {
-                    const defaultModel = models[0];
-                    LlmProvider.setActive(defaultProvider, defaultModel);
-                    console.debug("Configurazione non trovata: impostato default su Gemini.");
-                }
-            }
+            _setDefaultConfig();
         }
     },
 

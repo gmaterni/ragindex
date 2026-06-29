@@ -199,8 +199,12 @@ export async function addApiKey() {
             if (!await confirm(`Eliminare la chiave '${keyName}' di ${provider}?`)) return;
             const providerData = db.providers[provider];
             providerData.keys = providerData.keys.filter(k => k.name !== keyName);
-            if (providerData.exported_key === keyName) providerData.exported_key = null;
+            if (providerData.exported_key === keyName) {
+                providerData.exported_key = null;
+            }
             await saveDb();
+            const { LlmProvider } = await import("../llm_provider.js");
+            await LlmProvider.updateClient(provider);
         };
 
         wnds.winfo.show(jfh.html());
