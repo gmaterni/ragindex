@@ -175,7 +175,7 @@ const _UaWindowFactory = function(id, contentClass, copyMethodName, showCopy = t
                     <button class="btn-close wcl tt-left" data-tt="Chiudi" onclick="wnds.${copyMethodName}.close()">X</button>
                     ` : `
                     <button class="btn-copy wcl tt-left" data-tt="Chiudi" onclick="wnds.${copyMethodName}.close()">
-                        <svg class="icon" viewBox="0 0 24 24" style="fill: #f6e602;">
+                        <svg class="icon close-icon-yellow" viewBox="0 0 24 24">
                             <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
                         </svg>
                     </button>
@@ -541,8 +541,8 @@ const _actionShowProcessedDocs = async function() {
         kbDoclist.forEach(function(name) {
             const stillPresent = allDocNames.includes(name);
             const status = stillPresent
-                ? '<span style="color:#00bd97;">presente</span>'
-                : '<span style="color:#e82323;">rimosso</span>';
+                ? '<span class="status-presente">presente</span>'
+                : '<span class="status-assente">rimosso</span>';
             jfh.append('<tr><td>' + name + '</td><td>' + status + '</td></tr>');
         });
         jfh.append('</tbody></table>');
@@ -961,9 +961,9 @@ export const bindEventListener = function() {
             jfh.append('<div class="data-dialog"><h4>Gestione Knowledge Base</h4>');
             
             if (keys.length > 0) {
-                jfh.append('<div class="docs-header" style="margin-bottom:10px">');
+                jfh.append('<div class="docs-header">');
                 jfh.append('<label><input type="checkbox" onclick="document.querySelectorAll(\'.kb-checkbox\').forEach(cb => cb.checked = this.checked)"> Seleziona Tutto</label>');
-                jfh.append('<button class="btn-warning btn-small" style="margin-left:15px" onclick="wnds.deleteSelectedKB()">Elimina Selezionati</button>');
+                jfh.append('<button class="btn-warning btn-small btn-ml15" onclick="wnds.deleteSelectedKB()">Elimina Selezionati</button>');
                 jfh.append('</div>');
 
                 jfh.append('<table class="table-data"><thead><tr><th>Sel.</th><th>Nome</th><th>Azioni</th></tr></thead><tbody>');
@@ -973,8 +973,8 @@ export const bindEventListener = function() {
                     jfh.append('<tr>');
                     jfh.append(`<td><input type="checkbox" class="kb-checkbox" data-key="${key}"></td>`);
                     jfh.append(`<td>${displayName}</td><td><button class="btn-load-item btn-success" onclick="wnds.loadKB('${key}')">Attiva</button>`);
-                    jfh.append(`<button class="btn-warning btn-small" style="margin-left:5px" onclick="wnds.exportKB('${key}')">Backup</button>`);
-                    jfh.append(`<button class="btn-delete-item btn-danger" style="margin-left:5px" onclick="wnds.deleteKB('${key}')">Elimina</button></td></tr>`);
+                    jfh.append(`<button class="btn-warning btn-small btn-ml5" onclick="wnds.exportKB('${key}')">Backup</button>`);
+                    jfh.append(`<button class="btn-delete-item btn-danger btn-ml5" onclick="wnds.deleteKB('${key}')">Elimina</button></td></tr>`);
                 });
                 jfh.append('</tbody></table></div>');
 
@@ -1016,9 +1016,9 @@ export const bindEventListener = function() {
             jfh.append('<div class="data-dialog"><h4>Gestione Conversazioni</h4>');
 
             if (keys.length > 0) {
-                jfh.append('<div class="docs-header" style="margin-bottom:10px">');
+                jfh.append('<div class="docs-header">');
                 jfh.append('<label><input type="checkbox" onclick="document.querySelectorAll(\'.convo-checkbox\').forEach(cb => cb.checked = this.checked)"> Seleziona Tutto</label>');
-                jfh.append('<button class="btn-warning btn-small" style="margin-left:15px" onclick="wnds.deleteSelectedConvo()">Elimina Selezionate</button>');
+                jfh.append('<button class="btn-warning btn-small btn-ml15" onclick="wnds.deleteSelectedConvo()">Elimina Selezionate</button>');
                 jfh.append('</div>');
 
                 jfh.append('<table class="table-data"><thead><tr><th>Sel.</th><th>Nome</th><th>Azioni</th></tr></thead><tbody>');
@@ -1028,8 +1028,8 @@ export const bindEventListener = function() {
                     jfh.append('<tr>');
                     jfh.append(`<td><input type="checkbox" class="convo-checkbox" data-key="${key}"></td>`);
                     jfh.append(`<td>${displayName}</td><td><button class="btn-load-item btn-success" onclick="wnds.loadConvo('${key}')">Attiva</button>`);
-                    jfh.append(`<button class="btn-warning btn-small" style="margin-left:5px" onclick="wnds.exportConvo('${key}')">Backup</button>`);
-                    jfh.append(`<button class="btn-delete-item btn-danger" style="margin-left:5px" onclick="wnds.deleteConvo('${key}')">Elimina</button></td></tr>`);
+                    jfh.append(`<button class="btn-warning btn-small btn-ml5" onclick="wnds.exportConvo('${key}')">Backup</button>`);
+                    jfh.append(`<button class="btn-delete-item btn-danger btn-ml5" onclick="wnds.deleteConvo('${key}')">Elimina</button></td></tr>`);
                 });
                 jfh.append('</tbody></table></div>');
 
@@ -1057,8 +1057,8 @@ export const bindEventListener = function() {
         menuElencoDocs.onclick = async function() {
             const arr = await DocsMgr.names();
             const jfh = UaJtfh();
-            jfh.append('<div class="docs-dialog"><div class="docs-header" style="justify-content: flex-start;"><label><input type="checkbox" onclick="document.querySelectorAll(\'.doc-checkbox\').forEach(cb => cb.checked = this.checked)"> Tutto</label>');
-            jfh.append('<button class="btn-danger btn-small" style="margin-left:8px" onclick="wnds.delDocs()">Elimina</button></div>');
+            jfh.append('<div class="docs-dialog"><div class="docs-header docs-header-start"><label><input type="checkbox" onclick="document.querySelectorAll(\'.doc-checkbox\').forEach(cb => cb.checked = this.checked)"> Tutto</label>');
+            jfh.append('<button class="btn-danger btn-small btn-ml8" onclick="wnds.delDocs()">Elimina</button></div>');
             if (arr.length > 0) {
                 jfh.append('<table class="table-data"><tbody>');
                 arr.forEach((name, i) => jfh.append(`<tr><td><input type="checkbox" class="doc-checkbox" data-doc-name="${name}"></td><td>${name}</td><td><button class="btn-success" onclick="wnds.viewDoc(${i})">Visualizza</button></td></tr>`));
@@ -1096,13 +1096,7 @@ export const bindEventListener = function() {
                 jfh.append(`<tr><td>${k}</td><td>${d}</td><td>${_size(v)}</td></tr>`);
             };
 
-            jfh.append('<div class="ed-wrap" style="max-height:70vh;overflow-y:auto;">'
-                + '<style>'
-                + '.ed-wrap h4{color:#38bdf8;margin:0.4em 0 0.1em;font-size:0.9em;}'
-                + '.ed-wrap .table-data{margin:0.2em auto 0.6em;}'
-                + '.ed-wrap .table-data td{padding:2px 6px;font-size:0.85em;}'
-                + '.ed-wrap .table-data tr td:first-child{font-family:monospace;font-size:0.8em;color:#94a3b8;}'
-                + '</style>');
+            jfh.append('<div class="ed-wrap">');
 
             // --- Knowledge Base Attiva (kvStore) ---
             const activeChunks = _kv(DATA_KEYS.PHASE0_CHUNKS);
@@ -1244,7 +1238,7 @@ export const bindEventListener = function() {
             }
 
             if (kvRecords.length === 0 && settingIds.length === 0) {
-                jfh.append('<p style="text-align:center;padding:2em;">Nessun dato presente.</p>');
+                jfh.append('<p class="empty-data">Nessun dato presente.</p>');
             }
 
             jfh.append('</div>');

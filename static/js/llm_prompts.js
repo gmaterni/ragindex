@@ -149,15 +149,12 @@ export const promptBuilder = {
 
         if (isContextEmpty) {
             systemMessage = _buildNoContextSystemMessage();
-            // TODO: Log attivazione modalità senza contesto
-            const msg = ">>> MODO SENZA CONTESTO ATTIVATO (isContextEmpty=true) <<<";
+            const msg = "Modo senza contesto";
             console.debug(msg);
             UaLog.log(msg);
-            UaLog.log(`System Message Length: ${systemMessage.length}`);
         } else {
             systemMessage = _buildRagSystemMessage(context);
-            // TODO: Log attivazione modalità RAG
-            const msg = `MODO RAG ATTIVATO - Context length: ${context.length}`;
+            const msg = `Contesto: ${context.length} caratteri`;
             console.debug(msg);
             UaLog.log(msg);
         }

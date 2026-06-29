@@ -7,15 +7,15 @@
  */
 export const help0_html = `
 <div class="text">
-    <p class="center" style="font-size: 1.2em; font-weight: bold;">Elenco Comandi RagIndex</p>
+    <p class="center help-title">Elenco Comandi RagIndex</p>
 
-    <p class="center" style="font-style: italic; margin-bottom: 12px;">
+    <p class="center help-subtitle">
         Passa il mouse su ogni comando per un aiuto contestuale.
     </p>
 
     <div>
-        <strong style="font-size: 1.1em;">Barra Superiore (Header)</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Barra Superiore (Header)</strong>
+        <div class="help-grid">
             <strong>Icona Menu</strong> <span>Apre il menu laterale con tutte le sezioni (KB, Chat, Dati, API Key, Logout).</span>
             <strong>? (Help)</strong> <span>Apre questa finestra con l'elenco completo dei comandi.</span>
             <strong>Upload</strong> <span>Carica file PDF, DOCX o TXT nella Knowledge Base.</span>
@@ -28,8 +28,8 @@ export const help0_html = `
     <hr>
 
     <div>
-        <strong style="font-size: 1.1em;">Pulsanti di Controllo</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Pulsanti di Controllo</strong>
+        <div class="help-grid">
             <strong>Cancella Input</strong> <span>Elimina il testo nella casella di input.</span>
             <strong>Copia Output</strong> <span>Copia la risposta dell'AI negli appunti.</span>
             <strong>Avvia (Giallo)</strong> <span>Cerca il contesto nei documenti e invia la prima domanda all'AI.</span>
@@ -40,15 +40,15 @@ export const help0_html = `
     <hr>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Informazioni</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; Informazioni</strong>
+        <div class="help-grid">
             <strong>Quick Start</strong> <span>Guida operativa rapida su pipeline, memoria e comandi del menu.</span>
         </div>
     </div>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Knowledge Base</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; Knowledge Base</strong>
+        <div class="help-grid">
             <strong>Crea</strong> <span>Genera l'indice di ricerca Lunr BM25 dai documenti caricati.</span>
             <strong>Cancella</strong> <span>Elimina la Knowledge Base attiva e i suoi indici.</span>
             <strong>Archivia</strong> <span>Salva la KB corrente con un nome personalizzato per usi futuri.</span>
@@ -58,8 +58,8 @@ export const help0_html = `
     </div>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Conversazione</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; Conversazione</strong>
+        <div class="help-grid">
             <strong>Visualizza Contesto</strong> <span>Mostra il contenuto estratto usato dall'AI per rispondere.</span>
             <strong>Visualizza Conversazione</strong> <span>Mostra l'intero storico della chat in formato testo.</span>
             <strong>Cancella Contesto</strong> <span>Azzera contesto, prima domanda e tutta la conversazione.</span>
@@ -71,8 +71,8 @@ export const help0_html = `
     </div>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Gestione Dati</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; Gestione Dati</strong>
+        <div class="help-grid">
             <strong>Elenco Documenti</strong> <span>Mostra i file caricati con opzioni di visualizzazione ed eliminazione.</span>
             <strong>Dati Archiviati</strong> <span>Mostra tutti i dati in IndexedDB: chunk, indici, contesto e thread.</span>
             <strong>Reset</strong> <span>Cancella ogni dato: KB, contesto, conversazioni, documenti e chiavi.</span>
@@ -80,16 +80,16 @@ export const help0_html = `
     </div>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; API Key</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 12px 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; API Key</strong>
+        <div class="help-grid">
             <strong>API Keys Default</strong> <span>Ripristina le chiavi API predefinite dal file api_x.json.</span>
             <strong>Gestisci API Key</strong> <span>Aggiungi, attiva o elimina le tue chiavi API personali.</span>
         </div>
     </div>
 
     <div>
-        <strong style="font-size: 1.1em;">Menu Laterale &mdash; Sistema</strong>
-        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 6px; margin: 6px 0 0 0; font-size: 0.95em;">
+        <strong class="help-section-title">Menu Laterale &mdash; Sistema</strong>
+        <div class="help-grid-last">
             <strong>Logout</strong> <span>Esci dall'applicazione e torna alla schermata di login.</span>
         </div>
     </div>
@@ -103,32 +103,32 @@ export const help0_html = `
  */
 export const help2_html = `
 <div class="text">
-    <p class="center" style="font-size: 1.2em; font-weight: bold;">Guida Passo-Passo</p>
+    <p class="center help-title">Guida Passo-Passo</p>
 
     <div>
-        <strong style="color: #e82323;">Fase 1 &mdash; Caricare i Documenti</strong>
+        <strong class="help-phase-1">Fase 1 &mdash; Caricare i Documenti</strong>
         <p>Premi il pulsante <strong>Upload</strong> (icona nuvola) nella barra superiore. Puoi caricare file PDF, DOCX e TXT, anche pi&ugrave; alla volta. I file vengono elaborati subito nel browser.</p>
     </div>
 
     <div>
-        <strong style="color: #e82323;">Fase 2 &mdash; Creare la Knowledge Base</strong>
+        <strong class="help-phase-1">Fase 2 &mdash; Creare la Knowledge Base</strong>
         <p>Apri il <strong>menu laterale</strong> (icona hamburger in alto a sinistra) e vai su <strong>Knowledge Base &gt; Crea</strong>. Avvia l'indicizzazione: il sistema esegue il chunking Parent-Child e crea l'indice Lunr BM25 sui tuoi documenti.</p>
         <p><em>Nota:</em> Dopo ogni nuovo caricamento devi rieseguire questo passaggio per aggiornare l'indice.</p>
     </div>
 
     <div>
-        <strong style="color: #f6e602;">Fase 3 &mdash; Avviare la Conversazione</strong>
+        <strong class="help-phase-2">Fase 3 &mdash; Avviare la Conversazione</strong>
         <p>Premi il pulsante giallo <strong>Avvia Conversazione</strong>. Il sistema cerca nella KB i frammenti pi&ugrave; rilevanti per la tua domanda, li inietta nel prompt e interroga l'AI. Questa &egrave; la prima risposta.</p>
     </div>
 
     <div>
-        <strong style="color: #00bd97;">Fase 4 &mdash; Continuare il Dialogo</strong>
+        <strong class="help-phase-3">Fase 4 &mdash; Continuare il Dialogo</strong>
         <p>Per ogni domanda successiva premi il pulsante verde <strong>Continua Dialogo</strong>. La cronologia della chat e il contesto estratto vengono mantenuti.</p>
     </div>
 
     <hr>
 
-    <p class="center" style="font-weight: bold;">Gestione &mdash; Menu Laterale</p>
+    <p class="center help-title">Gestione &mdash; Menu Laterale</p>
 
     <div>
         <strong>Knowledge Base</strong>

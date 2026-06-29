@@ -157,7 +157,7 @@ const _buildTreeView = function() {
           <span class="${activeClass}" data-provider="${providerName}">
             ${icon} ${providerName}
           </span>
-          <ul class="model-list" style="display: ${isActiveProvider ? "block" : "none"};">
+          <ul class="model-list${isActiveProvider ? ' model-list--visible' : ''}">
       `;
 
         Object.keys(provider.models).forEach(function(modelName) {

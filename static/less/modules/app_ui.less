@@ -1,0 +1,77 @@
+/** @format */
+
+// ===================================================================
+//  APP_UI — Stili per finestre gestione KB, conversazioni, documenti e dati
+// ===================================================================
+
+@color-presente: #00bd97;
+@color-assente: #e82323;
+@color-icon-close: #f6e602;
+@btn-margin-left: 5px;
+@btn-margin-left-wide: 15px;
+@btn-margin-left-docs: 8px;
+
+// --- Icona chiusura gialla (quando senza copia) ---
+.close-icon-yellow {
+  fill: @color-icon-close;
+}
+
+// --- Stato documento nella KB ---
+.status-presente {
+  color: @color-presente;
+}
+
+.status-assente {
+  color: @color-assente;
+}
+
+// --- Pulsanti azioni con margine sinistro ---
+.btn-ml5 {
+  margin-left: @btn-margin-left;
+}
+
+.btn-ml8 {
+  margin-left: @btn-margin-left-docs;
+}
+
+.btn-ml15 {
+  margin-left: @btn-margin-left-wide;
+}
+
+// --- docs-header allineato a sinistra (lista documenti) ---
+.docs-header-start {
+  justify-content: flex-start;
+}
+
+// --- Wrapper ed-wrap per finestra Dati Archiviati ---
+.ed-wrap {
+  max-height: 70vh;
+  overflow-y: auto;
+
+  h4 {
+    color: #38bdf8;
+    margin: 0.4em 0 0.1em;
+    font-size: 0.9em;
+  }
+
+  .table-data {
+    margin: 0.2em auto 0.6em;
+
+    td {
+      padding: 2px 6px;
+      font-size: 0.85em;
+    }
+
+    tr td:first-child {
+      font-family: monospace;
+      font-size: 0.8em;
+      color: #94a3b8;
+    }
+  }
+}
+
+// --- Messaggio nessun dato ---
+.empty-data {
+  text-align: center;
+  padding: 2em;
+}

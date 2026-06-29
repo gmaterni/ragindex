@@ -36,11 +36,11 @@ export const documentUploader = {
           
           <div id="drop-zone" class="drop-zone">
             <p id="drop-zone-text">Trascina i file qui o clicca per selezionare</p>
-            <input type="file" id="id_fileupload" style="display: none;" multiple>
+            <input type="file" id="id_fileupload" multiple>
           </div>
           
           <!-- Barra di progresso -->
-          <div id="progress-container" style="display: none;">
+          <div id="progress-container">
             <div>
               <div id="progress-bar"></div>
             </div>
@@ -50,11 +50,6 @@ export const documentUploader = {
         </div>
       </div>
     `;
-    // <!-- Riepilogo upload -->
-    // <div id="upload-summary" style="display: none;">
-    //   <strong>Riepilogo:</strong>
-    //   <div id="summary-content"></div>
-    // </div>
 
     const uploadWindow = UaWindowAdm.create("id_upload");
     uploadWindow.drag();
