@@ -30,11 +30,9 @@ import { UaDb } from "./services/uadb.js";
 // COSTANTI
 // ============================================================================
 
-const DEFAULT_CONFIG = {
-    provider: "gemini",
-    model: "gemini-flash-latest",
-    windowSize: 1024
-};
+// Non c'è un config di default — se nessuna configurazione è stata
+// salvata in precedenza, _activeProvider/_activeModel restano vuoti
+// e l'utente deve selezionare manualmente un provider.
 
 const SUPPORTED_PROVIDERS = [
     "gemini", "mistral", "groq",
@@ -341,10 +339,14 @@ export const LlmProvider = {
 
     /**
      * Carica la configurazione salvata da IndexedDB e la applica.
-     * Se nessuna configurazione valida trovata, usa DEFAULT_CONFIG.
+     * Se nessuna configurazione valida trovata, imposta il primo modello di Gemini
+     * come default (scenario primo avvio).
      * @returns {Promise<void>}
      */
     loadConfig: async function() {
+        // Assicuriamoci che i modelli siano caricati prima di validare la config
+        await LlmProvider.loadModels();
+        
         const savedConfig = await UaDb.readJson(DATA_KEYS.KEY_PROVIDER);
 
         if (_isValidConfig(savedConfig)) {
@@ -352,12 +354,16 @@ export const LlmProvider = {
             _activeModel = savedConfig.model;
             _windowSize = savedConfig.windowSize;
         } else {
-            _activeProvider = DEFAULT_CONFIG.provider;
-            _activeModel = DEFAULT_CONFIG.model;
-            _windowSize = DEFAULT_CONFIG.windowSize;
-
-            const defaultToSave = LlmProvider.getConfig();
-            await UaDb.saveJson(DATA_KEYS.KEY_PROVIDER, defaultToSave);
+            // Scenario primo avvio o configurazione corrotta: Default a Gemini
+            const defaultProvider = "gemini";
+            if (_providerModels[defaultProvider]) {
+                const models = Object.keys(_providerModels[defaultProvider].models);
+                if (models.length > 0) {
+                    const defaultModel = models[0];
+                    LlmProvider.setActive(defaultProvider, defaultModel);
+                    console.debug("Configurazione non trovata: impostato default su Gemini.");
+                }
+            }
         }
     },
 

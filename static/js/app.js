@@ -13,7 +13,7 @@
 "use strict";
 
 import { UaLog } from "./services/ualog3.js";
-import { bindEventListener, showHtmlThread, wnds, Commands, TextInput, TextOutput, getTheme, updateActiveKbDisplay } from "./app_ui.js";
+import { bindEventListener, showHtmlThread, wnds, Commands, TextInput, TextOutput, getTheme, updateActiveKbDisplay, updateActiveModelDisplay } from "./app_ui.js";
 import { AppMgr } from "./app_mgr.js";
 import { WebId } from "./services/webuser_id.js";
 import { UaSender } from "./services/sender.js";
@@ -118,6 +118,7 @@ const openAppAsync = async function () {
         // 6. Caricamento Preferenze Utente
         await getTheme();
         await updateActiveKbDisplay();
+        updateActiveModelDisplay(); // <--- AGGIUNTO: Aggiorna display modello attivo
 
         // 7. Configurazione Sender Eventi
         const userId = WebId.get();
