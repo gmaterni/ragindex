@@ -88,7 +88,8 @@ const _buildIndex = function (indexEntries) {
   // Fail Fast
   if (!indexEntries || indexEntries.length === 0) {
     console.error("_buildIndex: indexEntries mancanti o vuote");
-    return null;
+    const empty = null;
+    return empty;
   }
 
   const idx = self.lunr(function () {
@@ -128,7 +129,8 @@ const _chunkDocument = async function (text, docIndex) {
   // Fail Fast
   if (!text) {
     console.error("_chunkDocument: testo mancante");
-    return { parents: [], indexEntries: [] };
+    const emptyResult = { parents: [], indexEntries: [] };
+    return emptyResult;
   }
 
   const parents = [];
@@ -146,7 +148,9 @@ const _chunkDocument = async function (text, docIndex) {
    * @returns {void}
    */
   const finalizeParent = async function () {
-    const pid = `d${docIndex}p${parentIdx++}`;
+    const parentNum = parentIdx++;
+    const docNum = docIndex;
+    const pid = `d${docNum}p${parentNum}`;
 
     // 1. Creo il Parent (Contesto)
     parents.push({
@@ -164,7 +168,8 @@ const _chunkDocument = async function (text, docIndex) {
         continue;
       }
 
-      const cid = `${pid}#${childIdx++}`; // ID Composito: ParentID#ChildID
+      const childNum = childIdx++;
+      const cid = `${pid}#${childNum}`; // ID Composito: ParentID#ChildID
       const meta = _processText(sent);
 
       indexEntries.push({

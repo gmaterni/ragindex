@@ -55,8 +55,8 @@ const _pickAndReadFileAsync = async function() {
         input.type = "file";
         input.accept = ".json";
 
-        const filePromise = new Promise((resolve) => {
-            input.onchange = (e) => {
+        const filePromise = new Promise(function(resolve) {
+            input.onchange = function(e) {
                 const file = e.target.files[0];
                 resolve(file);
             };
@@ -95,7 +95,8 @@ export const BackupMgr = {
         // Fail Fast
         if (!key) {
             console.error("BackupMgr.exportItemAsync: chiave mancante");
-            return false;
+            const invalid = false;
+            return invalid;
         }
 
         let success = false;
@@ -105,7 +106,8 @@ export const BackupMgr = {
             
             if (!data) {
                 console.error(`BackupMgr.exportItemAsync: nessun dato trovato per la chiave ${key}`);
-                return false;
+                const missing = false;
+                return missing;
             }
 
             const json = JSON.stringify(data, null, 2);
@@ -145,26 +147,30 @@ export const BackupMgr = {
             const data = await _pickAndReadFileAsync();
 
             if (!data) {
-                return null;
+                const empty = null;
+                return empty;
             }
 
             // Fail Fast: Validazione struttura KB
             if (!data.chunks || !data.serializedIndex) {
                 await alert("Errore: Il file selezionato non è una Knowledge Base valida.");
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const rawName = await prompt("Inserisci un nome per la Knowledge Base importata:");
             
             // Gestione annullamento prompt o stringa vuota
             if (rawName === null) {
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const name = String(rawName).trim();
             if (name.length === 0) {
                 await alert("Errore: Nome non valido.");
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const sanitizedName = name.replace(REGEX_NAME_CLEANER, "_").replace(/_+/g, "_");
@@ -175,7 +181,8 @@ export const BackupMgr = {
             if (exists) {
                 const confirmOverwrite = await confirm(`Esiste già una KB chiamata "${sanitizedName}". Vuoi sovrascriverla?`);
                 if (!confirmOverwrite) {
-                    return null;
+                    const empty = null;
+                return empty;
                 }
             }
 
@@ -203,7 +210,8 @@ export const BackupMgr = {
             const data = await _pickAndReadFileAsync();
 
             if (!data) {
-                return null;
+                const empty = null;
+                return empty;
             }
 
             // Fail Fast: Validazione struttura Conversazione
@@ -211,20 +219,23 @@ export const BackupMgr = {
             const thread = data.thread || data;
             if (!Array.isArray(thread)) {
                 await alert("Errore: Il file selezionato non è una conversazione valida.");
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const rawName = await prompt("Inserisci un nome per la Conversazione importata:");
             
             // Gestione annullamento prompt o stringa vuota
             if (rawName === null) {
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const name = String(rawName).trim();
             if (name.length === 0) {
                 await alert("Errore: Nome non valido.");
-                return null;
+                const empty = null;
+                return empty;
             }
 
             const sanitizedName = name.replace(REGEX_NAME_CLEANER, "_").replace(/_+/g, "_");
@@ -235,7 +246,8 @@ export const BackupMgr = {
             if (exists) {
                 const confirmOverwrite = await confirm(`Esiste già una conversazione chiamata "${sanitizedName}". Vuoi sovrascriverla?`);
                 if (!confirmOverwrite) {
-                    return null;
+                    const empty = null;
+                return empty;
                 }
             }
 

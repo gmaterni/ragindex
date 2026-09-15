@@ -25,11 +25,6 @@ export const DataRepository = {
         return result;
     },
 
-    async getAllDocs() {
-        const result = await idbMgr.getAllRecords();
-        return result;
-    },
-
     // --- Configurazioni e Impostazioni ---
     async getSetting(key) {
         const result = await UaDb.read(key);
@@ -39,14 +34,4 @@ export const DataRepository = {
     async saveSetting(key, val) {
         await UaDb.save(key, val);
     },
-
-    async deleteSetting(key) {
-        await UaDb.delete(key);
-    },
-
-    // --- Utility Operative ---
-    async clearAllData() {
-        const result = await idbMgr.clearAll();
-        return result;
-    }
 };

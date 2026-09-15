@@ -21,7 +21,7 @@ import { AppMgr } from "./app_mgr.js";
 import { UaDb } from "./services/uadb.js";
 import { DocsMgr } from "./docs_mgr.js";
 import { LlmProvider, getProviderConfig } from "./llm_provider.js";
-import { textFormatter, messages2html, messages2text } from "./services/history_utils.js";
+import { textFormatter, messages2html, messages2text, escapeHtml } from "./services/history_utils.js";
 import { ragEngine } from "./rag_engine.js";
 import { DATA_KEYS, getDescriptionForKey, REGEX_NAME_CLEANER } from "./services/data_keys.js";
 import { idbMgr } from "./services/idb_mgr.js";
@@ -37,6 +37,27 @@ import { WebId } from "./services/webuser_id.js";
 const CSS_SPINNER_BG = "spinner-bg";
 const CSS_SHOW_SPINNER = "show-spinner";
 const CSS_MENU_OPEN = "menu-open";
+
+/** Margine minimo del popup help rispetto ai bordi dello schermo (px). */
+const POPUP_MARGIN_PX = 10;
+
+/** Distanza del popup help dall'elemento di riferimento (px). */
+const POPUP_GAP_PX = 12;
+
+/** Spazio laterale del popup help rispetto al menu (px). */
+const POPUP_MENU_GAP_PX = 8;
+
+/** Ritardo prima della chiusura del popup help (millisecondi). */
+const POPUP_HIDE_DELAY_MS = 300;
+
+/** Durata della transizione di scomparsa del popup help (millisecondi). */
+const POPUP_FADE_MS = 200;
+
+/** Nome dell'attributo dichiarativo con il testo del tooltip. */
+const HELP_ATTR_NAME = "data-help";
+
+/** Delimitatore tra titolo e descrizione nel valore dichiarativo. */
+const HELP_ATTR_DELIMITER = "|";
 
 
 // ============================================================================
@@ -122,10 +143,11 @@ const _Spinner = (function () {
     }
   };
 
-  return {
+  const spinnerApi = {
     show: show,
     hide: hide,
   };
+  return spinnerApi;
 })();
 
 
@@ -167,14 +189,14 @@ const _UaWindowFactory = function(id, contentClass, copyMethodName, showCopy = t
         _win.vw_vh().setXY(xPos, 6, 1);
 
         const copyBtnHtml = showCopy ? `
-                    <button class="btn-copy wcp tt-left" data-tt="Copia" onclick="wnds.${copyMethodName}.copy()">
+                    <button class="btn-copy wcp" data-help="Copia" onclick="wnds.${copyMethodName}.copy()">
                         <svg class="icon copy-icon" viewBox="0 0 24 24">
                             <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
                         </svg>
                     </button>
-                    <button class="btn-close wcl tt-left" data-tt="Chiudi" onclick="wnds.${copyMethodName}.close()">X</button>
+                    <button class="btn-close wcl" data-help="Chiudi" onclick="wnds.${copyMethodName}.close()">X</button>
                     ` : `
-                    <button class="btn-copy wcl tt-left" data-tt="Chiudi" onclick="wnds.${copyMethodName}.close()">
+                    <button class="btn-copy wcl" data-help="Chiudi" onclick="wnds.${copyMethodName}.close()">
                         <svg class="icon close-icon-yellow" viewBox="0 0 24 24">
                             <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
                         </svg>
@@ -223,7 +245,7 @@ const _UaWindowInfoFactory = function(id) {
         const html = `
             <div class="window-info">
                 <div class="btn-wrapper">
-                    <button class="btn-close tt-left" data-tt="Chiudi" onclick="wnds.winfo.close()">X</button>
+                    <button class="btn-close" data-help="Chiudi" onclick="wnds.winfo.close()">X</button>
                 </div>
                 <div class="div-info">${innerContent}</div>
             </div>
@@ -255,6 +277,7 @@ const _UaWindowInfoFactory = function(id) {
 const HelpPopup = (function() {
     let _popupEl = null;
     let _hideTimer = null;
+    let _delegated = false;
 
     const _createPopup = function() {
         if (_popupEl) return;
@@ -264,13 +287,16 @@ const HelpPopup = (function() {
         document.body.appendChild(_popupEl);
     };
 
-    const show = function(event, text) {
+    const show = function(event, text, isCompact) {
         _createPopup();
         if (_hideTimer) {
             clearTimeout(_hideTimer);
             _hideTimer = null;
         }
         _popupEl.innerHTML = text;
+        const variantClass = isCompact ? "help-popup--compact" : "help-popup--rich";
+        _popupEl.classList.remove("help-popup--compact", "help-popup--rich");
+        _popupEl.classList.add(variantClass);
         _popupEl.classList.remove("visible");
         _popupEl.style.display = "block";
 
@@ -285,26 +311,26 @@ const HelpPopup = (function() {
         if (isMenu) {
             const menuBox = document.querySelector(".menu-box");
             const menuRect = menuBox.getBoundingClientRect();
-            left = menuRect.right + 8;
+            left = menuRect.right + POPUP_MENU_GAP_PX;
             top = rect.top + (rect.height / 2) - (pHeight / 2);
         } else {
-            top = rect.top - pHeight - 12;
+            top = rect.top - pHeight - POPUP_GAP_PX;
             left = rect.left + (rect.width / 2) - (pWidth / 2);
 
-            if (top < 10 || el.closest(".head-wrapper")) {
-                top = rect.bottom + 12;
+            if (top < POPUP_MARGIN_PX || el.closest(".head-wrapper")) {
+                top = rect.bottom + POPUP_GAP_PX;
             }
         }
         
-        if (left < 10) left = 10;
-        if (left + pWidth > window.innerWidth - 10) {
-            left = window.innerWidth - pWidth - 10;
+        if (left < POPUP_MARGIN_PX) left = POPUP_MARGIN_PX;
+        if (left + pWidth > window.innerWidth - POPUP_MARGIN_PX) {
+            left = window.innerWidth - pWidth - POPUP_MARGIN_PX;
         }
 
-        if (top + pHeight > window.innerHeight - 10) {
-            top = rect.top - pHeight - 12;
+        if (top + pHeight > window.innerHeight - POPUP_MARGIN_PX) {
+            top = rect.top - pHeight - POPUP_GAP_PX;
         }
-        if (top < 10) top = 10;
+        if (top < POPUP_MARGIN_PX) top = POPUP_MARGIN_PX;
 
         _popupEl.style.top = `${top}px`;
         _popupEl.style.left = `${left}px`;
@@ -320,28 +346,193 @@ const HelpPopup = (function() {
                 _popupEl.classList.remove("visible");
                 setTimeout(function() {
                     _popupEl.style.display = "none";
-                }, 200);
+                }, POPUP_FADE_MS);
             }
             _hideTimer = null;
-        }, 300);
+        }, POPUP_HIDE_DELAY_MS);
+    };
+
+    /**
+     * Compone l'HTML del popup da titolo e descrizione già filtrati.
+     */
+    const _buildHtml = function(title, desc) {
+        if (!desc) {
+            const titleOnly = title;
+            return titleOnly;
+        }
+        const html = `<strong>${title}</strong><br>${desc}`;
+        return html;
+    };
+
+    /**
+     * Interpreta il valore dichiarativo ("Titolo|Descrizione", descrizione opzionale).
+     */
+    const _parseDeclared = function(value) {
+        const safeValue = value || "";
+        const sepIndex = safeValue.indexOf(HELP_ATTR_DELIMITER);
+        let title = safeValue;
+        let desc = "";
+        if (sepIndex >= 0) {
+            title = safeValue.slice(0, sepIndex);
+            desc = safeValue.slice(sepIndex + 1);
+        }
+        const cleanTitle = escapeHtml(title.trim());
+        const cleanDesc = escapeHtml(desc.trim());
+        const html = _buildHtml(cleanTitle, cleanDesc);
+        const parsed = { html: html, isCompact: !cleanDesc };
+        return parsed;
+    };
+
+    /**
+     * Risolve il tooltip per un elemento: funzione dinamica, HTML legato o attributo.
+     */
+    const _resolveFor = function(trigger) {
+        if (trigger._helpFn) {
+            const declared = trigger._helpFn();
+            const parsed = _parseDeclared(declared);
+            return parsed;
+        }
+        if (trigger._helpHtml) {
+            const resolved = { html: trigger._helpHtml, isCompact: false };
+            return resolved;
+        }
+        const attrValue = trigger.getAttribute(HELP_ATTR_NAME);
+        if (attrValue) {
+            const parsed = _parseDeclared(attrValue);
+            return parsed;
+        }
+        const nothing = null;
+        return nothing;
+    };
+
+    /**
+     * Cerca il trigger risalendo dal nodo sotto il mouse.
+     */
+    const _findTrigger = function(node) {
+        let current = node;
+        while (current && current !== document) {
+            const isElement = current.nodeType === 1;
+            const hasHelp = isElement && (current._helpFn || current._helpHtml || current.hasAttribute(HELP_ATTR_NAME));
+            if (hasHelp) {
+                return current;
+            }
+            current = current.parentNode;
+        }
+        const nothing = null;
+        return nothing;
+    };
+
+    /**
+     * Verifica se il mouse resta dentro lo stesso trigger (spostamento interno).
+     */
+    const _isStillInside = function(trigger, related) {
+        const inside = related && trigger.contains(related);
+        return inside;
+    };
+
+    const _onMouseOver = function(event) {
+        const trigger = _findTrigger(event.target);
+        if (!trigger) {
+            return;
+        }
+        if (_isStillInside(trigger, event.relatedTarget)) {
+            return;
+        }
+        const resolved = _resolveFor(trigger);
+        if (!resolved) {
+            return;
+        }
+        const fakeEvent = { currentTarget: trigger };
+        show(fakeEvent, resolved.html, resolved.isCompact);
+    };
+
+    const _onMouseOut = function(event) {
+        const trigger = _findTrigger(event.target);
+        if (!trigger) {
+            return;
+        }
+        if (_isStillInside(trigger, event.relatedTarget)) {
+            return;
+        }
+        hide();
+    };
+
+    const _onClick = function(event) {
+        const trigger = _findTrigger(event.target);
+        if (!trigger) {
+            return;
+        }
+        hide();
+    };
+
+    /**
+     * Attiva la delega globale (una sola volta).
+     */
+    const init = function() {
+        if (_delegated) {
+            return;
+        }
+        _delegated = true;
+        document.addEventListener("mouseover", _onMouseOver);
+        document.addEventListener("mouseout", _onMouseOut);
+        document.addEventListener("click", _onClick);
+    };
+
+    /**
+     * Rimuove gli attributi del vecchio sistema CSS per evitare doppi tooltip.
+     */
+    const _stripLegacy = function(el) {
+        el.removeAttribute("data-tt");
+        el.removeAttribute("title");
+        const classesToRemove = Array.from(el.classList).filter(function(c) { return c.startsWith("tt-"); });
+        classesToRemove.forEach(function(c) { el.classList.remove(c); });
     };
 
     const bind = function(id, text) {
         const el = document.getElementById(id);
         if (!el) return;
-        el.removeAttribute("data-tt");
-        el.removeAttribute("title");
-        const classesToRemove = Array.from(el.classList).filter(c => c.startsWith("tt-"));
-        classesToRemove.forEach(c => el.classList.remove(c));
-        const trigger = el.closest("li") || el;
-        trigger.addEventListener("mouseenter", (e) => show(e, text));
-        trigger.addEventListener("mouseleave", hide);
-        trigger.addEventListener("click", hide);
+        _stripLegacy(el);
+        el._helpHtml = text;
     };
 
-    const api = { bind };
+    /**
+     * Lega un testo dinamico rivalutato a ogni apertura del popup.
+     */
+    const bindDynamic = function(id, textFn) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        _stripLegacy(el);
+        el._helpFn = textFn;
+    };
+
+    const api = { bind: bind, bindDynamic: bindDynamic, init: init };
     return api;
 })();
+
+/**
+ * Inizializza i tooltip informativi (HelpPopup) di pulsanti e voci di menu.
+ * I testi statici sono dichiarati nel markup via data-help; qui solo delega e dinamici.
+ */
+const _bindHelpPopups = function() {
+    HelpPopup.init();
+
+    HelpPopup.bindDynamic("btn-theme-toggle", function() {
+        const isLight = document.body.classList.contains("theme-light");
+        const label = isLight ? "Tema Scuro" : "Tema Chiaro";
+        return label;
+    });
+    HelpPopup.bindDynamic("id_log", function() {
+        const desc = UaLog.active ? "Nasconde il registro eventi." : "Mostra i messaggi di log dell'applicazione in tempo reale.";
+        const text = `Registro Eventi|${desc}`;
+        return text;
+    });
+    HelpPopup.bindDynamic("id-menu-icon-label", function() {
+        const menuBtn = document.getElementById("id-menu-btn");
+        const isOpen = menuBtn && menuBtn.checked;
+        const label = isOpen ? "Close" : "Open";
+        return label;
+    });
+};
 
 
 // ============================================================================
@@ -368,7 +559,6 @@ const _updateThemeAsync = async function(theme) {
             sunIcon.style.display = isLight ? "none" : "block";
             moonIcon.style.display = isLight ? "block" : "none";
         }
-        btn.setAttribute("data-tt", isLight ? "Tema Scuro" : "Tema Chiaro");
     }
     
     await UaDb.save(DATA_KEYS.KEY_THEME, theme);
@@ -569,9 +759,9 @@ const _actionShowProcessedDocs = async function() {
 export const wnds = {
     wdiv: null, wpre: null, winfo: null,
     init: function() {
-        wnds.wdiv = _UaWindowFactory("id-wnd-div", "div-text", "wdiv", false);
-        wnds.wpre = _UaWindowFactory("id-wnd-pre", "pre-text", "wpre");
-        wnds.winfo = _UaWindowInfoFactory("id-wnd-info");
+        wnds.wdiv = _UaWindowFactory("wnd-div", "div-text", "wdiv", false);
+        wnds.wpre = _UaWindowFactory("wnd-pre", "pre-text", "wpre");
+        wnds.winfo = _UaWindowInfoFactory("wnd-info");
         window.wnds = wnds;
     },
     closeAll: function() {
@@ -610,10 +800,6 @@ export const Commands = {
     upload: function() { documentUploader.open(); },
     log: function() {
         UaLog.toggle();
-        const btn = document.getElementById("id_log");
-        if (btn) {
-            btn.setAttribute("data-tt", UaLog.active ? "Close" : "Open");
-        }
     },
     providerSettings: function() { toggleProviderTree(); },
     resetAll: async function() {
@@ -764,15 +950,18 @@ export const TextInput = {
         const config = LlmProvider.getConfig();
         if (!config || !config.provider) {
             await alert("Nessun provider configurato. Selezionare un provider LLM.");
-            return false;
+            const ready = false;
+            return ready;
         }
         const provider = config.provider;
         const apiKey = await getApiKey(provider);
         if (!apiKey) {
             await alert(`API key mancante per il provider "${provider}".\nAggiungere una chiave valida in Gestisci API Key.`);
-            return false;
+            const ready = false;
+            return ready;
         }
-        return true;
+        const ready = true;
+        return ready;
     },
     startConversationAsync: async function() {
         if (!TextInput._inputEl) return;
@@ -925,7 +1114,7 @@ export const updateActiveModelDisplay = function() {
 /** @type {boolean} */
 let _treeVisible = false;
 
-const TREE_CONTAINER_ID = "provvider_id";
+const TREE_CONTAINER_ID = "wnd-provider-tree";
 
 /**
  * Costruisce l'HTML dell'albero di selezione provider/modelli.
@@ -938,14 +1127,15 @@ const _buildProviderTreeHtml = function() {
     const container = wnd.getElement();
 
     if (!container) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     const jfh = UaJtfh();
 
     jfh.append('<div class="provider-tree-header">')
        .append('  <span>Seleziona Modello</span>')
-       .append('  <button class="provider-tree-close-btn tt-left" data-tt="Chiudi">&times;</button>')
+       .append('  <button class="provider-tree-close-btn" data-help="Chiudi">&times;</button>')
        .append('</div>')
        .append('<ul class="provider-tree">');
 
@@ -1039,11 +1229,11 @@ const _addProviderTreeListeners = function() {
  * @param {string} provider
  * @param {string} model
  */
-const _onProviderModelSelect = function(provider, model) {
+const _onProviderModelSelect = async function(provider, model) {
     const success = LlmProvider.setActive(provider, model);
     if (!success) return;
 
-    LlmProvider.saveConfig();
+    await LlmProvider.saveConfig();
     updateActiveModelDisplay();
 
     if (_treeVisible) {
@@ -1077,28 +1267,6 @@ export const toggleProviderTree = function() {
     }
 };
 
-/**
- * Mostra la configurazione corrente del provider in una finestra informativa.
- */
-export const showProviderConfig = async function() {
-    const config = LlmProvider.getConfig();
-    const jfh = UaJtfh();
-
-    const prov = config.provider;
-    const mod = config.model;
-    const size = `${config.windowSize}k`;
-
-    jfh.append('<div class="config-confirm">')
-       .append('<table class="table-data">')
-       .append(`<tr><td>Provider</td><td>${prov}</td></tr>`)
-       .append(`<tr><td>Modello</td><td>${mod}</td></tr>`)
-       .append(`<tr><td>Prompt Size</td><td>${size}</td></tr>`)
-       .append("</table></div>");
-
-    const htmlContent = jfh.html();
-    wnds.winfo.show(htmlContent);
-};
-
 export const showHtmlThread = async function() {
     const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);
     if (thread) _setResponseHtml(messages2html(thread));
@@ -1121,7 +1289,7 @@ export const bindEventListener = function() {
         "menu-readme": _actionShowReadme,
         "menu-quickstart": _actionShowQuickstart,
         "menu-save-kb": _actionSaveKnowledgeBaseAsync,
-        "menu-restore-kb": async () => { 
+        "menu-restore-kb": async function() { 
             const n = await BackupMgr.importKbAsync(); 
             if (n) {
                 const key = `${DATA_KEYS.KEY_KB_PRE}${n}`;
@@ -1135,7 +1303,7 @@ export const bindEventListener = function() {
         "menu-clear-context": _actionClearContextAsync,
         "menu-clear-conversazione": _actionClearConversazioneAsync,
         "menu-save-convo": _actionSaveConversationAsync,
-        "menu-restore-convo": async () => { 
+        "menu-restore-convo": async function() { 
             const n = await BackupMgr.importConvoAsync(); 
             if (n) {
                 const key = `${DATA_KEYS.KEY_CONVO_PRE}${n}`;
@@ -1192,10 +1360,10 @@ export const bindEventListener = function() {
                 });
                 jfh.append('</tbody></table></div>');
 
-                wnds.loadKB = async (k) => { await _actionLoadKnowledgeBaseAsync(k); wnds.winfo.close(); };
-                wnds.exportKB = async (k) => { await BackupMgr.exportItemAsync(k, "KB"); };
+                wnds.loadKB = async function(k) { await _actionLoadKnowledgeBaseAsync(k); wnds.winfo.close(); };
+                wnds.exportKB = async function(k) { await BackupMgr.exportItemAsync(k, "KB"); };
                 
-                wnds.deleteSelectedKB = async () => {
+                wnds.deleteSelectedKB = async function() {
                     const sel = document.querySelectorAll(".kb-checkbox:checked");
                     if (sel.length && await confirm(`Eliminare le ${sel.length} KB selezionate?`)) {
                         for (const cb of sel) {
@@ -1209,7 +1377,7 @@ export const bindEventListener = function() {
                     }
                 };
 
-                wnds.deleteKB = async (k) => { 
+                wnds.deleteKB = async function(k) { 
                     const name = k.slice(DATA_KEYS.KEY_KB_PRE.length);
                     if (await confirm(`Eliminare "${name}"?`)) { 
                         await idbMgr.delete(k); 
@@ -1247,10 +1415,10 @@ export const bindEventListener = function() {
                 });
                 jfh.append('</tbody></table></div>');
 
-                wnds.loadConvo = async (k) => { await _actionLoadConversationAsync(k); wnds.winfo.close(); };
-                wnds.exportConvo = async (k) => { await BackupMgr.exportItemAsync(k, "CHAT"); };
+                wnds.loadConvo = async function(k) { await _actionLoadConversationAsync(k); wnds.winfo.close(); };
+                wnds.exportConvo = async function(k) { await BackupMgr.exportItemAsync(k, "CHAT"); };
 
-                wnds.deleteSelectedConvo = async () => {
+                wnds.deleteSelectedConvo = async function() {
                     const sel = document.querySelectorAll(".convo-checkbox:checked");
                     if (sel.length && await confirm(`Eliminare le ${sel.length} conversazioni selezionate?`)) {
                         for (const cb of sel) {
@@ -1260,7 +1428,7 @@ export const bindEventListener = function() {
                     }
                 };
 
-                wnds.deleteConvo = async (k) => { if (await confirm('Eliminare conversazione?')) { await idbMgr.delete(k); wnds.winfo.close(); } };
+                wnds.deleteConvo = async function(k) { if (await confirm('Eliminare conversazione?')) { await idbMgr.delete(k); wnds.winfo.close(); } };
             } else jfh.append('<p>Nessuna conversazione archiviata.</p></div>');
             wnds.winfo.show(jfh.html());
         };
@@ -1282,8 +1450,12 @@ export const bindEventListener = function() {
                 jfh.append('</tbody></table>');
             } else jfh.append('<p>Nessun documento.</p>');
             jfh.append('</div>');
-            wnds.viewDoc = async (i) => wnds.wpre.show(await DocsMgr.doc(i));
-            wnds.deleteSelectedDocs = async () => {
+            wnds.viewDoc = async function(i) {
+                const docText = await DocsMgr.doc(i);
+                const shown = wnds.wpre.show(docText);
+                return shown;
+            };
+            wnds.deleteSelectedDocs = async function() {
                 const sel = document.querySelectorAll(".doc-checkbox:checked");
                 if (sel.length && await confirm(`Eliminare ${sel.length} documenti?`)) {
                     for (const cb of sel) await DocsMgr.delete(cb.dataset.docName);
@@ -1301,16 +1473,31 @@ export const bindEventListener = function() {
             const kvRecords = await idbMgr.getAllRecords();
             const settingIds = await UaDb.getAllIds();
 
-            const _kv = (k) => kvRecords.find(r => r.key === k);
-
-            const _size = (v) => {
-                if (v === null || v === undefined) return '-';
-                const s = typeof v === 'string' ? v.length : JSON.stringify(v).length;
-                return s > 1024 ? `${(s / 1024).toFixed(1)} KB` : `${s} B`;
+            const _kv = function(k) {
+                const found = kvRecords.find(r => r.key === k);
+                return found;
             };
 
-            const _row = (k, d, v) => {
-                jfh.append(`<tr><td>${k}</td><td>${d}</td><td>${_size(v)}</td></tr>`);
+            const _size = function(v) {
+                if (v === null || v === undefined) {
+                    const missing = '-';
+                    return missing;
+                }
+                const strLen = typeof v === 'string' ? v.length : JSON.stringify(v).length;
+                const s = strLen;
+                const kiloSize = (s / 1024).toFixed(1);
+                const kbLabel = `${kiloSize} KB`;
+                const byteLabel = `${s} B`;
+                const formatted = s > 1024 ? kbLabel : byteLabel;
+                return formatted;
+            };
+
+            const _row = function(k, d, v) {
+                const key = k;
+                const desc = d;
+                const size = _size(v);
+                const rowHtml = `<tr><td>${key}</td><td>${desc}</td><td>${size}</td></tr>`;
+                jfh.append(rowHtml);
             };
 
             jfh.append('<div class="ed-wrap">');
@@ -1335,7 +1522,10 @@ export const bindEventListener = function() {
             const context = _kv(DATA_KEYS.PHASE2_CONTEXT);
             if (thread || context) {
                 jfh.append('<h4>Conversazione Attiva</h4><table class="table-data"><tbody>');
-                _row(DATA_KEYS.KEY_THREAD, `Messaggi: ${thread ? thread.value.length : 0}`, thread?.value);
+                const msgCount = thread ? thread.value.length : 0;
+                const threadDesc = `Messaggi: ${msgCount}`;
+                const threadValue = thread?.value;
+                _row(DATA_KEYS.KEY_THREAD, threadDesc, threadValue);
                 _row(DATA_KEYS.PHASE2_CONTEXT, 'Contesto estratto', context?.value);
                 jfh.append('</tbody></table>');
             }
@@ -1381,7 +1571,9 @@ export const bindEventListener = function() {
                     if (c.key === DATA_KEYS.KEY_API_KEYS) {
                         const keys = JSON.parse(c.raw || '{}');
                         const list = Object.keys(keys);
-                        desc = list.length > 0 ? `Chiavi: ${list.join(', ')}` : 'Nessuna chiave salvata';
+                        const keyList = list.join(', ');
+                        const keysDesc = `Chiavi: ${keyList}`;
+                        desc = list.length > 0 ? keysDesc : 'Nessuna chiave salvata';
                     }
                     _row(c.key, desc, c.raw);
                 }
@@ -1398,55 +1590,14 @@ export const bindEventListener = function() {
     }
 
     const menuBtn = document.querySelector("#id-menu-btn");
-    const menuLabel = document.querySelector("#id-menu-icon-label");
-    if (menuBtn && menuLabel) {
+    if (menuBtn) {
         menuBtn.onchange = function() {
             const isOpen = menuBtn.checked;
             document.body.classList.toggle(CSS_MENU_OPEN, isOpen);
-            menuLabel.setAttribute("data-tt", isOpen ? "Close" : "Open");
         };
     }
 
     // --- INIZIALIZZAZIONE POPUP INFORMATIVI ---
-    // Header
-    HelpPopup.bind("btn-help", "<strong>Istruzioni</strong><br>Apre il manuale utente con architettura, guida operativa e specifiche dell'app.");
-    HelpPopup.bind("btn-upload", "<strong>Caricamento Documenti</strong><br>Carica file PDF, TXT o DOCX dal tuo computer per la Knowledge Base.");
-    HelpPopup.bind("id_log", "<strong>Registro Eventi</strong><br>Mostra i messaggi di log dell'applicazione in tempo reale.");
-    HelpPopup.bind("btn-provider-settings", "<strong>Configurazione LLM</strong><br>Seleziona il provider AI e il modello specifico.");
-    // btn-theme-toggle usa tooltip CSS (data-tt) — dinamico in _updateThemeAsync
-
-    // Azioni
-    HelpPopup.bind("btn-action2-start-convo", "<strong>Avvia Conversazione</strong><br>Cerca il contesto nei documenti e interroga l'AI per la prima risposta.");
-    HelpPopup.bind("btn-action3-continue-convo", "<strong>Continua Dialogo</strong><br>Invia la nuova domanda mantenendo la memoria della chat e del contesto.");
-    HelpPopup.bind("btn-copy-output", "<strong>Copia Output</strong><br>Copia il testo dell'output della chat negli appunti.");
-
-    // Menu — Knowledge Base
-    HelpPopup.bind("menu-create-kb", "<strong>Crea Knowledge Base</strong><br>Genera l'indice di ricerca dai documenti caricati. Necessario prima di avviare una conversazione.");
-    HelpPopup.bind("menu-delete-kb", "<strong>Cancella KB</strong><br>Elimina la Knowledge Base attiva e i relativi indici di ricerca.");
-    HelpPopup.bind("menu-save-kb", "<strong>Archivia KB</strong><br>Salva la Knowledge Base corrente con un nome personalizzato per usi futuri.");
-    HelpPopup.bind("menu-elenco-kb", "<strong>Gestisci KB</strong><br>Elenca, attiva, esporta o elimina le Knowledge Base archiviate.");
-    HelpPopup.bind("menu-restore-kb", "<strong>Carica KB</strong><br>Carica una Knowledge Base da un file di backup salvato in precedenza.");
-    HelpPopup.bind("menu-processed-docs", "<strong>Documenti Processati</strong><br>Mostra l'elenco dei documenti usati nell'ultima costruzione della Knowledge Base, con indicazione di quali sono ancora presenti tra i caricati.");
-
-    // Menu — Conversazione
-    HelpPopup.bind("menu-view-context", "<strong>Visualizza Contesto</strong><br>Mostra il contenuto estratto usato dall'AI per rispondere.");
-    HelpPopup.bind("menu-view-convo", "<strong>Visualizza Conversazione</strong><br>Mostra l'intero storico della chat in formato testo.");
-    HelpPopup.bind("menu-clear-context", "<strong>Cancella Contesto</strong><br>Azzeramento totale: cancella il contesto, la prima domanda e l'intera conversazione. La chat torna come appena avviata.");
-    HelpPopup.bind("menu-clear-conversazione", "<strong>Cancella Conversazione</strong><br>Elimina solo i messaggi successivi alla prima domanda, mantenendo intatti il contesto e la domanda iniziale.");
-    HelpPopup.bind("menu-save-convo", "<strong>Archivia Conversazione</strong><br>Salva la cronologia della chat corrente con un nome personalizzato.");
-    HelpPopup.bind("menu-elenco-convo", "<strong>Gestisci Conversazioni</strong><br>Elenca, attiva, esporta o elimina le conversazioni archiviate.");
-    HelpPopup.bind("menu-restore-convo", "<strong>Carica Conversazione</strong><br>Carica una conversazione da un file di backup salvato in precedenza.");
-
-    // Menu — Dati e Sistema
-    HelpPopup.bind("menu-elenco-docs", "<strong>Elenco Documenti</strong><br>Mostra l'elenco dei documenti caricati nel sistema con opzioni di visualizzazione ed eliminazione.");
-    HelpPopup.bind("menu-elenco-dati", "<strong>Riepilogo Dati</strong><br>Mostra i dati in IndexedDB raggruppati per categoria: Knowledge Base attiva, Conversazione attiva, KB archiviate, Conversazioni archiviate, Configurazione.");
-    HelpPopup.bind("menu-default-api-keys", "<strong>API Keys Default</strong><br>Ripristina le chiavi API predefinite, sovrascrivendo quelle attuali.");
-    HelpPopup.bind("menu-add-api-key", "<strong>Gestione API Key</strong><br>Aggiungi, attiva o elimina le tue chiavi API personali.");
-    HelpPopup.bind("menu-reset", "<strong>Reset</strong><br>Cancella TUTTI i dati: KB, conversazioni, documenti, chiavi API e configurazione. Due conferme richieste.");
-    HelpPopup.bind("menu-test", "<strong>Test Provider</strong><br>Apre la pagina di test per tutti i provider e modelli configurati.");
-    HelpPopup.bind("menu-logout", "<strong>Logout</strong><br>Esci dall'applicazione e torna alla schermata di login.");
-
-    // Menu — Info
-    HelpPopup.bind("menu-readme", "<strong>README</strong><br>Apre il README tecnico del progetto in una nuova finestra.");
-    HelpPopup.bind("menu-quickstart", "<strong>Guida Rapida</strong><br>Mostra le istruzioni essenziali per iniziare subito con l'app.");
+    // Testi statici dichiarati via data-help nel markup; qui solo delega e dinamici.
+    _bindHelpPopups();
 };

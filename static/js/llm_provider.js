@@ -117,19 +117,23 @@ const _createClientInstance = function(clientName, apiKey) {
  */
 const _isValidConfig = function(config) {
     if (!config || typeof config !== "object" || Object.keys(config).length === 0) {
-        return false;
+        const valid = false;
+        return valid;
     }
 
     const { provider, model } = config;
     if (!provider || !_providerModels[provider]) {
-        return false;
+        const valid = false;
+        return valid;
     }
 
     if (!model || !_providerModels[provider].models[model]) {
-        return false;
+        const valid = false;
+        return valid;
     }
 
-    return true;
+    const valid = true;
+    return valid;
 };
 
 const _setDefaultConfig = function() {
@@ -161,11 +165,13 @@ export const getProviderConfig = function() {
  * Permette accesso dinamico del tipo _PROVIDER_CONFIG[providerName].
  */
 export const PROVIDER_CONFIG = new Proxy({}, {
-    get: (target, prop) => {
-        return _providerModels[prop];
+    get: function(target, prop) {
+        const entry = _providerModels[prop];
+        return entry;
     },
-    has: (target, prop) => {
-        return prop in _providerModels;
+    has: function(target, prop) {
+        const found = prop in _providerModels;
+        return found;
     }
 });
 
@@ -183,7 +189,7 @@ export const LlmProvider = {
      * Carica i modelli da file su disco. Ogni chiamata ricarica da zero.
      * @returns {Promise<void>}
      */
-    loadModels: async () => {
+    loadModels: async function() {
         _providerModels = {};
 
         let providers = [];
@@ -192,7 +198,9 @@ export const LlmProvider = {
             if (manifestRes.ok) {
                 providers = await manifestRes.json();
             }
-        } catch (_) {}
+        } catch (error) {
+            console.warn("LlmProvider.loadModels: manifest non disponibile, uso fallback:", error);
+        }
 
         if (providers.length === 0) {
             providers = IMPLEMENTED_CLIENTS;
@@ -223,8 +231,9 @@ export const LlmProvider = {
                         };
                     }
                 });
-            } catch (e) {
-                console.warn(`Impossibile caricare i modelli per ${p}:`, e);
+            } catch (error) {
+                const failedProvider = p;
+                console.warn(`LlmProvider.loadModels: impossibile caricare i modelli per ${failedProvider}:`, error);
             }
         }
     },
@@ -233,7 +242,7 @@ export const LlmProvider = {
      * Inizializzazione rapida: carica modelli e API keys.
      * @returns {Promise<void>}
      */
-    init: async () => {
+    init: async function() {
         await LlmProvider.loadModels();
         await fetchApiKeys();
     },
@@ -274,19 +283,22 @@ export const LlmProvider = {
     setActive: function(provider, model) {
         if (!provider || !model) {
             console.error("LlmProvider.setActive: parametri mancanti");
-            return false;
+            const result = false;
+            return result;
         }
 
         const providerData = _providerModels[provider];
         if (!providerData) {
             console.error(`LlmProvider.setActive: provider sconosciuto: ${provider}`);
-            return false;
+            const result = false;
+            return result;
         }
 
         const modelData = providerData.models[model];
         if (!modelData) {
             console.error(`LlmProvider.setActive: modello sconosciuto: ${model}`);
-            return false;
+            const result = false;
+            return result;
         }
 
         const providerChanged = provider !== _activeProvider;
@@ -301,7 +313,8 @@ export const LlmProvider = {
             _activeApiKey = "";
         }
 
-        return true;
+        const result = true;
+        return result;
     },
 
     // ========================================================================
@@ -316,7 +329,8 @@ export const LlmProvider = {
     getClient: async function() {
         if (!_activeProvider) {
             console.error("LlmProvider.getClient: nessun provider attivo");
-            return null;
+            const result = null;
+            return result;
         }
 
         const apiKey = await getApiKey(_activeProvider);
@@ -325,7 +339,8 @@ export const LlmProvider = {
             _activeClient = null;
             _activeClientProvider = "";
             _activeApiKey = "";
-            return null;
+            const result = null;
+            return result;
         }
 
         _createClientInstance(_activeProvider, apiKey);
@@ -337,7 +352,7 @@ export const LlmProvider = {
      * Chiamato da key_retriever.js quando una chiave viene aggiunta o attivata.
      * @param {string} clientName
      */
-    updateClient: async (clientName) => {
+    updateClient: async function(clientName) {
         if (_activeProvider === clientName) {
             _activeClient = null;
             _activeClientProvider = "";

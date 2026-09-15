@@ -2,6 +2,10 @@
  * data_keys.js - Chiavi di storage centralizzate
  * Definisce tutte le chiavi di storage usate nell'applicazione
  * per garantire consistenza e manutenibilità.
+ *
+ * @module  services/data_keys
+ * @version 1.0.0
+ * @date    2026-09-15
  */
 "use strict";
 
@@ -171,7 +175,7 @@ const KEY_DESCRIPTIONS = {
 /**
  * Controlla se una chiave inizia con un prefisso noto.
  */
-const _startsWith = (key, prefix) => {
+const _startsWith = function(key, prefix) {
     const startsWithPrefix = key.startsWith(prefix);
     return startsWithPrefix;
 };
@@ -179,7 +183,7 @@ const _startsWith = (key, prefix) => {
 /**
  * Estrae il nome da una chiave con prefisso.
  */
-const _extractName = (key, prefix) => {
+const _extractName = function(key, prefix) {
     const name = key.slice(prefix.length);
     return name;
 };
@@ -191,7 +195,7 @@ const _extractName = (key, prefix) => {
 /**
  * Restituisce una descrizione leggibile per una chiave di storage.
  */
-export const getDescriptionForKey = (key) => {
+export const getDescriptionForKey = function(key) {
     // Controllo descrizioni dirette
     const directDesc = KEY_DESCRIPTIONS[key];
     if (directDesc) {

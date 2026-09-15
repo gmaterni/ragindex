@@ -1,10 +1,20 @@
+/**
+ * uadb.js - Astrazione IndexedDB dell'applicazione.
+ *
+ * Espone letture e scritture tipizzate sopra l'istanza Dexie.
+ *
+ * @module  services/uadb
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 import { dbInstance as _db } from "./db_instance.js";
 
 const _logErr = function(op, err) { 
     console.error(`UaDb.${op}:`, err); 
-    return false; 
+    const logged = false;
+    return logged; 
 };
 
 export const UaDb = {
@@ -63,7 +73,8 @@ export const UaDb = {
     const str = await this.read(id);
 
     if (!str || str.trim().length === 0) {
-      return [];
+      const empty = [];
+      return empty;
     }
 
     let result = [];
@@ -87,7 +98,8 @@ export const UaDb = {
     const str = await this.read(id);
 
     if (!str) {
-      return {};
+      const empty = {};
+      return empty;
     }
 
     let result = {};
@@ -101,12 +113,4 @@ export const UaDb = {
 
     return result;
   },
-
-  async clear() {
-    try {
-      await _db.settings.clear();
-    } catch (e) {
-      _logErr("clear", e);
-    }
-  }
 };

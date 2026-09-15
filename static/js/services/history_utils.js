@@ -16,10 +16,6 @@
 // COSTANTI DI MODULO
 // ============================================================================
 
-/** Prefissi per ruoli nei messaggi. */
-export const QUESTION_PREFIX = "question:";
-export const ANSWER_PREFIX = "answer:";
-
 /** Ruoli dei messaggi nel formato standard OpenAI. */
 export const ROLE_USER = "user";
 export const ROLE_ASSISTANT = "assistant";
@@ -38,7 +34,8 @@ export const ROLE_SYSTEM = "system";
 const _isValidMessage = function(msg) {
     if (typeof msg !== "object" || msg === null) {
         console.error("_isValidMessage: input non è un oggetto valido");
-        return false;
+        const invalid = false;
+        return invalid;
     }
 
     const hasRole = "role" in msg;
@@ -63,7 +60,8 @@ const _isValidMessage = function(msg) {
 const _normalizeContent = function(content) {
     // Fail Fast
     if (typeof content !== "string") {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     // Sostituisce 3 o più ritorni a capo con esattamente 2
@@ -81,7 +79,8 @@ const _normalizeContent = function(content) {
  */
 export const cleanLlmResponse = function(text) {
     if (!text) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     let cleaned = text.trim();
@@ -123,7 +122,8 @@ export const cleanLlmResponse = function(text) {
 const _parseMarkdown = function(text) {
     // Fail Fast
     if (!text) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     let result = "";
@@ -155,7 +155,8 @@ const _formatMessageHtml = function(role, content, isLastUser = false) {
     // Fail Fast
     if (!role || content === undefined) {
         console.error("_formatMessageHtml: parametri mancanti");
-        return "<div>ERROR: Missing Params</div>";
+        const errorHtml = "<div>ERROR: Missing Params</div>";
+        return errorHtml;
     }
 
     let html = "";
@@ -168,7 +169,7 @@ const _formatMessageHtml = function(role, content, isLastUser = false) {
         
         if (isLastUser) {
             const btnIcon = `<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
-            editButton = `<button class="btn-edit-last tt-right" data-tt="Modifica domanda" onclick="wnds.editLastQuestion()">${btnIcon}</button>`;
+            editButton = `<button class="btn-edit-last" data-help="Modifica domanda" onclick="wnds.editLastQuestion()">${btnIcon}</button>`;
         }
 
         html = `<div class="user">${editButton}<b>User:</b><div class="msg-content">${formattedContent}</div></div>`;
@@ -222,7 +223,8 @@ const _formatMessageText = function(role, content) {
 export const messages2html = function(history) {
     // Fail Fast
     if (!history || !Array.isArray(history)) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     const htmlParts = [];
@@ -272,7 +274,8 @@ export const messages2html = function(history) {
 export const messages2text = function(history) {
     // Fail Fast
     if (!history || !Array.isArray(history)) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     const textParts = [];
@@ -310,7 +313,8 @@ export const messages2text = function(history) {
 export const textFormatter = function(txt) {
     // Fail Fast
     if (!txt) {
-        return "";
+        const empty = "";
+        return empty;
     }
 
     // Pulizia HTML (se presente)
@@ -340,4 +344,26 @@ export const textFormatter = function(txt) {
 
     // Return Strict
     return result;
+};
+
+/**
+ * Previeni XSS quando i contenuti utente vengono inseriti nel DOM.
+ *
+ * @param {string} text - Testo da escapare.
+ * @returns {string} Testo con i caratteri HTML escapati.
+ */
+export const escapeHtml = function(text) {
+    if (!text) {
+        const empty = "";
+        return empty;
+    }
+
+    const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    return escaped;
 };

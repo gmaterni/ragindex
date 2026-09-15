@@ -2,6 +2,10 @@
  * llm_prompts.js - Costruzione prompt per LLM
  * Fornisce funzioni per costruire messaggi prompt per modelli LLM.
  * Modulo specifico dell'applicazione RagIndex.
+ *
+ * @module  llm_prompts
+ * @version 1.0.0
+ * @date    2026-09-15
  */
 "use strict";
 
@@ -30,7 +34,7 @@ const _assembler = {
     /**
      * Imposta il messaggio di sistema.
      */
-    setSystemMessage: (content) => {
+    setSystemMessage: function(content) {
         _assembler.messages = _assembler.messages.filter((msg) => msg.role !== SYSTEM);
         const systemMessage = { role: SYSTEM, content: content };
         _assembler.messages.unshift(systemMessage);
@@ -40,7 +44,7 @@ const _assembler = {
     /**
      * Aggiunge un messaggio utente.
      */
-    addUserMessage: (content) => {
+    addUserMessage: function(content) {
         const userMessage = { role: USER, content: content };
         _assembler.messages.push(userMessage);
         return _assembler;
@@ -49,7 +53,7 @@ const _assembler = {
     /**
      * Aggiunge un messaggio assistente.
      */
-    addAssistantMessage: (content) => {
+    addAssistantMessage: function(content) {
         const assistantMessage = { role: ASSISTANT, content: content };
         _assembler.messages.push(assistantMessage);
         return _assembler;
@@ -58,7 +62,7 @@ const _assembler = {
     /**
      * Ottiene l'array di messaggi formattato.
      */
-    getMessages: () => {
+    getMessages: function() {
         const msgs = [..._assembler.messages].map(msg => ({ ...msg }));
 
         for (let i = 0; i < msgs.length; i++) {
@@ -71,7 +75,7 @@ const _assembler = {
     /**
      * Pulisce l'array di messaggi.
      */
-    clear: () => {
+    clear: function() {
         _assembler.messages = [];
         return _assembler;
     }
@@ -97,7 +101,7 @@ const _neutralizeSourceClosers = function (text) {
 /**
  * System prompt per modalità senza contesto.
  */
-const _buildNoContextSystemMessage = () => {
+const _buildNoContextSystemMessage = function() {
     const message = `# Role
 Sei un assistente intelligente.
 
@@ -115,7 +119,7 @@ Nessun preambolo.`.trim();
  * System prompt per modalità con contesto RAG.
  * Il contesto viene inserito tra tag <source> per isolamento dati.
  */
-const _buildRagSystemMessage = (context) => {
+const _buildRagSystemMessage = function(context) {
     const safeContext = _neutralizeSourceClosers(context);
     const message = `# Role
 Sei un assistente esperto in analisi documenti.
@@ -139,7 +143,7 @@ Nessun preambolo.`.trim();
 /**
  * System prompt per distillazione query in termini di ricerca.
  */
-const _buildDistillSystemMessage = () => {
+const _buildDistillSystemMessage = function() {
     const message = `# Role
 Essere un esperto di Information Retrieval.
 
@@ -165,7 +169,7 @@ Solo parole chiave separate da spazio. No preamble.`.trim();
 /**
  * User prompt per distillazione.
  */
-const _buildDistillUserMessage = (query) => {
+const _buildDistillUserMessage = function(query) {
     const safeQuery = _neutralizeSourceClosers(query);
     const message = `## Instructions
 Estrai le parole chiave dalla domanda seguente.
@@ -192,7 +196,7 @@ export const promptBuilder = {
      * @param {Array} history - Array di messaggi {role, content} con cronologia conversazione.
      * @returns {Array<Object>} Array di messaggi formattati per richiesta LLM.
      */
-    answerPrompt: (context, history) => {
+    answerPrompt: function(context, history) {
         console.debug("answerPrompt - context type:", typeof context, "value:", JSON.stringify(context));
 
         const currentUserQuery = history[history.length - 1].content;
@@ -254,10 +258,11 @@ ${safeQuery}
      * @param {string} query - Query utente originale.
      * @returns {Object|null} Oggetto con messages[], temperature, max_tokens, o null se query mancante.
      */
-    buildDistillPrompt: (query) => {
+    buildDistillPrompt: function(query) {
         if (!query) {
             console.error("buildDistillPrompt: query mancante");
-            return null;
+            const empty = null;
+            return empty;
         }
 
         const systemMessage = _buildDistillSystemMessage();

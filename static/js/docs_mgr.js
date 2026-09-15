@@ -15,7 +15,7 @@ import { DATA_KEYS } from "./services/data_keys.js";
 
 let _names = [];
 
-const _init = async () => {
+const _init = async function() {
     const data = await DataRepository.getSetting(DATA_KEYS.KEY_DOCS);
     _names = data ? JSON.parse(data) : [];
 };
@@ -26,9 +26,12 @@ const _init = async () => {
 
 export const DocsMgr = {
 
-    init: async () => await _init(),
+    init: async function() {
+        const done = await _init();
+        return done;
+    },
 
-    add: async (name, doc) => {
+    add: async function(name, doc) {
         await _init();
 
         if (!_names.includes(name)) {
@@ -39,55 +42,43 @@ export const DocsMgr = {
         await DataRepository.saveDoc(`${DATA_KEYS.KEY_DOC_PRE}${name}`, doc);
     },
 
-    read: async (name) => {
-        return await DataRepository.getDoc(`${DATA_KEYS.KEY_DOC_PRE}${name}`);
+    read: async function(name) {
+        const doc = await DataRepository.getDoc(`${DATA_KEYS.KEY_DOC_PRE}${name}`);
+        return doc;
     },
 
-    names: async () => {
+    names: async function() {
         await _init();
         return _names;
     },
 
-    getAll: async () => {
+    name: async function(i) {
         await _init();
-        return await Promise.all(_names.map(async (name) => ({
-            name,
-            text: await DocsMgr.read(name)
-        })));
+        const result = (i >= 0 && i < _names.length) ? _names[i] : null;
+        return result;
     },
 
-    name: async (i) => {
-        await _init();
-        return (i >= 0 && i < _names.length) ? _names[i] : null;
-    },
-
-    doc: async (i) => {
+    doc: async function(i) {
         const name = await DocsMgr.name(i);
-        return name ? await DocsMgr.read(name) : null;
+        const result = name ? await DocsMgr.read(name) : null;
+        return result;
     },
 
-    delete: async (name) => {
+    delete: async function(name) {
         await _init();
         const index = _names.indexOf(name);
         if (index > -1) {
             _names.splice(index, 1);
             await DataRepository.saveSetting(DATA_KEYS.KEY_DOCS, JSON.stringify(_names));
             await DataRepository.deleteDoc(`${DATA_KEYS.KEY_DOC_PRE}${name}`);
-            return true;
+            const deleted = true;
+            return deleted;
         }
-        return false;
+        const deleted = false;
+        return deleted;
     },
 
-    deleteAll: async () => {
-        await _init();
-        for (const name of _names) {
-            await DataRepository.deleteDoc(`${DATA_KEYS.KEY_DOC_PRE}${name}`);
-        }
-        _names = [];
-        await DataRepository.saveSetting(DATA_KEYS.KEY_DOCS, JSON.stringify([]));
-    },
-
-    exists: async (name) => {
+    exists: async function(name) {
         await _init();
         return _names.includes(name);
     }

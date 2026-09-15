@@ -1,4 +1,12 @@
-/** @format */
+/**
+ * build_state_mgr.js - Stato di costruzione della knowledge base.
+ *
+ * Traccia l'avanzamento del build incrementale della KB.
+ *
+ * @module  services/build_state_mgr
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 import { UaDb } from "./uadb.js";
@@ -19,7 +27,8 @@ export const BuildStateMgr = {
 
   // Carica lo stato corrente
   async loadState() {
-    return await UaDb.readJson(DATA_KEYS.KEY_BUILD_STATE);
+    const state = await UaDb.readJson(DATA_KEYS.KEY_BUILD_STATE);
+    return state;
   },
 
   // Aggiorna e salva lo stato
@@ -40,24 +49,32 @@ export const BuildStateMgr = {
   },
 
   // Funzioni per gestire i risultati intermedi dei chunk
-  getChunkResultsKey: (docName) => `${DATA_KEYS.KEY_CHUNK_RES_PRE}${docName}`,
+  getChunkResultsKey: function(docName) {
+    const key = `${DATA_KEYS.KEY_CHUNK_RES_PRE}${docName}`;
+    return key;
+  },
 
   async saveChunkResults(docName, results) {
     await UaDb.saveArray(this.getChunkResultsKey(docName), results);
   },
 
   async loadChunkResults(docName) {
-    return await UaDb.readArray(this.getChunkResultsKey(docName));
+    const results = await UaDb.readArray(this.getChunkResultsKey(docName));
+    return results;
   },
 
   // Funzioni per gestire le KB dei singoli documenti
-  getDocKbKey: (docName) => `${DATA_KEYS.KEY_DOC_KB_PRE}${docName}`,
+  getDocKbKey: function(docName) {
+    const key = `${DATA_KEYS.KEY_DOC_KB_PRE}${docName}`;
+    return key;
+  },
 
   async saveDocKb(docName, docKb) {
     await UaDb.save(this.getDocKbKey(docName), docKb);
   },
 
   async loadDocKb(docName) {
-    return await UaDb.read(this.getDocKbKey(docName));
+    const docKb = await UaDb.read(this.getDocKbKey(docName));
+    return docKb;
   },
 };

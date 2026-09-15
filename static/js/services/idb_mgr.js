@@ -21,7 +21,8 @@ import { WebId } from "./webuser_id.js";
  */
 const _logErr = function(op, err) { 
     console.error(`idbMgr.${op}:`, err); 
-    return false; 
+    const logged = false;
+    return logged; 
 };
 
 // ============================================================================
@@ -29,12 +30,11 @@ const _logErr = function(op, err) {
 // ============================================================================
 
 export const idbMgr = {
-    db: () => _db,
-
     create: async function(key, val) { 
         if (!key) {
             console.error("idbMgr.create: key mancante");
-            return false;
+            const invalid = false;
+            return invalid;
         }
 
         let success = false;
@@ -50,7 +50,8 @@ export const idbMgr = {
     read: async function(key) { 
         if (!key) {
             console.error("idbMgr.read: key mancante");
-            return undefined;
+            const missing = undefined;
+            return missing;
         }
 
         let result = undefined;
@@ -66,15 +67,11 @@ export const idbMgr = {
         return result;
     },
 
-    update: async function(key, val) { 
-        const result = await idbMgr.create(key, val);
-        return result;
-    },
-
     delete: async function(key) { 
         if (!key) {
             console.error("idbMgr.delete: key mancante");
-            return false;
+            const invalid = false;
+            return invalid;
         }
 
         let success = false;
@@ -90,7 +87,8 @@ export const idbMgr = {
     exists: async function(key) { 
         if (!key) {
             console.error("idbMgr.exists: key mancante");
-            return false;
+            const invalid = false;
+            return invalid;
         }
 
         let exists = false;
@@ -101,17 +99,6 @@ export const idbMgr = {
             exists = _logErr("exists", e); 
         } 
         return exists;
-    },
-
-    getAllKeys: async function() { 
-        let keys = [];
-        try { 
-            keys = await _db.kvStore.toCollection().primaryKeys(); 
-        } catch (e) { 
-            _logErr("getAllKeys", e);
-            keys = [];
-        } 
-        return keys;
     },
 
     selectKeys: async function(prefix) { 
@@ -132,18 +119,6 @@ export const idbMgr = {
             records = all.map(r => ({ key: r.id, value: r.value })); 
         } catch (e) { 
             _logErr("getAllRecords", e);
-            records = [];
-        } 
-        return records;
-    },
-
-    selectRecords: async function(prefix) { 
-        let records = [];
-        try { 
-            const found = await _db.kvStore.where("id").startsWith(prefix).toArray(); 
-            records = found.map(r => ({ key: r.id, value: r.value })); 
-        } catch (e) { 
-            _logErr("selectRecords", e);
             records = [];
         } 
         return records;

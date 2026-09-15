@@ -17,6 +17,8 @@
     </script>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
+    <!-- <link rel="stylesheet" href="css/style.min.css?v=1" />  -->
+
     <link rel="stylesheet/less" href="less/style.less?v=2" />
     <link rel="stylesheet/less" href="less/uadialog.less?v=2" />
     <link rel="stylesheet/less" href="less/ualog3.less?v=2" />
@@ -43,26 +45,26 @@
 
     <div class="menu-h">
       <input id="id-menu-btn" name="id-menu-btn" class="menu-btn" type="checkbox" />
-      <label for="id-menu-btn" id="id-menu-icon-label" class="menu-icon tt-right" data-tt="Open">
+      <label for="id-menu-btn" id="id-menu-icon-label" class="menu-icon">
         <span class="nav-icon"></span>
       </label>
 
       <div class="head-wrapper">
-        <button id="btn-help" class="help tt-bottom" data-tt="Istruzioni">HELP</button>
+        <button id="btn-help" class="help" data-help="Istruzioni|Apre il manuale utente con architettura, guida operativa e specifiche dell'app.">HELP</button>
 
-        <button id="btn-upload" class="upload">
+        <button id="btn-upload" class="upload" data-help="Caricamento Documenti|Carica file PDF, TXT o DOCX dal tuo computer per la Knowledge Base.">
           <svg class="icon" viewBox="0 0 24 24">
             <path d="M20 15v2H4v-2H2v5h20v-5zM13 5V1h-2v4H7l5 5 5-5z" />
           </svg>
         </button>
         <span id="active-kb-display" class="active-kb-display"></span>
-        <button id="btn-provider-settings" class="provider-settings">LLM</button>
+        <button id="btn-provider-settings" class="provider-settings" data-help="Configurazione LLM|Seleziona il provider AI e il modello specifico.">LLM</button>
         <span id="active-model-display" class="active-model-display"></span>
-        <button class="log tt-bottom" id="id_log" data-tt="Open">Log</button>
+        <button class="log" id="id_log">Log</button>
 
       </div>
 
-      <button id="btn-theme-toggle" class="btn-theme-toggle tt-left" data-tt="Tema Chiaro">
+      <button id="btn-theme-toggle" class="btn-theme-toggle">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5" />
           <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
@@ -74,37 +76,37 @@
 
       <div class="menu-box">
         <ul>
-          <li><a href="#" id="menu-readme">README</a></li>
-          <li><a href="#" id="menu-quickstart">Quick Start</a></li>
+          <li><a href="#" id="menu-readme" data-help="README|Apre il README tecnico del progetto in una nuova finestra.">README</a></li>
+          <li><a href="#" id="menu-quickstart" data-help="Guida Rapida|Mostra le istruzioni essenziali per iniziare subito con l'app.">Quick Start</a></li>
           <li><b>Knowledge Base</b></li>
-          <li><a href="#" id="menu-create-kb">Crea</a></li>
-          <li><a href="#" id="menu-delete-kb">Cancella</a></li>
-          <li><a href="#" id="menu-save-kb">Archivia</a></li>
-          <li><a href="#" id="menu-elenco-kb">Gestisci</a></li>
-          <li><a href="#" id="menu-restore-kb">Carica</a></li>
-          <li><a href="#" id="menu-processed-docs">Documenti Processati</a></li>
+          <li><a href="#" id="menu-create-kb" data-help="Crea Knowledge Base|Genera l'indice di ricerca dai documenti caricati. Necessario prima di avviare una conversazione.">Crea</a></li>
+          <li><a href="#" id="menu-delete-kb" data-help="Cancella KB|Elimina la Knowledge Base attiva e i relativi indici di ricerca.">Cancella</a></li>
+          <li><a href="#" id="menu-save-kb" data-help="Archivia KB|Salva la Knowledge Base corrente con un nome personalizzato per usi futuri.">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-kb" data-help="Gestisci KB|Elenca, attiva, esporta o elimina le Knowledge Base archiviate.">Gestisci</a></li>
+          <li><a href="#" id="menu-restore-kb" data-help="Carica KB|Carica una Knowledge Base da un file di backup salvato in precedenza.">Carica</a></li>
+          <li><a href="#" id="menu-processed-docs" data-help="Documenti Processati|Mostra l'elenco dei documenti usati nell'ultima costruzione della Knowledge Base, con indicazione di quali sono ancora presenti tra i caricati.">Documenti Processati</a></li>
           <li class="separator"></li>
           <li><b>Conversazione</b></li>
-          <li><a href="#" id="menu-view-context">Visualizza Contesto</a></li>
-          <li><a href="#" id="menu-view-convo">Visualizza Conversazione</a></li>
-          <li><a href="#" id="menu-clear-context">Cancella Contesto</a></li>
-          <li><a href="#" id="menu-clear-conversazione">Cancella Conversazione</a></li>
-          <li><a href="#" id="menu-save-convo">Archivia</a></li>
-          <li><a href="#" id="menu-elenco-convo">Gestisci</a></li>
-          <li><a href="#" id="menu-restore-convo">Carica</a></li>
+          <li><a href="#" id="menu-view-context" data-help="Visualizza Contesto|Mostra il contenuto estratto usato dall'AI per rispondere.">Visualizza Contesto</a></li>
+          <li><a href="#" id="menu-view-convo" data-help="Visualizza Conversazione|Mostra l'intero storico della chat in formato testo.">Visualizza Conversazione</a></li>
+          <li><a href="#" id="menu-clear-context" data-help="Cancella Contesto|Azzeramento totale: cancella il contesto, la prima domanda e l'intera conversazione. La chat torna come appena avviata.">Cancella Contesto</a></li>
+          <li><a href="#" id="menu-clear-conversazione" data-help="Cancella Conversazione|Elimina solo i messaggi successivi alla prima domanda, mantenendo intatti il contesto e la domanda iniziale.">Cancella Conversazione</a></li>
+          <li><a href="#" id="menu-save-convo" data-help="Archivia Conversazione|Salva la cronologia della chat corrente con un nome personalizzato.">Archivia</a></li>
+          <li><a href="#" id="menu-elenco-convo" data-help="Gestisci Conversazioni|Elenca, attiva, esporta o elimina le conversazioni archiviate.">Gestisci</a></li>
+          <li><a href="#" id="menu-restore-convo" data-help="Carica Conversazione|Carica una conversazione da un file di backup salvato in precedenza.">Carica</a></li>
           <li class="separator"></li>
           <li><b>Gestione Dati</b></li>
-          <li><a href="#" id="menu-elenco-docs">Elenco Documenti</a></li>
-          <li><a href="#" id="menu-elenco-dati">Riepilogo Dati</a></li>
+          <li><a href="#" id="menu-elenco-docs" data-help="Elenco Documenti|Mostra l'elenco dei documenti caricati nel sistema con opzioni di visualizzazione ed eliminazione.">Elenco Documenti</a></li>
+          <li><a href="#" id="menu-elenco-dati" data-help="Riepilogo Dati|Mostra i dati in IndexedDB raggruppati per categoria: Knowledge Base attiva, Conversazione attiva, KB archiviate, Conversazioni archiviate, Configurazione.">Riepilogo Dati</a></li>
           <li class="separator"></li>
-          <li><a href="#" id="menu-default-api-keys">API Keys Default</a></li>
-          <li><a href="#" id="menu-add-api-key">Gestisci API Key</a></li>
+          <li><a href="#" id="menu-default-api-keys" data-help="API Keys Default|Ripristina le chiavi API predefinite, sovrascrivendo quelle attuali.">API Keys Default</a></li>
+          <li><a href="#" id="menu-add-api-key" data-help="Gestione API Key|Aggiungi, attiva o elimina le tue chiavi API personali.">Gestisci API Key</a></li>
           <li class="separator"></li>
-          <li><a href="#" id="menu-test" class="delete">Test Provider</a></li>
+          <li><a href="#" id="menu-test" class="delete" data-help="Test Provider|Apre la pagina di test per tutti i provider e modelli configurati.">Test Provider</a></li>
           <li class="separator"></li>
-          <li><a href="#" id="menu-reset" class="delete menu-reset">Reset</a></li>
+          <li><a href="#" id="menu-reset" class="delete menu-reset" data-help="Reset|Cancella TUTTI i dati: KB, conversazioni, documenti, chiavi API e configurazione. Due conferme richieste.">Reset</a></li>
           <li class="separator"></li>
-          <li><a href="#" id="menu-logout" class="delete">Logout</a></li>
+          <li><a href="#" id="menu-logout" class="delete" data-help="Logout|Esci dall'applicazione e torna alla schermata di login.">Logout</a></li>
         </ul>
       </div>
 
@@ -125,12 +127,12 @@
           <textarea class="text-input" placeholder="Scrivi qui... " rows="2"></textarea>
         </div>
         <div class="input-context-actions">
-          <button class="clear-input tt-leftx" data-tt="Cancella Input">
+          <button class="clear-input" data-help="Cancella Input">
             <svg class="icon" viewBox="0 0 24 24">
               <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
             </svg>
           </button>
-          <button id="btn-copy-output" class="tt-leftx" data-tt="Copia Output">
+          <button id="btn-copy-output" data-help="Copia Output|Copia il testo dell'output della chat negli appunti.">
             <svg class="icon" viewBox="0 0 24 24">
               <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
             </svg>
@@ -138,12 +140,12 @@
         </div>
 
         <div class="input-actions">
-          <button id="btn-action3-continue-convo" class="tt-leftx" data-tt="Continua Dialogo">
+          <button id="btn-action3-continue-convo" data-help="Continua Dialogo|Invia la nuova domanda mantenendo la memoria della chat e del contesto.">
             <svg class="btn-icon-svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8 5v14l11-7z" />
             </svg>
           </button>
-          <button id="btn-action2-start-convo" class="tt-leftx" data-tt="Avvia Conversazione">
+          <button id="btn-action2-start-convo" data-help="Avvia Conversazione|Cerca il contesto nei documenti e interroga l'AI per la prima risposta.">
             <svg class="btn-icon-svg" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8 5v14l11-7z" />
             </svg>

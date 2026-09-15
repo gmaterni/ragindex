@@ -28,7 +28,7 @@ export const LOCAL_USER_ID = "user_local";
  * 
  * @returns {boolean}
  */
-export const isLocalEnvironment = () => {
+export const isLocalEnvironment = function() {
     const host = window.location.hostname;
     const protocol = window.location.protocol;
     return (host === "localhost" || host === "127.0.0.1" || protocol === "file:");

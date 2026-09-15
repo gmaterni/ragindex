@@ -1,4 +1,12 @@
-/** @format */
+/**
+ * db_instance.js - Istanza Dexie del database per utente.
+ *
+ * Crea il database IndexedDB isolato per utente.
+ *
+ * @module  services/db_instance
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 import Dexie from "./vendor/dexie.js";

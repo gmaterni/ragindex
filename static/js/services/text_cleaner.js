@@ -15,7 +15,7 @@
  * @returns {string} Testo senza tag speciali
  * @private
  */
-const _removeTag = (txt) => {
+const _removeTag = function(txt) {
     const cleaned = txt.replace(/<<<|>>>|<<|>>|#/g, "");
     return cleaned;
 };
@@ -26,7 +26,7 @@ const _removeTag = (txt) => {
  * @returns {string} Testo senza link
  * @private
  */
-const _removeLinks = (doc) => {
+const _removeLinks = function(doc) {
     const pattern = /https?:\/\/\S+|file:\/\/\/[^\s]+|\[([^\]]+)\]\([^)]+\)|<a\s+(?:[^>]*?\s+)?href="[^"]*"[^>]*>([^<]+)<\/a>/g;
     const cleaned = doc.replace(pattern, "").trim();
     return cleaned;
@@ -38,7 +38,7 @@ const _removeLinks = (doc) => {
  * @returns {string} Testo pulito e normalizzato
  * @private
  */
-const _cleanText = (text) => {
+const _cleanText = function(text) {
     let cleaned = text;
 
     // Rimuove backtick
@@ -98,7 +98,7 @@ const _cleanText = (text) => {
  * @returns {string} Testo con linee separate da newline
  * @private
  */
-const _splitIntoLines = (text) => {
+const _splitIntoLines = function(text) {
     // Lista di abbreviazioni comuni che non terminano una frase
     const abbreviations = ["dott", "ing", "arch", "prof", "sig", "sig.ra", "avv", "pag", "cap", "art", "vol", "cfr", "ecc", "es"];
     
@@ -143,7 +143,7 @@ const _splitIntoLines = (text) => {
  * @returns {string} Testo pulito e normalizzato
  * @public
  */
-export const cleanDoc = (text) => {
+export const cleanDoc = function(text) {
     let cleaned = text;
 
     // Rimuove tag speciali

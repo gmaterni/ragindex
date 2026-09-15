@@ -1,4 +1,12 @@
-/** @format */
+/**
+ * key_retriever.js - Gestione API key dei provider LLM.
+ *
+ * Recupera le chiavi da IndexedDB con seed offuscato da data/api_x.json.
+ *
+ * @module  services/key_retriever
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 import { UaJtfh } from "./uajtfh.js";
@@ -46,14 +54,16 @@ export async function getApiKey(providerName) {
         const db = await UaDb.readJson(STORAGE_KEY);
 
         if (!db || !db.providers || !db.providers[providerName]) {
-            return null;
+            const empty = null;
+            return empty;
         }
 
         const providerData = db.providers[providerName];
         const activeKeyName = providerData.exported_key;
 
         if (!activeKeyName) {
-            return null;
+            const empty = null;
+            return empty;
         }
 
         const keyObj = providerData.keys.find(k => k.name === activeKeyName);
@@ -80,7 +90,7 @@ const INITIAL_DB = {
 export async function addApiKey() {
     let db = await UaDb.readJson(STORAGE_KEY) || JSON.parse(JSON.stringify(INITIAL_DB));
 
-    const render = async () => {
+    const render = async function() {
         const jfh = UaJtfh();
 
         // Uniamo i provider supportati con quelli già nel DB
@@ -160,14 +170,16 @@ export async function addApiKey() {
         }
         jfh.append('</tbody></table></div></div>');
 
-        wnds.handleAddKey = async () => {
+        wnds.handleAddKey = async function() {
             const provider = document.getElementById("key-sel-provider").value;
             const name = document.getElementById("key-inp-name").value;
             const key = document.getElementById("key-inp-key").value;
             if (!provider || !name || !key) return await alert("Provider, Nome e Key obbligatori.");
 
             if (!db.providers[provider]) {
-                db.providers[provider] = { api_key_env: `${provider.toUpperCase()}_API_KEY`, exported_key: null, keys: [] };
+                const envName = provider.toUpperCase();
+                const envVar = `${envName}_API_KEY`;
+                db.providers[provider] = { api_key_env: envVar, exported_key: null, keys: [] };
             }
             const providerData = db.providers[provider];
             if (providerData.keys.some(k => k.name === name)) return await alert(`Esiste già una chiave con nome '${name}' per ${provider}.`);
@@ -183,7 +195,7 @@ export async function addApiKey() {
             await saveDb();
         };
 
-        wnds.handleSetActiveKey = async (provider, keyName) => {
+        wnds.handleSetActiveKey = async function(provider, keyName) {
             if (!await confirm(`Attivare la chiave '${keyName}' per ${provider}?`)) {
                 await render();
                 return;
@@ -196,7 +208,7 @@ export async function addApiKey() {
             await LlmProvider.updateClient(provider);
         };
 
-        wnds.handleDeleteKey = async (provider, keyName) => {
+        wnds.handleDeleteKey = async function(provider, keyName) {
             if (!await confirm(`Eliminare la chiave '${keyName}' di ${provider}?`)) return;
             const providerData = db.providers[provider];
             providerData.keys = providerData.keys.filter(k => k.name !== keyName);
@@ -211,7 +223,7 @@ export async function addApiKey() {
         wnds.winfo.show(jfh.html());
     };
 
-    const saveDb = async () => {
+    const saveDb = async function() {
         db.last_updated = new Date().toISOString();
         await UaDb.saveJson(STORAGE_KEY, db);
         await render();
@@ -233,17 +245,22 @@ export async function addApiKey() {
  * @param {Object} data - Dati con chiavi offuscate.
  * @returns {Object} Dati con chiavi decodificate.
  */
-const decodeApiKeysJson = (data) => {
+const decodeApiKeysJson = function(data) {
     if (!data?.providers) return data;
 
     const ALPHABET_FROM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     const ALPHABET_TO = "mKpX3vQwL8ZnR4yTbJxF1YHcU9AgNsI2oODh7eMzW5jV6ifqGrPECuS0Btaldk-_";
 
-    const decodeKey = (encodedKey) =>
-        [...encodedKey].map(char => {
+    const decodeKey = function(encodedKey) {
+        const chars = [...encodedKey];
+        const decodedChars = chars.map(function(char) {
             const index = ALPHABET_TO.indexOf(char);
-            return index !== -1 ? ALPHABET_FROM[index] : char;
-        }).join('');
+            const decodedChar = index !== -1 ? ALPHABET_FROM[index] : char;
+            return decodedChar;
+        });
+        const decoded = decodedChars.join('');
+        return decoded;
+    };
 
     const decodedData = JSON.parse(JSON.stringify(data));
 
@@ -265,7 +282,7 @@ export async function fetchApiKeys() {
         }
         await _loadDefaultKeys(URL);
     } catch (error) {
-        console.error("Errore in fetchApiKeys:", error);
+        console.error("fetchApiKeys:", error);
     }
 }
 
@@ -280,7 +297,7 @@ export async function restoreDefaultApiKeys() {
         await _loadDefaultKeys(URL);
         await alert("API Keys di default caricate con successo.");
     } catch (error) {
-        console.error("Errore in restoreDefaultApiKeys:", error);
+        console.error("restoreDefaultApiKeys:", error);
         await alert("Errore durante il caricamento delle API Keys di default.");
     }
 }

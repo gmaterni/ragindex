@@ -406,7 +406,8 @@ const _sanitizeDistillOutput = function (text) {
 const _distillQuery = async function (query) {
   if (!query) {
     console.error("_distillQuery: query mancante");
-    return "";
+    const empty = "";
+    return empty;
   }
 
   UaLog.log("🔍 Ottimizzazione termini di ricerca...");
@@ -463,7 +464,8 @@ const _sendRequest = async function (client, payload, errorTag) {
   // Fail Fast
   if (!client || !payload) {
     console.error("_sendRequest: client o payload mancanti");
-    return null;
+    const empty = null;
+    return empty;
   }
 
   let result = null;
@@ -581,7 +583,8 @@ export const ragEngine = {
     // Fail Fast
     if (!serializedIndex || !allChunks || !query) {
       console.error("ragEngine.buildContext: input mancanti");
-      return "";
+      const empty = "";
+      return empty;
     }
 
     const indexJson = JSON.parse(serializedIndex);
@@ -680,7 +683,10 @@ export const ragEngine = {
 
     console.debug("PAYLOAD:", JSON.stringify(payload, null, 2));
 
-    UaLog.log(`✍️ LLM: ${_model} | Contesto: ${context ? context.length : 0} caratteri`);
+    const modelName = _model;
+    const contextLen = context ? context.length : 0;
+    const llmLogMsg = `✍️ LLM: ${modelName} | Contesto: ${contextLen} caratteri`;
+    UaLog.log(llmLogMsg);
     const rr = await _sendRequest(_client, payload, "ERR_GENERATE_RESPONSE");
 
     if (!rr || !rr.ok) {

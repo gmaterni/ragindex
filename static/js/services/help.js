@@ -1,4 +1,12 @@
-/** @format */
+/**
+ * help.js - Testi di aiuto dei comandi.
+ *
+ * HTML per la finestra di aiuto con l'elenco dei comandi.
+ *
+ * @module  services/help
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 /**

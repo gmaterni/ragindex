@@ -1,114 +1,17 @@
 @import "modules/variables.less";
 
 /**
- * Regolare i valori di calc() per distanze diverse
- * Aggiungere white-space: normal per tooltip multi-riga
- * Modificare border-width per frecce più grandi/più piccole
- * 
- * Nota importante: 
- * Il sistema sfrutta l'attributo data-tooltip per il contenuto testuale,
- * mantenendo HTML semantico e accessibile. 
- * Per contenuti dinamici, basta modificare l'attributo via JavaScript.
- * Esmpio:
- * <span class="menu-h-box tt-right" data-tt="Open">
- *   <span class="menu-h-inner"></span>
- * </span>
+ * Tooltip dell'applicazione: unico motore HelpPopup (JS, attributo dichiarativo
+ * data-help="Titolo|Descrizione"). Due vesti: pill compatta (solo titolo) e
+ * card ricca (titolo + descrizione wrappata).
+ * Il vecchio sistema CSS data-tt / tt-* è stato rimosso (unificazione).
  *
  * @format
  */
 
 /* ========= VARIABILI LESS ========= */
 @help-accent: #00bd97;
-@tt-bg: #323232; // Colore di sfondo del tooltip (allineato help popup)
-@tt-text: #e0e0e0; // Colore testo del tooltip (allineato help popup)
-@tt-font: 13px/1.5 "Inter", "Segoe UI", Roboto, Arial, sans-serif; // Stile font (allineato help popup)
-@tt-radius: 6px; // Border-radius (allineato help popup)
-@tt-shadow: 0 8px 24px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3); // Ombra (allineato help popup)
-@tt-transition: 0.3s opacity; // Transizione
-@border-width: 6px;
-
-/* ========= BASE TOOLTIP ========= */
-.tt-top,
-.tt-bottom,
-.tt-left,
-.tt-leftx,
-.tt-right {
-  position: relative;
-  // cursor: help;
-  transition: 0.2s transform;
-
-  // Pseudo-elementi comuni
-  &::before,
-  &::after {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    z-index: @z-tooltip;
-    transition: @tt-transition;
-  }
-
-  // Testo del tooltip
-  &::before {
-    content: attr(data-tt);
-    background: @tt-bg;
-    color: @tt-text;
-    font: @tt-font;
-    font-weight: normal;
-    padding: 4px 10px;
-    border-radius: @tt-radius;
-    box-shadow: @tt-shadow;
-    border: 1px solid lighten(@help-accent, 10%);
-    white-space: nowrap;
-  }
-
-  &:hover {
-    &::before,
-    &::after {
-      opacity: 1;
-    }
-  }
-}
-
-/* ========= POSIZIONAMENTI ========= */
-.tt-top {
-  &::before {
-    bottom: ~"calc(100% + 12px)"; // Posizionato sopra l'elemento di 12px
-    left: 50%; // Centrato orizzontalmente
-    transform: translateX(-50%); // Spostato indietro del 50% della sua larghezza
-  }
-}
-
-.tt-bottom {
-  &::before {
-    top: ~"calc(100% + 12px)"; // Posizionato sotto l'elemento di 12px
-    left: 50%; // Centrato orizzontalmente
-    transform: translateX(-50%); // Spostato indietro del 50% della sua larghezza
-  }
-}
-
-.tt-left {
-  &::before {
-    right: ~"calc(50% + 0px)";
-    top: ~"calc(100% + 22px)";
-    transform: translateY(-50%);
-  }
-}
-
-.tt-leftx {
-  &::before {
-    right: ~"calc(50% + 3vw)";
-    top: ~"calc(100% - 1vh)";
-    transform: translateY(-80%);
-  }
-}
-
-.tt-right {
-  &::before {
-    left: ~"calc(100% + 12px)"; // Posizionato a destra dell'elemento di 12px
-    top: 50%; // Centrato verticalmente
-    transform: translateY(50%); // Spostato in alto del 50% della sua altezza
-  }
-}
+@tt-radius: 6px; // Border-radius della pill compatta
 
 /* ========= HELP POPUP (Dark Material Style) ========= */
 @help-popup-bg: #323232;
@@ -151,4 +54,20 @@
 .help-popup-window.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ========= VARIANTI HELP POPUP (stesso motore, due vesti) ========= */
+
+// Pill compatta: solo titolo, monoriga (testi corti tipo "Chiudi")
+.help-popup-window.help-popup--compact {
+  padding: 4px 10px;
+  border-radius: @tt-radius;
+  white-space: nowrap;
+  max-width: none;
+}
+
+// Card ricca: titolo + descrizione wrappata (testi lunghi)
+.help-popup-window.help-popup--rich {
+  max-width: @help-popup-max-width;
+  white-space: normal;
 }

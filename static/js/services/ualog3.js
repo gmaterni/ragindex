@@ -1,17 +1,25 @@
-/** @format */
+/**
+ * ualog3.js - Log applicativo su finestra fluttuante.
+ *
+ * Mostra i messaggi tecnici di chunking, ricerca ed errori.
+ *
+ * @module  services/ualog3
+ * @version 1.0.0
+ * @date    2026-09-15
+ */
 "use strict";
 
 import { UaWindowAdm } from "./uawindow.js";
 
 const log = document.getElementById("id_log");
 
-const callShow = () => {
+const callShow = function() {
   if (!log) return;
   if (log.classList.contains("active")) return;
   log.classList.add("active");
 };
 
-const callHide = () => {
+const callHide = function() {
   if (!log) return;
   if (!log.classList.contains("active")) return;
   log.classList.remove("active");
@@ -27,15 +35,15 @@ export const UaLog = {
   msg_id: "ualogmsg_",
   new() {
     if (this.wind == null) {
-      this.wind = UaWindowAdm.create("ualog_id");
+      this.wind = UaWindowAdm.create("wnd-ualog");
       this.wind.drag();
     }
     const h = `
     <button type="button" class="clear">Clear</button>
-    <button type="button" class="close tt-left" data-tt="Chiudi">Close</button>
+    <button type="button" class="close" data-help="Chiudi">Close</button>
     <pre id="ualogmsg_"></pre>`;
     this.wind.setHtml(h);
-    document.getElementById("ualog_id").addEventListener("click", (e) => {
+    document.getElementById("wnd-ualog").addEventListener("click", (e) => {
       if (e.target.classList.contains("clear")) {
         this.cls();
       } else if (e.target.classList.contains("close")) {
@@ -62,18 +70,8 @@ export const UaLog = {
     let h = e.textContent + s + "\n";
     e.textContent = h;
   },
-  print(...args) {
-    if (this.wind == null) return;
-    if (!this.active) return;
-    this.prn_(...args);
-  },
   log(...args) {
     if (this.wind == null) return;
-    this.prn_(...args);
-  },
-  log_show(...args) {
-    if (this.wind == null) return;
-    if (!this.active) this.toggle();
     this.prn_(...args);
   },
   cls() {

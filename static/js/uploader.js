@@ -19,7 +19,7 @@ export const documentUploader = {
     const htmlContent = `
       <div class="window-text">
         <div class="btn-wrapper">
-         <button class="btn-close tt-left " data-tt="Chiudi">X</button>
+         <button class="btn-close" data-help="Chiudi">X</button>
         </div>
         <div class="upload-dialog-content">
           <p class="upload-description">Trascina uno o più file (testo, PDF, DOCX, ODT) o un'intera cartella per aggiungerli alla knowledge base.</p>
@@ -51,13 +51,13 @@ export const documentUploader = {
       </div>
     `;
 
-    const uploadWindow = UaWindowAdm.create("id_upload");
+    const uploadWindow = UaWindowAdm.create("wnd-upload");
     uploadWindow.drag();
     uploadWindow.setZ(12);
     uploadWindow.vw_vh().setXY(16.5, 5, -1);
     uploadWindow.setHtml(htmlContent);
 
-    document.getElementById("id_upload").addEventListener("click", (e) => {
+    document.getElementById("wnd-upload").addEventListener("click", (e) => {
       if (e.target.classList.contains("btn-close")) {
         uploadWindow.close();
       }
@@ -140,8 +140,14 @@ export const documentUploader = {
     });
 
     // Previene il comportamento di default del browser
-    this.dragoverHandler = (e) => e.preventDefault();
-    this.dropHandler = (e) => e.preventDefault();
+    this.dragoverHandler = function(e) {
+        const result = e.preventDefault();
+        return result;
+    };
+    this.dropHandler = function(e) {
+        const result = e.preventDefault();
+        return result;
+    };
     window.addEventListener("dragover", this.dragoverHandler);
     window.addEventListener("drop", this.dropHandler);
   },
@@ -186,7 +192,7 @@ export const documentUploader = {
     });
 
     if (validFiles.length === 0) {
-      alert("Nessun file valido trovato. Formati supportati: .txt, .pdf, .docx, .odt");
+      await alert("Nessun file valido trovato. Formati supportati: .txt, .pdf, .docx, .odt");
       return;
     }
 
@@ -199,11 +205,8 @@ export const documentUploader = {
     const progressContainer = document.getElementById("progress-container");
     const progressBar = document.getElementById("progress-bar");
     const progressText = document.getElementById("progress-text");
-    // const summaryDiv = document.getElementById("upload-summary");
-    // const summaryContent = document.getElementById("summary-content");
 
     progressContainer.style.display = "block";
-    // summaryDiv.style.display = "none";
 
     const stats = {
       total: validFiles.length,
@@ -217,7 +220,10 @@ export const documentUploader = {
     for (let i = 0; i < validFiles.length; i++) {
       const file = validFiles[i];
       const percentage = Math.round(((i + 1) / stats.total) * 100);
-      progressText.textContent = `${i + 1} / ${stats.total} file processati`;
+      const fileNum = i + 1;
+      const fileTotal = stats.total;
+      const progressLabel = `${fileNum} / ${fileTotal} file processati`;
+      progressText.textContent = progressLabel;
       progressBar.style.width = `${percentage}%`;
       progressBar.textContent = `${percentage}%`;
 
@@ -233,22 +239,6 @@ export const documentUploader = {
       }
     }
 
-    // Mostra riepilogo finale
-    // summaryDiv.style.display = "block";
-    // summaryContent.innerHTML = `
-    //   <div class="success">Caricati con successo: <strong>${stats.success}</strong></div>
-    //   <div class="duplicate"> Duplicati (ignorati): <strong>${stats.duplicates}</strong></div>
-    //   <div class="error">Errori: <strong>${stats.errors}</strong></div>
-    //   ${stats.errorFiles.length > 0 ? `
-    //     <details>
-    //       <summary>Mostra file con errori</summary>
-    //       <ul>
-    //         ${stats.errorFiles.map(f => `<li>${f.name}: ${f.error}</li>`).join("")}
-    //       </ul>
-    //     </details>
-    //   ` : ""}
-    // `;
-
     // Nascondi la barra dopo 2 secondi se tutto ok
     if (stats.errors === 0) {
       setTimeout(() => {
@@ -260,7 +250,7 @@ export const documentUploader = {
   close() {
     window.removeEventListener("dragover", this.dragoverHandler);
     window.removeEventListener("drop", this.dropHandler);
-    UaWindowAdm.close("id_upload");
+    UaWindowAdm.close("wnd-upload");
   },
 
   /**
@@ -281,7 +271,7 @@ export const documentUploader = {
     // Controlla duplicati ma NON blocca il processo
     if (await DocsMgr.exists(fileName)) {
       if (!silent) {
-        alert(`Il file "${fileName}"già in archivio. Verrà  ignorato.`);
+        await alert(`Il file "${fileName}"già in archivio. Verrà  ignorato.`);
       }
 
       // Aggiunge comunque un elemento visivo
@@ -321,7 +311,7 @@ export const documentUploader = {
       } else {
         const errorMsg = "Formato non supportato";
         if (!silent) {
-          alert(`${fileName}: ${errorMsg}`);
+          await alert(`${fileName}: ${errorMsg}`);
         }
         const errorResult = { status: "error", error: errorMsg, fileName };
         return errorResult;
@@ -361,7 +351,6 @@ export const documentUploader = {
   },
 };
 
-// Le classi PdfHandler, DocxHandler e FileReaderUtil rimangono identiche
 class PdfHandler {
   constructor() {
     this.pdfjsLib = null;
@@ -498,7 +487,7 @@ class DocxHandler {
 }
 
 export const FileReaderUtil = {
-  readTextFile: async (file) => {
+  readTextFile: async function(file) {
     if (!file) {
       throw new Error("Nessun file fornito");
     }
@@ -507,11 +496,20 @@ export const FileReaderUtil = {
     if (ext !== "txt") {
       throw new Error("Formato non supportato. Seleziona un file .txt");
     }
-    return new Promise((resolve, reject) => {
+    const promise = new Promise(function(resolve, reject) {
       const reader = new FileReader();
-      reader.onload = (event) => resolve(event.target.result);
-      reader.onerror = (error) => reject(new Error("Error reading file: " + error.message));
+      reader.onload = function(event) {
+        const content = event.target.result;
+        resolve(content);
+      };
+      reader.onerror = function(error) {
+        const message = "Error reading file: " + error.message;
+        const failure = new Error(message);
+        reject(failure);
+      };
       reader.readAsText(file);
     });
+    const content = await promise;
+    return content;
   }
 };
