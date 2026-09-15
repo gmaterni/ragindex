@@ -10,9 +10,11 @@
  *
  * Uso: `node test/retrieval_probe.mjs <cartella-docs>` (obbligatoria).
  * La cartella deve contenere file .txt; esce con errore se manca o è vuota.
+ * Copre anche il rerank semantico (sezione `rerank` del report): promozione
+ * pilotata dell'ultimo parent BM25 e fallback a BM25 con giudice inaffidabile.
  *
  * @module  retrieval_probe
- * @version 1.0.0
+ * @version 1.1.0
  * @date    2026-09-15
  * @author  OpenCode
  */
@@ -286,12 +288,86 @@ const main = async function () {
             const found = d.expect.length === 0 ? parents.length === 0 : parentContainsAny(kb.chunks, parents, d.expect);
             const strategyLine = strategyLog.length > 0 ? strategyLog[strategyLog.length - 1] : "";
             const strategyMatch = strategyLine.match(/Strategia contesto: (\S+)/);
-            const strategy = strategyMatch ? strategyMatch[1] : "unknown";
-            outcome = { id: d.id, ok: true, strategy: strategy, strategyOk: strategy === d.expectStrategy, parents: parents, expectedFound: found, contextLength: context.length };
+            const fullStrategy = strategyMatch ? strategyMatch[1] : "unknown";
+            const strategyParts = fullStrategy.split("+");
+            const strategyBase = strategyParts[0];
+            const strategyMode = strategyParts.length > 1 ? strategyParts[1] : "";
+            outcome = { id: d.id, ok: true, strategy: fullStrategy, strategyBase: strategyBase, strategyMode: strategyMode, strategyOk: strategyBase === d.expectStrategy, parents: parents, expectedFound: found, contextLength: context.length };
         } catch (err) {
             outcome = { id: d.id, ok: false, error: err.message, strategy: "error", strategyOk: false, parents: [], expectedFound: false, contextLength: 0 };
         }
         distillResults.push(outcome);
+    }
+
+    // Casi di rerank semantico: giudice finto che promuove l'ultimo parent
+    // BM25 (J1: l'ordine deve cambiare) e giudice inaffidabile (J2: fallback
+    // identico al BM25 puro con suffisso +bm25). Il giudice finto distingue
+    // le chiamate dal SYSTEM prompt ("giudice imparziale" = rerank).
+    const rerankCaseResults = [];
+    ragEngine.setRerankEnabled(false);
+    const rerankQuery = "Che cos'e l'Index Thomisticus e su quali testi si basa?";
+    const rerankThread = [{ role: "user", content: rerankQuery }];
+    const baseContext = await ragEngine.getOptimizedContext(rerankQuery, kbData, rerankThread);
+    const baseParents = extractParentIds(baseContext);
+    if (baseParents.length >= 2) {
+        const boosted = baseParents[baseParents.length - 1];
+        const judgeClient = {
+            sendRequest: async function (payload) {
+                const systemText = payload.messages[0].content;
+                if (!systemText.includes("giudice imparziale")) {
+                    const distillResult = { ok: true, data: rerankQuery };
+                    return distillResult;
+                }
+                const userText = payload.messages[1].content;
+                const seenIds = [];
+                const idPattern = /\[([A-Za-z0-9_]+)\]/g;
+                let idMatch = idPattern.exec(userText);
+                while (idMatch !== null) {
+                    seenIds.push(idMatch[1]);
+                    idMatch = idPattern.exec(userText);
+                }
+                const scoreLines = seenIds.map(function (pid) {
+                    const score = pid === boosted ? 5 : (pid === baseParents[0] ? 0 : 2);
+                    const line = `${pid}:${score}`;
+                    return line;
+                });
+                const judgeResult = { ok: true, data: scoreLines.join("\n") };
+                return judgeResult;
+            },
+        };
+        ragEngine.init(judgeClient, "probe-model", promptSize);
+        ragEngine.setRerankEnabled(true);
+        strategyLog.length = 0;
+        const reContext = await ragEngine.getOptimizedContext(rerankQuery, kbData, rerankThread);
+        const reParents = extractParentIds(reContext);
+        const reStrategyLine = strategyLog.length > 0 ? strategyLog[strategyLog.length - 1] : "";
+        const reStrategyMatch = reStrategyLine.match(/Strategia contesto: (\S+)/);
+        const reStrategy = reStrategyMatch ? reStrategyMatch[1] : "unknown";
+        rerankCaseResults.push({ id: "J1", ok: true, firstParent: reParents.length > 0 ? reParents[0] : null, expectedFirst: boosted, orderChanged: reParents.length > 0 && reParents[0] === boosted, strategy: reStrategy, strategyIsRerank: reStrategy.endsWith("+rerank"), contextLength: reContext.length });
+
+        const garbageClient = {
+            sendRequest: async function (payload) {
+                const systemText = payload.messages[0].content;
+                if (systemText.includes("giudice imparziale")) {
+                    const garbageResult = { ok: true, data: "non so, mi spiace tanto" };
+                    return garbageResult;
+                }
+                const distillResult = { ok: true, data: rerankQuery };
+                return distillResult;
+            },
+        };
+        ragEngine.init(garbageClient, "probe-model", promptSize);
+        ragEngine.setRerankEnabled(true);
+        strategyLog.length = 0;
+        const fallbackContext = await ragEngine.getOptimizedContext(rerankQuery, kbData, rerankThread);
+        const fallbackParents = extractParentIds(fallbackContext);
+        const fbStrategyLine = strategyLog.length > 0 ? strategyLog[strategyLog.length - 1] : "";
+        const fbStrategyMatch = fbStrategyLine.match(/Strategia contesto: (\S+)/);
+        const fbStrategy = fbStrategyMatch ? fbStrategyMatch[1] : "unknown";
+        const sameOrder = JSON.stringify(fallbackParents) === JSON.stringify(baseParents);
+        rerankCaseResults.push({ id: "J2", ok: true, sameOrderAsBm25: sameOrder, strategy: fbStrategy, strategyIsBm25: fbStrategy.endsWith("+bm25"), contextLength: fallbackContext.length });
+    } else {
+        rerankCaseResults.push({ id: "J1-J2", ok: true, skipped: true, reason: "meno di 2 parent dal BM25 per la query di prova" });
     }
 
     const parentCount = kb.chunks.length;
@@ -323,6 +399,7 @@ const main = async function () {
         questions: questionResults,
         robustness: robustnessResults,
         distill: distillResults,
+        rerank: rerankCaseResults,
         prompts: promptResults,
     };
     stdoutLog(JSON.stringify(report, null, 2));

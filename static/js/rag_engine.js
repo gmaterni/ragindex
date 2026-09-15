@@ -43,6 +43,18 @@ const CONTEXT_SCORE_THRESHOLD_RATIO = 0.2;
  */
 const CONTEXT_MAX_PARENTS = 8;
 
+/**
+ * Abilitazione default del giudizio semantico sui candidati.
+ * Disattivabile via ragEngine.setRerankEnabled(false) per confronto BM25.
+ */
+const RERANK_ENABLED_DEFAULT = true;
+
+/**
+ * Numero massimo di parent candidati sottoposti al giudice semantico.
+ * Il contesto finale resta limitato da CONTEXT_MAX_PARENTS.
+ */
+const RERANK_CANDIDATE_COUNT = 25;
+
 // ============================================================================
 // STATO PRIVATO DEL MODULO
 // ============================================================================
@@ -52,6 +64,7 @@ const _requestPromises = {};
 let _client = null;
 let _model = null;
 let _promptSize = 0;
+let _rerankEnabled = RERANK_ENABLED_DEFAULT;
 
 // ============================================================================
 // FUNZIONI PRIVATE - Normalizzazione ricerca
@@ -270,6 +283,177 @@ const _assembleContext = function (searchResults, allChunks) {
 
     const finalContext = context;
     return finalContext;
+};
+
+// ============================================================================
+// FUNZIONI PRIVATE - Giudizio semantico dei candidati (rerank)
+// ============================================================================
+
+/**
+ * Raccoglie i parent candidati dai risultati di ricerca, in ordine BM25
+ * e deduplicati per parent, fino al limite indicato.
+ *
+ * @param {Array<Object>} searchResults - Risultati `{ref, score}` ordinati per score.
+ * @param {Array<Object>} allChunks - Tutti i frammenti (Parent Chunks).
+ * @param {number} limit - Numero massimo di candidati da raccogliere.
+ * @returns {Array<Object>} Candidati `{id, text, bm25Score}`.
+ * @private
+ */
+const _collectCandidateParents = function (searchResults, allChunks, limit) {
+    if (!searchResults || !allChunks || !limit) {
+        console.error("_collectCandidateParents: input mancanti");
+        const emptyCandidates = [];
+        return emptyCandidates;
+    }
+    const candidates = [];
+    const seenParentIds = new Set();
+    for (const result of searchResults) {
+        if (candidates.length >= limit) {
+            break;
+        }
+        const parentId = result.ref.split("#")[0];
+        if (seenParentIds.has(parentId)) {
+            continue;
+        }
+        seenParentIds.add(parentId);
+        const chunk = allChunks.find(function (c) {
+            const isMatch = c.id === parentId;
+            return isMatch;
+        });
+        if (chunk) {
+            const candidate = { id: parentId, text: chunk.text, bm25Score: result.score };
+            candidates.push(candidate);
+        }
+    }
+    return candidates;
+};
+
+/**
+ * Chiede al modello un punteggio semantico 0-5 per ciascun candidato e
+ * restituisce gli ID ordinati per punteggio (a parita', ordine BM25).
+ * Restituisce null quando il giudizio non e' disponibile: il chiamante
+ * usa l'ordine BM25 esistente (fallback invariato).
+ *
+ * @param {string} query - Domanda originale dell'utente.
+ * @param {Array<Object>} candidates - Candidati `{id, text, bm25Score}`.
+ * @returns {Promise<Array<string>|null>} ID parent ordinati, o null in fallback.
+ * @private
+ */
+const _rerankCandidateIds = async function (query, candidates) {
+    if (!_rerankEnabled) {
+        const disabled = null;
+        return disabled;
+    }
+    if (!query || !candidates || candidates.length === 0) {
+        console.error("_rerankCandidateIds: query o candidati mancanti");
+        const empty = null;
+        return empty;
+    }
+    if (!_client) {
+        console.warn("_rerankCandidateIds: client LLM assente, uso ordine BM25.");
+        const missing = null;
+        return missing;
+    }
+
+    UaLog.log("Giudizio semantico dei candidati...");
+
+    const promptData = promptBuilder.buildRerankPrompt(query, candidates);
+    if (!promptData || !promptData.messages) {
+        console.warn("_rerankCandidateIds: buildRerankPrompt ha fallito, uso ordine BM25.");
+        const failed = null;
+        return failed;
+    }
+
+    const payload = {
+        model: _model,
+        messages: promptData.messages,
+        temperature: promptData.temperature,
+        max_tokens: promptData.max_tokens,
+    };
+
+    const rr = await _sendRequest(_client, payload, "ERR_RERANK");
+    if (!rr || !rr.ok) {
+        console.warn("_rerankCandidateIds: giudizio fallito, uso ordine BM25.");
+        const failed = null;
+        return failed;
+    }
+
+    const scores = promptBuilder.parseRerankScores(rr.data);
+    const scoredIds = Object.keys(scores);
+    if (scoredIds.length === 0) {
+        console.warn("_rerankCandidateIds: nessun punteggio valido, uso ordine BM25.");
+        const failed = null;
+        return failed;
+    }
+
+    const ranked = candidates.slice();
+    ranked.sort(function (first, second) {
+        const scoreFirst = scores[first.id] !== undefined ? scores[first.id] : -1;
+        const scoreSecond = scores[second.id] !== undefined ? scores[second.id] : -1;
+        const scoreDiff = scoreSecond - scoreFirst;
+        if (scoreDiff !== 0) {
+            return scoreDiff;
+        }
+        const bm25Diff = second.bm25Score - first.bm25Score;
+        return bm25Diff;
+    });
+    const orderedIds = ranked.map(function (candidate) {
+        const candidateId = candidate.id;
+        return candidateId;
+    });
+
+    const summaryParts = [];
+    for (const candidate of ranked) {
+        const candidateId = candidate.id;
+        const rawScore = scores[candidateId];
+        const shownScore = rawScore !== undefined ? rawScore : "-";
+        const summaryPart = `${candidateId}:${shownScore}`;
+        summaryParts.push(summaryPart);
+    }
+    const summary = summaryParts.join(" ");
+    const rerankMsg = `Rerank semantico: ${summary}`;
+    console.info(rerankMsg);
+    UaLog.log(rerankMsg);
+
+    return orderedIds;
+};
+
+/**
+ * Riordina i risultati di ricerca secondo gli ID rerankati: prima i
+ * risultati il cui parent e' in classifica (nell'ordine del giudice),
+ * poi gli eventuali resti nell'ordine originale.
+ *
+ * @param {Array<Object>} searchResults - Risultati `{ref, score}` originali.
+ * @param {Array<string>} rankedParentIds - ID parent ordinati dal giudice.
+ * @returns {Array<Object>} Risultati riordinati.
+ * @private
+ */
+const _applyRerankOrder = function (searchResults, rankedParentIds) {
+    if (!searchResults || !rankedParentIds || rankedParentIds.length === 0) {
+        console.error("_applyRerankOrder: input mancanti");
+        const fallback = searchResults || [];
+        return fallback;
+    }
+    const rankByParentId = {};
+    for (let rank = 0; rank < rankedParentIds.length; rank++) {
+        const parentId = rankedParentIds[rank];
+        rankByParentId[parentId] = rank;
+    }
+    const ordered = searchResults.slice();
+    ordered.sort(function (first, second) {
+        const parentFirst = first.ref.split("#")[0];
+        const parentSecond = second.ref.split("#")[0];
+        const maxRank = Number.MAX_SAFE_INTEGER;
+        const rankFirst = rankByParentId[parentFirst] !== undefined ? rankByParentId[parentFirst] : maxRank;
+        const rankSecond = rankByParentId[parentSecond] !== undefined ? rankByParentId[parentSecond] : maxRank;
+        const rankDiff = rankFirst - rankSecond;
+        if (rankDiff !== 0) {
+            return rankDiff;
+        }
+        const scoreDiff = second.score - first.score;
+        return scoreDiff;
+    });
+    return ordered;
 };
 
 // ============================================================================
@@ -636,10 +820,19 @@ export const ragEngine = {
       if (attemptResults.length === 0) {
         continue;
       }
-      const attemptContext = _assembleContext(attemptResults, kbData.chunks);
+      const candidates = _collectCandidateParents(attemptResults, kbData.chunks, RERANK_CANDIDATE_COUNT);
+      const rankedParentIds = await _rerankCandidateIds(query, candidates);
+      let orderedResults = attemptResults;
+      let rerankLabel = "bm25";
+      if (rankedParentIds) {
+        orderedResults = _applyRerankOrder(attemptResults, rankedParentIds);
+        rerankLabel = "rerank";
+      }
+      const attemptContext = _assembleContext(orderedResults, kbData.chunks);
       if (attemptContext.length > 0) {
         context = attemptContext;
-        winningStrategy = attempt.name;
+        const attemptName = attempt.name;
+        winningStrategy = `${attemptName}+${rerankLabel}`;
         break;
       }
     }
@@ -650,6 +843,26 @@ export const ragEngine = {
 
     const result = context;
     return result;
+  },
+
+  /**
+   * Attiva o disattiva il giudizio semantico sui candidati.
+   * Disattivato, il contesto segue l'ordinamento BM25 esistente.
+   *
+   * @param {boolean} enabled - True per attivare il rerank semantico.
+   */
+  setRerankEnabled: function (enabled) {
+    _rerankEnabled = enabled === true;
+  },
+
+  /**
+   * Indica se il giudizio semantico sui candidati e' attivo.
+   *
+   * @returns {boolean} True se il rerank semantico e' attivo.
+   */
+  isRerankEnabled: function () {
+    const enabled = _rerankEnabled;
+    return enabled;
   },
 
   /**
