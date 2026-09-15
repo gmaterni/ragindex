@@ -1,6 +1,0 @@
-deepseek-ai/DeepSeek-V3.2|131072|9|18.68
-deepseek-ai/DeepSeek-V3.2-Exp|131072|9|19.63
-deepseek-ai/DeepSeek-V4-Flash|4096|9|12.13
-google/gemma-4-26B-A4B-it|262144|10|11.85
-openai/gpt-oss-120b|8192|8|22.39
-zai-org/GLM-5.2|128000|10|22.89

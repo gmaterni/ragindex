@@ -17,7 +17,7 @@ export const help0_html = `
         <strong class="help-section-title">Barra Superiore (Header)</strong>
         <div class="help-grid">
             <strong>Icona Menu</strong> <span>Apre il menu laterale con tutte le sezioni (KB, Chat, Dati, API Key, Logout).</span>
-            <strong>? (Help)</strong> <span>Apre questa finestra con l'elenco completo dei comandi.</span>
+            <strong>HELP</strong> <span>Apre questa finestra con l'elenco completo dei comandi.</span>
             <strong>Upload</strong> <span>Carica file PDF, DOCX o TXT nella Knowledge Base.</span>
             <strong>LLM</strong> <span>Sceglie il provider AI (Gemini, Mistral, OpenRouter, ecc.) e il modello.</span>
             <strong>Log</strong> <span>Mostra la console tecnica con i messaggi di chunking, ricerca ed errori.</span>

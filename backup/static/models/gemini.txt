@@ -1,7 +1,0 @@
-gemini-2.5-flash|1048576|10|8.08
-gemini-2.5-flash-lite|1048576|9|12.04
-gemini-3.1-flash-lite|1048576|9|5.69
-gemini-flash-latest|1048576|10|7.77
-gemini-flash-lite-latest|1048576|9|9.99
-gemma-4-26b-a4b-it|262144|10|34.77
-gemma-4-31b-it|262144|10|46.04

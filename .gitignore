@@ -7,7 +7,6 @@ AGENTS.md
 *.png 
 .agents/
 backup/
-data_src/
 dati/
 arg/
 jslint/

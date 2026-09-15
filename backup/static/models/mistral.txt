@@ -1,6 +1,0 @@
-devstral-latest|262144|9|14.40
-devstral-medium-latest|262144|9|13.98
-ministral-14b-latest|262144|9|8.76
-mistral-large-latest|262144|9|13.17
-mistral-medium-latest|262144|9|3.95
-mistral-small-latest|262144|7|6.71
