@@ -1,4 +1,10 @@
+backup/
+.playwright-mcp/
+opencode.jsonc
+.opencode/
+openspec/
 AGENTS.md
+*.png 
 .agents/
 backup/
 data_src/
@@ -26,4 +32,3 @@ MANIFEST
 .env
 .gitignore
 static/tmp/
-static/css/style.min.css
