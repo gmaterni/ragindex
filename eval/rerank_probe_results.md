@@ -14,6 +14,8 @@
 | Prompt P1–P2 (isolamento `<source>`) | 2/2 ok |
 | J1 promozione semantica | Giudice finto promuove ultimo parent BM25 → primo nel contesto; strategia `distilled+rerank` |
 | J2 giudice inaffidabile | Contesto identico al BM25 puro; strategia `distilled+bm25` |
+| J3 client attivo + toggle | Toggle off identico al BM25; secondo giudice (client diverso) produce ordine diverso da J1 via `+rerank`: il giudizio usa il client attivo per chiamata |
+| Marcatore troncamento | Candidato >1000 char troncato con suffisso ` [...]`, candidato corto intatto (verifica diretta su `buildRerankPrompt`) |
 
 ## Log strategie osservato
 

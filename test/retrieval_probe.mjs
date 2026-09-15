@@ -366,6 +366,47 @@ const main = async function () {
         const fbStrategy = fbStrategyMatch ? fbStrategyMatch[1] : "unknown";
         const sameOrder = JSON.stringify(fallbackParents) === JSON.stringify(baseParents);
         rerankCaseResults.push({ id: "J2", ok: true, sameOrderAsBm25: sameOrder, strategy: fbStrategy, strategyIsBm25: fbStrategy.endsWith("+bm25"), contextLength: fallbackContext.length });
+
+        // J3: un secondo giudice (client diverso, promuove il PRIMO parent BM25)
+        // deve produrre un ordine diverso da J1: prova che il giudizio usa il
+        // client attivo al momento della chiamata e che il toggle off/on ripristina.
+        const judgeBClient = {
+            sendRequest: async function (payload) {
+                const systemText = payload.messages[0].content;
+                if (!systemText.includes("giudice imparziale")) {
+                    const distillResult = { ok: true, data: rerankQuery };
+                    return distillResult;
+                }
+                const userText = payload.messages[1].content;
+                const seenIds = [];
+                const idPattern = /\[([A-Za-z0-9_]+)\]/g;
+                let idMatch = idPattern.exec(userText);
+                while (idMatch !== null) {
+                    seenIds.push(idMatch[1]);
+                    idMatch = idPattern.exec(userText);
+                }
+                const scoreLines = seenIds.map(function (pid, idx) {
+                    const score = idx === 0 ? 5 : 1;
+                    const line = `${pid}:${score}`;
+                    return line;
+                });
+                const judgeResult = { ok: true, data: scoreLines.join("\n") };
+                return judgeResult;
+            },
+        };
+        ragEngine.init(judgeBClient, "probe-model", promptSize);
+        ragEngine.setRerankEnabled(false);
+        const offContext = await ragEngine.getOptimizedContext(rerankQuery, kbData, rerankThread);
+        const offParents = extractParentIds(offContext);
+        const offSameAsBm25 = JSON.stringify(offParents) === JSON.stringify(baseParents);
+        ragEngine.setRerankEnabled(true);
+        strategyLog.length = 0;
+        const reContextB = await ragEngine.getOptimizedContext(rerankQuery, kbData, rerankThread);
+        const reParentsB = extractParentIds(reContextB);
+        const reBStrategyLine = strategyLog.length > 0 ? strategyLog[strategyLog.length - 1] : "";
+        const reBStrategyMatch = reBStrategyLine.match(/Strategia contesto: (\S+)/);
+        const reBStrategy = reBStrategyMatch ? reBStrategyMatch[1] : "unknown";
+        rerankCaseResults.push({ id: "J3", ok: true, toggleOffSameAsBm25: offSameAsBm25, firstParent: reParentsB.length > 0 ? reParentsB[0] : null, expectedFirst: baseParents[0], usesActiveClient: reParentsB.length > 0 && reParentsB[0] === baseParents[0], strategy: reBStrategy, strategyIsRerank: reBStrategy.endsWith("+rerank"), contextLength: reContextB.length });
     } else {
         rerankCaseResults.push({ id: "J1-J2", ok: true, skipped: true, reason: "meno di 2 parent dal BM25 per la query di prova" });
     }

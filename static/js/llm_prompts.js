@@ -26,6 +26,8 @@ const RERANK_TEMPERATURE = 0.1;
 const RERANK_TOKEN_LIMIT = 600;
 /** Caratteri massimi di testo candidato inviati al giudice. */
 const RERANK_MAX_CHARS_PER_CANDIDATE = 1000;
+/** Suffisso che segnala al giudice il troncamento del testo candidato. */
+const RERANK_TRUNCATION_SUFFIX = " [...]";
 
 // ============================================================================
 // VARIABILI PRIVATE
@@ -355,9 +357,11 @@ ${safeQuery}
         for (const candidate of candidates) {
             const candidateId = candidate.id;
             const rawText = String(candidate.text || "");
-            const truncated = rawText.length > RERANK_MAX_CHARS_PER_CANDIDATE ? rawText.slice(0, RERANK_MAX_CHARS_PER_CANDIDATE) : rawText;
-            const singleLine = truncated.replace(/\s+/g, " ").trim();
-            const line = `[${candidateId}] ${singleLine}`;
+            const isTruncated = rawText.length > RERANK_MAX_CHARS_PER_CANDIDATE;
+            const clipped = isTruncated ? rawText.slice(0, RERANK_MAX_CHARS_PER_CANDIDATE) : rawText;
+            const singleLine = clipped.replace(/\s+/g, " ").trim();
+            const markedLine = isTruncated ? singleLine + RERANK_TRUNCATION_SUFFIX : singleLine;
+            const line = `[${candidateId}] ${markedLine}`;
             lines.push(line);
         }
         const candidatesText = lines.join("\n");
