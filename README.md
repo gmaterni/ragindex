@@ -28,6 +28,7 @@ Essendo un'applicazione puramente statica, non richiede build system complessi (
     - **Parent Chunks**: Paragrafi completi inviati all'AI per mantenere il contesto.
 - **Zero Dipendenze da Backend**: L'applicazione è un puro front-end che sfrutta le API degli LLM direttamente dal client.
 - **Ricerca Lessicale BM25**: Sfrutta `Lunr.js` per un'indicizzazione veloce e affidabile direttamente nel browser.
+- **Giudizio Semantico (rerank)**: Dopo la ricerca BM25, il modello valuta la pertinenza reale (0-5) dei candidati e riordina il contesto: sinonimi e parafrasi vengono promossi, i falsi positivi lessicali declassati. Nessun embedding, nessuna modifica all'indice.
 
 ## Il Flusso di Lavoro a 3 Azioni
 

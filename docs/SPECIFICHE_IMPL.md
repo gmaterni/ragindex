@@ -301,13 +301,18 @@ dà `d0p5` = Parent ID.
 De-duplicazione: `Set<usedParentIds>` evita di includere lo stesso Parent
 più volte (anche se più Child dello stesso Parent hanno score alto).
 
+Prima della risoluzione, fino a 25 Parent candidati sono riordinati per
+punteggio semantico 0-5 assegnato dal modello giudice (`_rerankCandidateIds`):
+a parità vale l'ordine BM25; se il giudizio fallisce o è disattivato, resta
+l'ordine BM25 invariato. Nessun embedding, nessuna modifica all'indice.
+
 ### 3.5 Fase 3 — Costruzione contesto
 
 ```
 MAX_CONTEXT_LENGTH = promptSize * 0.7   ← 70% della window size del modello
 
 contesto = ""
-per ogni risultato ordinato per score decrescente:
+per ogni risultato (ordinamento semantico, fallback: score BM25 decrescente):
   parentId = ref.split("#")[0]
   se parentId non in usedParentIds:
     chunk = allChunks.find(c => c.id === parentId)

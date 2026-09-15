@@ -14,7 +14,7 @@ La pipeline trasforma una domanda dell'utente in un contesto pertinente estratto
 Query utente
   │
   ├── Prima domanda (thread ≤ 1):
-  │     Distillazione query → Ricerca BM25 → Risoluzione Parent → Contesto
+  │     Distillazione query → Ricerca BM25 → Giudizio semantico → Risoluzione Parent → Contesto
   │
   └── Domanda successiva (thread > 1):
         Contesto già esistente (PHASE2_CONTEXT) — riutilizzato
@@ -124,14 +124,35 @@ I risultati sono ordinati per score decrescente (BM25 nativo di Lunr).
 
 ---
 
-## Fase 3 — Risoluzione Parent
+## Fase 3 — Giudizio semantico (rerank)
+
+Eseguita da `rag_engine.js` → `_rerankCandidateIds(query, candidates)`, solo per la prima domanda.
+
+Dai risultati BM25 vengono raccolti fino a `RERANK_CANDIDATE_COUNT` (25) Parent
+deduplicati (`_collectCandidateParents`) e sottoposti al modello attivo come
+giudice di pertinenza (`promptBuilder.buildRerankPrompt` in `llm_prompts.js`):
+punteggio intero 0-5 per candidato, una riga `ID:PUNTEGGIO`, temperatura 0.1.
+
+```
+Rerank semantico: d0p5:4 d0p3:0 d1p0:2 ...   ← log UaLog + console
+Strategia contesto: distilled+rerank (1250 caratteri)
+```
+
+Il contesto segue l'ordinamento semantico (a parità, ordine BM25). Se il giudizio
+fallisce, è disattivato (`ragEngine.setRerankEnabled(false)`) o non produce
+punteggi validi, si usa l'ordinamento BM25 invariato (suffisso `+bm25` nel log).
+Nessun embedding, nessuna modifica a indice o IndexedDB.
+
+---
+
+## Fase 4 — Risoluzione Parent
 
 Ogni risultato della ricerca è un **Child ID** (es. `d0p5#3`) con uno score BM25.
 
 ```
-per ogni risultato (ordinato per score decrescente):
+per ogni risultato (ordinato per punteggio semantico, fallback: score BM25):
   parentId = result.ref.split("#")[0]     ← "d0p5#3" → "d0p5"
-  
+
   se parentId non già in usedParentIds:   ← deduplicazione
     chunk = allChunks.find(c => c.id === parentId)
     se chunk trovato:
@@ -142,7 +163,7 @@ per ogni risultato (ordinato per score decrescente):
 
 ---
 
-## Fase 4 — Costruzione Contesto Formattato
+## Fase 5 — Costruzione Contesto Formattato
 
 ```
 MAX_CONTEXT_LENGTH = _promptSize * 0.7    ← 70% della window size del modello
@@ -165,13 +186,13 @@ Il Cenacolo, dipinto da Leonardo tra il 1495 e il 1498, ...
 ```
 
 **Criteri di inclusione:**
-1. Ordinamento per score decrescente
+1. Ordinamento per punteggio semantico (fallback: score BM25 decrescente)
 2. Inclusione finché `len(contesto) + len(snippet) <= MAX_CONTEXT_LENGTH`
 3. Interruzione al primo superamento del limite
 
 ---
 
-## Fase 5 — Generazione Risposta LLM
+## Fase 6 — Generazione Risposta LLM
 
 Eseguita da `rag_engine.js:399` → `ragEngine.generateResponse(context, thread)`, che delega a `llm_prompts.js:175` → `promptBuilder.answerPrompt(context, thread)` per la costruzione dei messaggi.
 
@@ -300,6 +321,11 @@ Errori con `code === 499` (interruzione utente) vengono ignorati globalmente da 
 | `REQUEST_TIMEOUT_SEC` | `rag_engine.js:30` | 90 | Timeout chiamata LLM |
 | `MAX_RETRIES` | `rag_engine.js:25` | 3 | Tentativi retry |
 | `RETRY_DELAY_MS` | `rag_engine.js:26` | 5000 | Delay tra retry in ms |
+| `RERANK_ENABLED_DEFAULT` | `rag_engine.js:50` | true | Giudizio semantico attivo di default |
+| `RERANK_CANDIDATE_COUNT` | `rag_engine.js:56` | 25 | Max Parent sottoposti al giudice |
+| `RERANK_TEMPERATURE` | `llm_prompts.js:24` | 0.1 | Determinismo del giudizio |
+| `RERANK_TOKEN_LIMIT` | `llm_prompts.js:26` | 600 | Token max risposta del giudice |
+| `RERANK_MAX_CHARS_PER_CANDIDATE` | `llm_prompts.js:28` | 1000 | Testo max per candidato (` [...]` se troncato) |
 
 ---
 
@@ -324,10 +350,11 @@ getOptimizedContext(query, kbData, thread)
   │     └── Fallimento → query originale
   │     │
   │     ▼
-  │   buildContext(serializedIndex, chunks, searchTerms)
+  │   Cascata BM25 (distilled → local → single-wildcard)
   │     │
   │     ├── lunr.Index.load(JSON.parse(index))
-  │     ├── index.search(keywords)
+  │     ├── index.query OR tra termini (primo ramo non vuoto vince)
+  │     ├── Giudizio semantico su max 25 Parent (+rerank, fallback +bm25)
   │     ├── Risoluzione Parent (split su #)
   │     ├── De-duplicazione (Set<usedParentIds>)
   │     └── Costruzione formato "--- Context: {id} (Score: {score}) ---\n{text}"

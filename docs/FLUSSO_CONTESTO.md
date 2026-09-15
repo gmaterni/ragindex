@@ -46,9 +46,11 @@ l'interfaccia `search(termini) → risultati ordinati`.
 ### 3. Estrazione del contesto
 
 Dai risultati si risalgono i frammenti ampi (parent) e li si deduplica
-(un parent può apparire più volte). I frammenti vengono concatenati in un
-contesto testuale fino a riempire una **quota fissa** della finestra del
-modello (70% di default). Oltre quella soglia ci si ferma.
+(un parent può apparire più volte). Nell'implementazione, prima della
+deduplicazione fino a 25 candidati sono riordinati per punteggio semantico
+(0-5) assegnato dall'LLM, con fallback all'ordine BM25. I frammenti vengono
+concatenati in un contesto testuale fino a riempire una **quota fissa**
+della finestra del modello (70% di default). Oltre quella soglia ci si ferma.
 
 ### 4. Invio all'LLM
 
@@ -88,7 +90,7 @@ Il flusso è indipendente dalle scelte implementative:
 |---|---|
 | Esplosione (fase 1) | Lessicale, semantica, ibrida, o assente (query diretta) |
 | KB (fase 2) | Indice inverso, vector DB, ricerca full-text |
-| Estrazione (fase 3) | Top-k, reranking, MMR, compressione |
+| Estrazione (fase 3) | Top-k, reranking (implementato come giudizio LLM con fallback BM25), MMR, compressione |
 | LLM (fase 4) | Qualsiasi provider |
 
 L'unico vincolo: l'output di ogni fase deve rispettare l'input atteso

@@ -40,7 +40,7 @@ export const help0_html = `
         <div class="help-grid">
             <strong>Cancella Input</strong> <span>Elimina il testo nella casella di input.</span>
             <strong>Copia Output</strong> <span>Copia la risposta dell'AI negli appunti.</span>
-            <strong>Avvia (Giallo)</strong> <span>Cerca il contesto nei documenti e invia la prima domanda all'AI.</span>
+            <strong>Avvia (Giallo)</strong> <span>Cerca il contesto nei documenti (ricerca BM25 + giudizio semantico di pertinenza) e invia la prima domanda all'AI.</span>
             <strong>Continua (Verde)</strong> <span>Invia una nuova domanda mantenendo chat e contesto.</span>
         </div>
     </div>
@@ -127,7 +127,7 @@ export const help2_html = `
 
     <div>
         <strong class="help-phase-2">Fase 3 &mdash; Avviare la Conversazione</strong>
-        <p>Premi il pulsante giallo <strong>Avvia Conversazione</strong>. Il sistema cerca nella KB i frammenti pi&ugrave; rilevanti per la tua domanda, li inietta nel prompt e interroga l'AI. Questa &egrave; la prima risposta.</p>
+        <p>Premi il pulsante giallo <strong>Avvia Conversazione</strong>. Il sistema cerca nella KB i frammenti pi&ugrave; rilevanti per la tua domanda, li inietta nel prompt e interroga l'AI. Questa &egrave; la prima risposta. La ricerca lessicale BM25 seleziona i candidati e il modello ne giudica la pertinenza semantica (sinonimi promossi, falsi positivi scartati) prima di comporre il contesto.</p>
     </div>
 
     <div>
