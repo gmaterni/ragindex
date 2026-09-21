@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RagIndex - AI, Privacy e Ricerca Intelligente</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-color: #38bdf8;
+            --secondary-bg: #1e293b;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --link-color: #38bdf8;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --accent-color: #0284c7;
+            --secondary-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+            --link-color: #0284c7;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--bg-color) 100%);
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            background: var(--secondary-bg);
+            color: var(--accent-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            font-family: monospace;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .launch-box {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem;
+            border-top: 2px solid var(--accent-color);
+        }
+
+        .btn-launch {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white !important;
+            padding: 1rem 2.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 1rem;
+            font-style: italic;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <header>
+            <div class="logo"><strong>RagIndex</strong> 0.4.6</div>
+            <button class="theme-toggle" id="theme-btn" title="Cambia Tema">
+                <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5" />
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                </svg>
+                <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+            </button>
+        </header>
+
+        <section class="hero">
+            <h1>RagIndex</h1>
+            <p style="font-size: 1.25rem; opacity: 0.9;">L'Intelligenza Artificiale che vive nel tuo browser.</p>
+            <p>Privacy Assoluta. 100% Client-Side. Controllo Totale.</p>
+        </section>
+
+        <div class="section">
+            <h2>Cos'è RagIndex?</h2>
+            <p>
+                RagIndex è una piattaforma sperimentale che porta la potenza della <strong>Generazione Aumentata da Recupero (RAG)</strong> 
+                direttamente nel client. L'ingestione, l'indicizzazione e la ricerca del contesto avvengono localmente nel tuo browser.
+            </p>
+            <div class="card highlight">
+                "I tuoi documenti non lasciano mai il tuo computer. L'elaborazione avviene localmente, garantendo che i tuoi dati sensibili rimangano privati."
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>L'Architettura 100% Client-Side</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Zero Backend</h3>
+                    <p>L'intera pipeline è eseguita localmente sfruttando <strong>Web Workers</strong> e <strong>IndexedDB</strong>. Nessun server intermedio legge i tuoi file.</p>
+                    <span class="tech-tag">Web Workers</span> <span class="tech-tag">IndexedDB</span>
+                </div>
+                <div class="card">
+                    <h3>Ricerca Lessicale BM25</h3>
+                    <p>Utilizziamo <code>Lunr.js</code> con algoritmo <strong>BM25</strong> per una ricerca ultra-veloce e precisa, ideale per documenti tecnici e nomi propri.</p>
+                    <span class="tech-tag">Lunr.js</span> <span class="tech-tag">BM25</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>La Pipeline RAG</h2>
+            <p>RagIndex utilizza una strategia <strong>Parent-Child</strong> per massimizzare la qualità delle risposte:</p>
+            <ul class="feature-list">
+                <li><strong>Azione 1 (Crea KB):</strong> Esegue il chunking gerarchico e crea l'indice di ricerca.</li>
+                <li><strong>Azione 2 (Inizia Chat):</strong> Genera il contesto rilevante dalla KB e avvia il dialogo con l'LLM.</li>
+                <li><strong>Azione 3 (Continua):</strong> Approfondisce l'argomento mantenendo memoria della chat e del contesto.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Gestione Memoria</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Browser Storage</h3>
+                    <p>I dati vengono salvati in <strong>IndexedDB</strong>. Puoi archiviare diverse Knowledge Base e conversazioni e riattivarle istantaneamente.</p>
+                </div>
+                <div class="card">
+                    <h3>Backup Locale</h3>
+                    <p>Esporta i tuoi indici e le tue chat in formato <strong>JSON</strong> per conservarli sul tuo PC o trasferirli su altri dispositivi.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="launch-box">
+            <h2>Pronto a iniziare?</h2>
+            <p>Lancia l'applicazione e scopri il futuro della ricerca privata.</p>
+            <br>
+            <a href="index.html" class="btn-launch">Avvia RagIndex Now</a>
+        </div>
+
+        <footer style="margin-top: 4rem; text-align: center; font-size: 0.8rem; opacity: 0.6;">
+            RagIndex è un progetto Open Source focalizzato sulla privacy e sull'edge computing.
+        </footer>
+    </div>
+
+    <script>
+        const themeBtn = document.getElementById('theme-btn');
+        const body = document.body;
+        const sunIcon = themeBtn.querySelector('.icon-sun');
+        const moonIcon = themeBtn.querySelector('.icon-moon');
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            sunIcon.style.display = newTheme === 'light' ? 'none' : 'block';
+            moonIcon.style.display = newTheme === 'light' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

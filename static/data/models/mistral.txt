@@ -1,0 +1,8 @@
+glm-5-2|1048576|9|3.80
+magistral-medium-latest|262144|9|4.68
+ministral-3b-latest|131072|8|3.17
+ministral-8b-latest|262144|8|10.19
+mistral-large-latest|262144|9|10.20
+mistral-medium-latest|262144|9|4.61
+mistral-small-latest|262144|7|6.71
+ministral-14b-latest|262144|9|8.76

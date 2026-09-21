@@ -1,0 +1,6 @@
+Qwen/Qwen2.5-Coder-7B-Instruct|0|9|3.44
+Qwen/Qwen3-14B|0|9|10.17
+deepseek-ai/DeepSeek-V3|0|8|32.85
+deepseek-ai/DeepSeek-V3-0324|0|8|13.17
+meta-llama/Llama-3.1-8B-Instruct|0|8|17.37
+zai-org/GLM-5.2|0|8|7.51

@@ -1,0 +1,4 @@
+dots-studio/dots-3-note-preview:free|512000|8|15.80
+liquid/lfm-2.5-2.6b:free|65536|8|12.47
+minimax/minimax-m3:free|1048576|9|7.39
+nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free|256000|8|9.59

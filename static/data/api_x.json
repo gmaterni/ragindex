@@ -1,0 +1,50 @@
+{
+  "last_updated": "2026-06-28T00:16:06.340811",
+  "providers": {
+    "gemini": {
+      "api_key_env": "GEMINI_API_KEY",
+      "exported_key": "gab",
+      "keys": [{
+        "name": "gab",
+        "key": "mLEAxPmoXRPFjtpMhpuQQdSrB0h6ocXleTxBbkL",
+        "notes": "gabriele.tenebra"
+      }]
+    },
+    "cerebras": {
+      "api_key_env": "CEREBRAS_API_KEY",
+      "exported_key": "ua260310",
+      "keys": [{
+        "name": "ua260310",
+        "key": "N67-sa5s0VOr7zNMshiqGVSG7MSkaMkM2MrGzOP5MVN0q2iGqsMk",
+        "notes": "giuseppe.materni"
+      }]
+    },
+    "openrouter": {
+      "api_key_env": "OPENROUTER_API_KEY",
+      "exported_key": "260530",
+      "keys": [{
+        "name": "260530",
+        "key": "67-WV-qu-SSa0Sd0dlBSkkItlB0NgBSa2ld0CsakBdAaIIBIAatA0dNlugs222agBgsIuuIsd",
+        "notes": "giuseppe.materni"
+      }]
+    },
+    "mistral": {
+      "api_key_env": "MISTRAL_API_KEY",
+      "exported_key": "260416",
+      "keys": [{
+        "name": "260416",
+        "key": "VRd2FGMaeqvzGXHfsnQneD4bqPQi5qzi",
+        "notes": "ipotesi1000"
+      }]
+    },
+    "groq": {
+      "api_key_env": "GROQ_API_KEY",
+      "exported_key": "gmt2",
+      "keys": [{
+        "name": "gmt2",
+        "key": "o67_deaFoPWuNsV9xSs82bmNHQsPg0vU9HpaKqgqYBbpDwdWvJMKIMR0",
+        "notes": "giuseppe.materni"
+      }]
+    }
+  }
+}
