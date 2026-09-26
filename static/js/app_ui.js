@@ -723,7 +723,7 @@ const _rebuildLunrIndex = async function(indexEntries) {
 // GESTORI AZIONI MENU (Privati)
 // ============================================================================
 
-const _actionShowReadme = function() { window.open("readme.html", "_blank"); };
+const _actionShowReadme = function() { window.open("README.html", "_blank"); };
 
 const _actionViewConversationAsync = async function() {
     const thread = await idbMgr.read(DATA_KEYS.KEY_THREAD);

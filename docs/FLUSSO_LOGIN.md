@@ -7,12 +7,13 @@ Come l'app decide se l'utente è autenticato, in base all'ambiente.
 ## Panoramica
 
 ```
-ragindex.html          ← landing page marketing (nessuna guardia)
+static/ragindex.html     ← landing page marketing (nessuna guardia)
      │ link "Avvia RagIndex Now"
      ▼
-index.html (root)      ← redirect nudo a static/index.html
+index.html (root)        ← redirect a static/ragindex.html
+     │ (la landing linka l'app)
      ▼
-static/index.html      ← GUARDIA LOGIN (inline JS, sincrono)
+static/index.html        ← GUARDIA LOGIN (inline JS, sincrono)
      │
      ├── needsLogin? → login.html (Google OAuth) → index.html → static/index.html → APP
      │

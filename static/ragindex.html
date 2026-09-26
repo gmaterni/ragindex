@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico">
     <title>RagIndex - AI, Privacy e Ricerca Intelligente</title>
+    <meta name="description" content="RagIndex: RAG 100% client-side nel tuo browser. Documenti, indice BM25 e LLM senza server, con privacy assoluta.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="RagIndex - AI, Privacy e Ricerca Intelligente">
+    <meta property="og:description" content="L'Intelligenza Artificiale che vive nel tuo browser: privacy assoluta, 100% client-side, controllo totale.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="RagIndex - AI, Privacy e Ricerca Intelligente">
+    <meta name="twitter:description" content="RAG direttamente nel client: ingestione, indicizzazione e ricerca del contesto nel tuo browser.">
     <style>
         :root {
             --bg-color: #0f172a;
@@ -48,10 +56,23 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         h1, h2, h3 {
             color: var(--accent-color);
+        }
+
+        code {
+            background: var(--secondary-bg);
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        .logo {
+            font-size: 1rem;
         }
 
         .theme-toggle {
@@ -174,21 +195,113 @@
             height: 20px;
             fill: currentColor;
         }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn-launch-small {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white !important;
+            padding: 0.5rem 1.1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-launch-small:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .readme-link, .install-link {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--border-color);
+            background: var(--secondary-bg);
+            color: var(--text-color) !important;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .readme-link:hover, .install-link:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color) !important;
+            text-decoration: none;
+        }
+
+        .secondary-links {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .launch-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+        }
+
+        .launch-links .launch-link {
+            font-size: 0.95rem;
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        .launch-links .launch-link:hover {
+            text-decoration: underline;
+        }
+
+        a { color: var(--link-color); }
+
+        @media (max-width: 600px) {
+            header {
+                justify-content: center;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .secondary-links {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body data-theme="dark">
     <div class="container">
         <header>
-            <div class="logo"><strong>RagIndex</strong> 0.4.6</div>
-            <button class="theme-toggle" id="theme-btn" title="Cambia Tema">
-                <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="5" />
-                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-                <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-            </button>
+            <div class="logo"><strong>RagIndex</strong></div>
+            <div class="header-actions">
+                <div class="secondary-links">
+                    <a href="index.html" class="btn-launch-small">🚀 Apri ragindex →</a>
+                    <a href="README.html" class="readme-link">📖 Guida utente</a>
+                    <a href="installazione.html" class="install-link">💻 Installazione Locale</a>
+                </div>
+                <button class="theme-toggle" id="theme-btn" title="Cambia Tema">
+                    <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                    </svg>
+                    <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <section class="hero">
@@ -200,7 +313,7 @@
         <div class="section">
             <h2>Cos'è RagIndex?</h2>
             <p>
-                RagIndex è una piattaforma sperimentale che porta la potenza della <strong>Generazione Aumentata da Recupero (RAG)</strong> 
+                RagIndex è una piattaforma sperimentale che porta la potenza della <strong>Generazione Aumentata da Recupero (RAG)</strong>
                 direttamente nel client. L'ingestione, l'indicizzazione e la ricerca del contesto avvengono localmente nel tuo browser.
             </p>
             <div class="card highlight">
@@ -251,8 +364,11 @@
         <div class="launch-box">
             <h2>Pronto a iniziare?</h2>
             <p>Lancia l'applicazione e scopri il futuro della ricerca privata.</p>
-            <br>
-            <a href="index.html" class="btn-launch">Avvia RagIndex Now</a>
+            <div class="launch-links">
+                <a href="index.html" class="btn-launch">🚀 Avvia RagIndex Now</a>
+                <a href="README.html" class="launch-link">📖 Guida utente</a>
+                <a href="installazione.html" class="launch-link">💻 Installazione Locale</a>
+            </div>
         </div>
 
         <footer style="margin-top: 4rem; text-align: center; font-size: 0.8rem; opacity: 0.6;">
@@ -266,11 +382,18 @@
         const sunIcon = themeBtn.querySelector('.icon-sun');
         const moonIcon = themeBtn.querySelector('.icon-moon');
 
+        // Tema persistito: stessa chiave usata da README e installazione.
+        const savedTheme = localStorage.getItem('ragindex-theme') || 'dark';
+        body.setAttribute('data-theme', savedTheme);
+        sunIcon.style.display = savedTheme === 'light' ? 'none' : 'block';
+        moonIcon.style.display = savedTheme === 'light' ? 'block' : 'none';
+
         themeBtn.addEventListener('click', () => {
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+
             body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('ragindex-theme', newTheme);
             sunIcon.style.display = newTheme === 'light' ? 'none' : 'block';
             moonIcon.style.display = newTheme === 'light' ? 'block' : 'none';
         });

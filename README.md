@@ -6,14 +6,15 @@
 
 **RagIndex** è un'applicazione web che implementa un'architettura RAG (Retrieval-Augmented Generation) completa, operando interamente nel browser dell'utente. Nessun dato lascia mai il client, garantendo massima privacy e autonomia.
 
-> 🚀 **Scopri di più**: Per una presentazione approfondita delle funzionalità e dell'implementazione tecnica, consulta la nuova pagina [ragindex.html](ragindex.html).
+> 🚀 **Scopri di più**: per una presentazione delle funzionalità e dell'implementazione tecnica, consulta la pagina [static/ragindex.html](static/ragindex.html).
+> ⬇️ **Installazione locale:** vedi [static/installazione.html](static/installazione.html) — `git clone https://github.com/uaorg/ragindex.git`
 
 ## Setup Rapido
 
 Essendo un'applicazione puramente statica, non richiede build system complessi (Webpack, Vite, ecc.) né backend.
 
-1.  **Requisiti**: Un qualsiasi web server statico (es: `python3 -m http.server`, `npx http-server .`, o l'estensione "Live Server" di VS Code).
-2.  **Avvio**: Apri il browser all'indirizzo locale della cartella root.
+1.  **Requisiti**: Un qualsiasi web server statico (es: `python3 -m http.server`, `npx http-server .`, o l'estensione "Live Server" di VS Code), servito dalla root del progetto. Scarica il codice con `git clone https://github.com/uaorg/ragindex.git` o *Download ZIP* dalla pagina GitHub (vedi [installazione](static/installazione.html)).
+2.  **Avvio**: Apri il browser all'indirizzo locale della root — `index.html` redirige automaticamente a `static/ragindex.html` (presentazione, con link all'app in `static/index.html`).
 3.  **Configurazione API**: 
     - Apri il menu laterale.
     - Seleziona **"API Keys Default"** per caricare le chiavi di prova predefinite dal file locale.
