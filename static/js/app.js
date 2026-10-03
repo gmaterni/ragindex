@@ -25,7 +25,7 @@ import "./services/uadialog.js";
 // ============================================================================
 
 /** @type {string} Versione dell'applicazione. */
-export const APP_VERSION = "0.2.1";
+export const APP_VERSION = "0.2.3";
 
 /** @type {string} URL del worker per l'invio eventi. */
 const WORKER_URL = "https://ragindex.workerua.workers.dev";

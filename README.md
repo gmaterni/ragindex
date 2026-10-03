@@ -2,7 +2,7 @@
 
 # RagIndex: Generazione Aumentata da Recupero (RAG) 100% Client-Side
 
-**Versione:** 0.2.1
+**Versione:** 0.2.3
 
 **RagIndex** è un'applicazione web che implementa un'architettura RAG (Retrieval-Augmented Generation) completa, operando interamente nel browser dell'utente. Nessun dato lascia mai il client, garantendo massima privacy e autonomia.
 
